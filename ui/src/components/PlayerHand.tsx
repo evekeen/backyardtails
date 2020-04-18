@@ -11,27 +11,18 @@ interface PlayerHandProps {
 export const PlayerHand = (props: PlayerHandProps) => {
   const [chosenCard, chooseCard] = useState<CardIndex>(undefined);
   const [show, setShow] = useState(false);
+  const first = props.cards[0];
+  const chooser = (card: CardIndex) => {
+    chooseCard(card);
+    setShow(true);
+  }
   return (
     <>
-      <div>
-        <CardsChooser chooseCard={card => chooseCard(card)} first={props.cards[0]} second={props.cards.length > 1 ? props.cards[1] : undefined}/>
+      <div className="">
+        <Card card={first} onClick={() => chooser(first)} selected={chosenCard === first}/>
+        {props.cards.length > 1 && <Card card={props.cards[1]} onClick={() => chooser(props.cards[1])} selected={chosenCard === props.cards[1]}/>}
       </div>
       <ActionDialog card={chosenCard} show={show} onHide={() => setShow(false)}/>
     </>
-  );
-}
-
-interface CardsChooserProps {
-  first: CardIndex;
-  second: CardIndex | undefined;
-  chooseCard: (card: CardIndex) => void;
-}
-
-export const CardsChooser = (props: CardsChooserProps) => {
-  return (
-    <div className="deck">
-      <Card card={props.first} onClick={() => props.chooseCard(props.first)}/>
-      {props.second && <Card card={props.second} onClick={() => props.chooseCard(props.second)}/>}
-    </div>
   );
 }
