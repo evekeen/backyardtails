@@ -14,7 +14,7 @@ export const PlayerHand = (props: PlayerHandProps) => {
   return (
     <>
       <div>
-        <CardsChooser chooseCard={card => chooseCard(card)} first={props.cards[0]} second={props.cards.length > 1 ? props.cards[1] : undefined}/>
+        <CardsChooser chooseCard={card => chooseCard(card)} cards={props.cards}/>
       </div>
       <ActionDialog card={chosenCard} show={show} onHide={() => setShow(false)}/>
     </>
@@ -22,16 +22,23 @@ export const PlayerHand = (props: PlayerHandProps) => {
 }
 
 interface CardsChooserProps {
-  first: CardIndex;
-  second: CardIndex | undefined;
+  cards: CardIndex[];
   chooseCard: (card: CardIndex) => void;
 }
 
 export const CardsChooser = (props: CardsChooserProps) => {
+  const [chosenIndex, chooseIndex] = useState<CardInHandsIndex>(undefined);
+  const chooseCard = (index: CardInHandsIndex) => {
+    const card = props.cards[index];
+    chooseIndex(index);
+    props.chooseCard(card);
+  }
   return (
-    <div className="deck">
-      <Card card={props.first} onClick={() => props.chooseCard(props.first)}/>
-      {props.second && <Card card={props.second} onClick={() => props.chooseCard(props.second)}/>}
+    <div className="">
+      <Card card={props.cards[0]} onClick={() => chooseCard(0)} selected={chosenIndex === 0}/>
+      {props.cards.length > 1 && <Card card={props.cards[1]} onClick={() => chooseCard(1)} selected={chosenIndex === 1}/>}
     </div>
   );
 }
+
+type CardInHandsIndex = 0 | 1;
