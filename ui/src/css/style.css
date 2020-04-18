@@ -82,18 +82,6 @@ h3:hover {
   margin-right: 30px;
   margin-left: 30px;
 }
-.ll-card {
-  width: 148px;
-  height: 209px;
-}
-
-.ll-card_1 {
-  background-image: url('../img/guard.png');
-}
-
-.ll-card_2 {
-  background-image: url('../img/priest.png');
-}
 
 .rules {
     margin-left: 30px;

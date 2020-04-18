@@ -29,6 +29,7 @@
     "@types/webpack-env": "^1.15.1",
     "css-loader": "^3.5.2",
     "file-loader": "^6.0.0",
+    "html-loader": "^1.1.0",
     "redux-devtools": "3.5.0",
     "redux-devtools-extension": "2.13.8",
     "source-map-loader": "0.2.4",

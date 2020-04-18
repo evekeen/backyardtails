@@ -15,7 +15,18 @@ module.exports = {
   },
 
   entry: {
-    board: ['./src/index.tsx', './src/css/style.css']
+    board: [
+      './src/index.tsx',
+      './src/css/style.css',
+      './src/img/guard.png',
+      './src/img/priest.png',
+      './src/img/baron.png',
+      './src/img/handmaid.png',
+      './src/img/prince.png',
+      './src/img/king.png',
+      './src/img/countess.png',
+      './src/img/princess.png',
+    ]
   },
 
   module: {
@@ -43,10 +54,18 @@ module.exports = {
         ]
       },
       {
-        test: /\.(svg|png|gif|cur|woff|woff2|eot|ttf|otf)$/,
+        test: /\.(cur|woff|woff2|eot|ttf|otf)$/,
         loader: 'url-loader',
         options: {
           name: '[path][name].[ext]?[hash]'
+        },
+        exclude: /node_modules/
+      },
+      {
+        test: /\.(svg|png|gif)$/,
+        loader: 'file-loader',
+        options: {
+          name: 'img/[name].[ext]'
         },
         exclude: /node_modules/
       },
