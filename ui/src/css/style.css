@@ -24,7 +24,7 @@ h3:hover {
   color: #bc5952;
 }
 
-.card__box {
+.ll-card__box {
   width: 167px;
   height: 230px;
   background: #fff8f8;
@@ -32,7 +32,7 @@ h3:hover {
   border-radius: 10px;
 }
 
-.card__cover img {
+.ll-card__cover img {
   margin: 0 auto;
   border: 2px solid #c7c299;
   box-sizing: border-box;
@@ -82,11 +82,15 @@ h3:hover {
   margin-right: 30px;
   margin-left: 30px;
 }
-
-.card_1 {
-  background-image: url('../img/guard.PNG');
+.ll-card {
+  width: 148px;
+  height: 209px;
 }
 
-.card_2 {
-  background-image: url('../img/priest.PNG');
+.ll-card_1 {
+  background-image: url('../img/guard.png');
+}
+
+.ll-card_2 {
+  background-image: url('../img/priest.png');
 }

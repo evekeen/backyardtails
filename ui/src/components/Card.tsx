@@ -8,9 +8,9 @@ interface CardProps {
 
 export const Card = (props: CardProps) => {
   return (
-    <div className="card" onClick={props.onClick}>
-      <div className="card__box">
-        <div className={`card_${props.card}`}/>
+    <div className="ll-card" onClick={props.onClick}>
+      <div className="ll-card__box">
+        <div className={`ll-card ll-card_${props.card}`}/>
       </div>
     </div>
   );
