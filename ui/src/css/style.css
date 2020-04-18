@@ -94,3 +94,45 @@ h3:hover {
 .ll-card_2 {
   background-image: url('../img/priest.png');
 }
+
+.rules {
+    margin-left: 30px;
+    display: block;
+    background-color: #FFF8F8;
+    width: 400px;
+    height: 500px;
+    box-shadow: 17px 17px 43px rgba(196, 191, 191, 0.9), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(196, 191, 191, 0.2), -17px 17px 34px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.rules h4 {
+    text-align: center;
+    text-transform: uppercase;
+}
+.rules p {
+    padding: 20px 30px 20px 30px;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 150%;
+}
+.main-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 380px;
+    justify-content: center;
+}
+.main-player__cards {
+    display: flex;
+    justify-content: center;
+    margin-top: 0;
+}
+
+.main-player__cards .card {
+    margin-right: 30px;
+}
+
+.main-wrapper h3{
+    display: block;
+    text-align: center;
+    margin-top: -167px;
+}
