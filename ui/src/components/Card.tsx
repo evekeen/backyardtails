@@ -21,7 +21,7 @@ export const Card = (props: CardProps) => {
 };
 
 const cardNameMapping = {
-  1: 'gard',
+  1: 'guard',
   2: 'priest',
   3: 'baron',
   4: 'handmaid',
