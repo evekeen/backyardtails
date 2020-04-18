@@ -20,6 +20,20 @@
         </div>
       </div>
     </div>
+    <ul class="score">
+      <li>
+        <img src="img/mish.svg" alt="" width="50" height="auto">
+      </li>
+      <li>
+        <img src="img/mish.svg" alt="" width="50" height="auto">
+      </li>
+      <li>
+        <img src="img/mish.svg" alt="" width="50" height="auto">
+      </li>
+      <li>
+        <img src="img/mish.svg" alt="" width="50" height="auto">
+      </li>
+    </ul>
   </div>
   <div class="status-log">
     <p>Player 1 <br> turn.</p>
@@ -27,7 +41,7 @@
 </div>
 <!-- /.top-row_wrapper -->
 <div class="middle-row_wrapper">
-  <div class="player">
+  <div class="player_4">
     <div class="player__name">
       <h3>Player 4</h3>
       <div class="ll-card">
@@ -35,56 +49,6 @@
           <div class="ll-card__cover">
             <img src="img/cover.jpg" alt="">
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="deck">
-    <div class="played_cards">
-      <div class="ll-card__box"></div>
-      <div class="ll-card__cover"></div>
-    </div>
-    <div class="unplayed_cards">
-      <div class="ll-card__box">
-        <div class="ll-card__cover">
-          <img src="img/cover.jpg" alt="">
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="player">
-    <div class="player__name">
-      <h3>Player 2</h3>
-      <div class="ll-card">
-        <div class="ll-card__box">
-          <div class="ll-card__cover">
-            <img src="img/cover.jpg" alt="">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- /.middle-row_wrapper -->
-<div class="rules">
-  <h4>Rules</h4>
-  <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi ipsa distinctio adipisci odio voluptate debitis delectus, repellendus quas
-    maxime autem. Explicabo natus, nisi eum nostrum facilis alias nihil dolore sed.</p>
-</div>
-<div class="main-wrapper">
-  <h3>Player 1</h3>
-  <div class="main-player__cards">
-    <div class="ll-card">
-      <div class="ll-card__box">
-        <div class="ll-card__cover">
-          <img src="img/priest.PNG" alt="">
-        </div>
-      </div>
-    </div>
-    <div class="ll-card">
-      <div class="ll-card__box">
-        <div class="ll-card__cover">
-          <img src="img/guard.PNG" alt="">
         </div>
       </div>
     </div>
@@ -102,8 +66,107 @@
         <img src="img/mish.svg" alt="" width="50" height="auto">
       </li>
     </ul>
-  </div>  
+  </div>
+  <div class="deck">
+    <div class="played_cards">
+      <div class="ll-card__box"></div>
+      <div class="ll-card__cover"></div>
+    </div>
+    <div class="unplayed_cards">
+      <div class="ll-card__box">
+        <div class="ll-card__cover">
+          <img src="img/cover.jpg" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="player_2">
+    <div class="player__name">
+      <h3>Player 2</h3>
+      <div class="ll-card">
+        <div class="ll-card__box">
+          <div class="ll-card__cover">
+            <img src="img/cover.jpg" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul class="score">
+      <li>
+        <img src="img/mish.svg" alt="" width="50" height="auto">
+      </li>
+      <li>
+        <img src="img/mish.svg" alt="" width="50" height="auto">
+      </li>
+      <li>
+        <img src="img/mish.svg" alt="" width="50" height="auto">
+      </li>
+      <li>
+        <img src="img/mish.svg" alt="" width="50" height="auto">
+      </li>
+    </ul>
+  </div>
 </div>
-<!-- /.main-wrapper -->
+<!-- /.middle-row_wrapper -->
+<div class="bottom-row_wrapper">
+  <div class="rules">
+    <h4>Rules</h4>
+    <ol>
+      <li><span>Guard 5 cards</span> Player designates another player and names a type of card. If that player's hand matches the type of card specified, that player is eliminated from the round. However, Guard cannot be named as the type of card.</li>
+      <li><span>Priest 2 cards</span> Player is allowed to see another player's hand.</li>
+      <li><span>Baron 2 cards</span> Player will choose another player and privately compare hands. The player with the lower-strength hand is eliminated from the round.</li>
+      <li><span>Handmaid 2 cards</span> Player cannot be affected by any other player's card until the next turn.</li>
+      <li><span>Prince 2 cards</span> Player can choose any player (including themselves) to discard their hand and draw a new one. If the discarded card is the Princess, the discarding player is eliminated.</li>
+      <li><span>King 1 card</span> Player trades hands with any other player.</li>
+      <li><span>Countess 1 card</span> If a player holds both this card and either the King or Prince card, this card must be played immediately.</li>
+      <li><span>Princess 1 card</span> If a player plays this card for any reason, they are eliminated from the round.</li>
+    </ol>
+  </div>
+  <div class="main-wrapper">
+    <h3>Player 1</h3>
+    <div class="main-player__cards">
+      <div class="ll-card">
+        <div class="ll-card__box">
+          <div class="ll-card__cover">
+            <img src="img/priest.PNG" alt="">
+            <div class="description-box">
+              <h4>Priest</h4>
+              <p>Player is allowed to see another player's hand.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ll-card">
+        <div class="ll-card__box">
+          <div class="ll-card__cover">
+            <img src="img/guard.PNG" alt="">
+            <div class="description-box">
+              <h4>Guard</h4>
+              <p>Player designates another player and names a type of card. If the guess is right, that player is eliminated from the round.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ul class="score">
+        <li>
+          <img src="img/mish.svg" alt="" width="50" height="auto">
+        </li>
+        <li>
+          <img src="img/mish.svg" alt="" width="50" height="auto">
+        </li>
+        <li>
+          <img src="img/mish.svg" alt="" width="50" height="auto">
+        </li>
+        <li>
+          <img src="img/mish.svg" alt="" width="50" height="auto">
+        </li>
+      </ul>
+    </div>  
+  </div>
+  <!-- /.main-wrapper -->
+</div>
+<!-- /.bottom-row_wrapper -->
+
+
 </body>
 </html>
