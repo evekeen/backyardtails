@@ -1,10 +1,10 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {Player} from '../model/Player';
+import {User} from '../model/User';
 
-const testState = [new Player(1, 'Player 1'), new Player(2, 'Player 2'), new Player(3, 'Player 3'), new Player(4, 'Player 4')];
+const testState = [new User(1, 'Player 1'), new User(2, 'Player 2'), new User(3, 'Player 3'), new User(4, 'Player 4')];
 
-const playersSlice = createSlice({
-  name: 'players',
+const usersSlice = createSlice({
+  name: 'users',
   initialState: [],
   reducers: {
     addPlayer(state, action) {
@@ -16,4 +16,4 @@ const playersSlice = createSlice({
   }
 });
 
-export default playersSlice.reducer;
+export default usersSlice.reducer;
