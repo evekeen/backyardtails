@@ -1,11 +1,12 @@
 import {connect} from 'react-redux';
-import {BoardState, setTable} from '../reducers/board';
+import {setTable} from '../reducers/board';
 import {Board} from '../components/Board';
+import {AppState} from '../components/App';
 
 const mapDispatchToProps = { setTable }
 
-const mapStateToProps = (state: BoardState) => {
-  return state;
+const mapStateToProps = (state: AppState) => {
+  return state.board;
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Board);

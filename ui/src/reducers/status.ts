@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import * as _ from 'lodash';
 
-interface StatusState {
+export interface StatusState {
   message: string;
 }
 
@@ -11,7 +11,7 @@ const statusSlice = createSlice({
     message: undefined
   } as StatusState,
   reducers: {
-    setTable(state: StatusState, action: PayloadAction<StatusState>) {
+    setStatus(state: StatusState, action: PayloadAction<StatusState>) {
       _.extend(state, action.payload);
     }
   }

@@ -3,26 +3,36 @@ import React = require('react');
 
 interface CardProps {
   card: CardIndex;
-  onClick: () => void;
-  selected: boolean;
+  onClick?: () => void;
+  selected?: boolean;
 }
 
 export const Card = (props: CardProps) => {
-  const name = `${cardNameMapping[props.card]}`;
-  const src = `dist/img/${name}.png`;
   const selected = props.selected ? 'll-card-selected' : '';
   return (
-    <div onClick={props.onClick}>
+    <div onClick={() => props.onClick && props.onClick()}>
       <div className={`ll-card__box ${selected}`}>
         <div className={`ll-card__cover`}>
-          <img src={src} alt={name}/>
+          <CardImg card={props.card}/>
         </div>
       </div>
     </div>
   );
 };
 
-const cardNameMapping = {
+export const CardImg = (props: {card: CardIndex}) => {
+  const name = cardNameMapping[props.card];
+  return (
+    <img src={getCardImg(props.card)} alt={name}/>
+  );
+}
+
+function getCardImg(card: CardIndex): string {
+  const name = cardNameMapping[card];
+  return `dist/img/${name}.png`;
+}
+
+export const cardNameMapping = {
   1: 'guard',
   2: 'priest',
   3: 'baron',

@@ -3,26 +3,33 @@ import {useState} from 'react';
 import {Card} from './Card';
 import {CardIndex} from '../reducers/board';
 import {ActionDialog} from './ActionDialog';
+import {CardAction} from '../model/CardAction';
+import {User} from '../model/User';
 
 interface PlayerHandProps {
+  active: boolean;
   cards: CardIndex[];
+  selectedCard: CardIndex | undefined;
+  selectedUser: User | undefined;
+  selectCard: (card: CardIndex) => void;
+  submitAction: (action: CardAction) => void;
 }
 
 export const PlayerHand = (props: PlayerHandProps) => {
-  const [chosenCard, chooseCard] = useState<CardIndex>(undefined);
+  const selectedCard = props.selectedCard
   const [show, setShow] = useState(false);
-  const first = props.cards[0];
-  const chooser = (card: CardIndex) => {
-    chooseCard(card);
-    setShow(true);
+  const submit = () => props.submitAction({card: selectedCard, userId: props.selectedUser.id});
+  if (!props.active) {
+    return (
+      <Card card={props.cards[0]}/>
+    );
   }
   return (
     <>
-      <div className="">
-        <Card card={first} onClick={() => chooser(first)} selected={chosenCard === first}/>
-        {props.cards.length > 1 && <Card card={props.cards[1]} onClick={() => chooser(props.cards[1])} selected={chosenCard === props.cards[1]}/>}
-      </div>
-      <ActionDialog card={chosenCard} show={show} onHide={() => setShow(false)}/>
+      <Card card={props.cards[0]} onClick={() => props.selectCard(props.cards[0])} selected={selectedCard === props.cards[0]}/>
+      {props.cards.length > 1 &&
+      <Card card={props.cards[1]} onClick={() => props.selectCard(props.cards[1])} selected={selectedCard === props.cards[1]}/>}
+      <ActionDialog card={selectedCard} user={props.selectedUser} show={show} onHide={() => setShow(false)} onSubmit={submit}/>
     </>
   );
 }
