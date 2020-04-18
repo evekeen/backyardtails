@@ -1,7 +1,11 @@
-import * as React from "react";
+import * as React from 'react';
+import ManagedBoard from '../containers/ManagedBoard';
 
 export const App = () => {
   return (
-    <div>Love Letter</div>
+    <div>
+      <div>Love Letter</div>
+      <ManagedBoard/>
+    </div>
   );
 }

@@ -4,8 +4,8 @@
   "description": "Love letter board game",
   "private": true,
   "scripts": {
-    "dev": "webpack --config webpack.config.js",
-    "build": "webpack --config webpack.config.build.js",
+    "build": "webpack --config webpack.config.js",
+    "watch": "webpack --watch",
     "start:dev": "webpack-dev-server"
   },
   "repository": {

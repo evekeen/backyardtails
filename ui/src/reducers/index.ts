@@ -1,6 +1,8 @@
-import {combineReducers} from "redux";
-import players from "./players";
+import {combineReducers} from 'redux';
+import board from './board';
+import status from './status';
 
 export default combineReducers({
-  players,
-})
+  board,
+  status
+});
