@@ -3,11 +3,11 @@ import {Hand} from '../model/Hand';
 import * as _ from 'lodash';
 
 export type HandIndex = 1 | 2 | 3 | 4;
-export type Card = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+export type CardIndex = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 export interface BoardState {
   deckLeft: number,
-  discardPileTop: Card | undefined,
+  discardPileTop: CardIndex | undefined,
   hands: Hand[],
   active: HandIndex
 }

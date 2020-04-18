@@ -1,10 +1,10 @@
 import {Hand} from '../model/Hand';
-import {Card, HandIndex} from '../reducers/board';
+import {CardIndex, HandIndex} from '../reducers/board';
 import * as React from 'react';
 
 interface BoardProps {
   deckLeft: number,
-  discardPileTop: Card | undefined,
+  discardPileTop: CardIndex | undefined,
   hands: Hand[],
   active: HandIndex
 }

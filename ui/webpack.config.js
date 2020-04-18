@@ -14,6 +14,10 @@ module.exports = {
     hot: true,
   },
 
+  entry: {
+    board: ['./src/index.tsx', './src/css/style.css']
+  },
+
   module: {
     rules: [
       {
@@ -30,7 +34,22 @@ module.exports = {
         enforce: "pre",
         test: /\.js$/,
         loader: "source-map-loader"
-      }
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader'
+        ]
+      },
+      {
+        test: /\.(svg|png|gif|cur|woff|woff2|eot|ttf|otf)$/,
+        loader: 'url-loader',
+        options: {
+          name: '[path][name].[ext]?[hash]'
+        },
+        exclude: /node_modules/
+      },
     ]
   },
 
