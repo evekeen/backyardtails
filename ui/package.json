@@ -2,8 +2,12 @@
   "name": "loveletter",
   "version": "1.0.0",
   "description": "Love letter board game",
-  "main": "dist/main.js",
-  "scripts": {},
+  "private": true,
+  "scripts": {
+    "dev": "webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.build.js",
+    "start:dev": "webpack-dev-server"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/junglefunkyman/loveletter.git"
@@ -16,14 +20,20 @@
   },
   "homepage": "https://github.com/junglefunkyman/loveletter#readme",
   "devDependencies": {
+    "@reduxjs/toolkit": "1.3.4",
+    "@types/node": "^13.13.0",
     "@types/react": "16.9.34",
     "@types/react-dom": "16.9.6",
-    "redux-devtools": "^3.5.0",
+    "@types/react-redux": "7.1.7",
+    "@types/webpack-env": "^1.15.1",
+    "redux-devtools": "3.5.0",
+    "redux-devtools-extension": "2.13.8",
     "source-map-loader": "0.2.4",
     "ts-loader": "7.0.0",
     "typescript": "3.8.3",
     "webpack": "4.42.1",
-    "webpack-cli": "3.3.11"
+    "webpack-cli": "3.3.11",
+    "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
     "react": "16.13.1",
