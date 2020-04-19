@@ -1,10 +1,9 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
 import {startTurn, loadCard, TurnData} from '../reducers/yourTurn';
-import {updateCurrentUser, setTable, BoardState} from '../reducers/board';
+import {updateCurrentUser, setTable, BoardState, CardIndex} from '../reducers/board';
 import {Button} from 'react-bootstrap';
 import {HandIndex} from '../reducers/board';
-import {Player} from '../model/Player';
 import _ = require('lodash');
 
 interface DebugPanelProps {
@@ -27,7 +26,7 @@ const DebugPanel = (props: DebugPanelProps) => {
   }));
   props.setTable({
     deckLeft: 5,
-    discardPileTop: 1,
+    discardPileTop: Math.round(Math.random() * 8) as CardIndex,
     players: players,
     activeIndex: 4,
     currentUserInTurn: false,

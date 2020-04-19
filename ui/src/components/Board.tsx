@@ -14,22 +14,23 @@ interface BoardProps {
 }
 
 export const Board = (props: BoardProps) => {
+  const selectable = props.activeIndex === 1;
   return (
     <div>
       <div className="top-row_wrapper">
-        {player(props.players[2], props.selectPlayer, props.selectedPlayerIndex)}
+        {player(props.players[2], props.selectPlayer, props.selectedPlayerIndex, selectable)}
       </div>
       <div className="middle-row_wrapper">
-        {player(props.players[1], props.selectPlayer, props.selectedPlayerIndex)}
-        <Decks/>
-        {player(props.players[3], props.selectPlayer, props.selectedPlayerIndex)}
+        {player(props.players[1], props.selectPlayer, props.selectedPlayerIndex, selectable)}
+        <Decks deckLeft={props.deckLeft} discardPileTop={props.discardPileTop}/>
+        {player(props.players[3], props.selectPlayer, props.selectedPlayerIndex, selectable)}
       </div>
     </div>
   );
 }
 
-function player(player: Player, selectPlayer: (player: Player) => void, selectedPlayerIndex: HandIndex | undefined) {
+function player(player: Player, selectPlayer: (player: Player) => void, selectedPlayerIndex: HandIndex | undefined, selectable: boolean) {
   return (
-    <OtherPlayer player={player} onClick={selectPlayer} selected={selectedPlayerIndex === player.index}/>
+    <OtherPlayer player={player} onClick={selectPlayer} selected={selectedPlayerIndex === player.index} selectable={selectable}/>
   )
 }
