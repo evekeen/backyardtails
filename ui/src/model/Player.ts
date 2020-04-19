@@ -1,3 +1,8 @@
-export class Player {
-  constructor(readonly index: number, readonly alive: boolean, readonly shield: boolean) {}
+
+export interface Player {
+  index: number;
+  alive: boolean;
+  shield: boolean;
+  name: string;
+  score: number;
 }

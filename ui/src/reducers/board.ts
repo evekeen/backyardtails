@@ -20,7 +20,8 @@ const boardSlice = createSlice({
     deckLeft: 0,
     discardPileTop: undefined,
     players: [],
-    activeIndex: 1
+    activeIndex: 1,
+    currentUserInTurn: false
   } as BoardState,
   reducers: {
     setTable(state: BoardState, action: PayloadAction<BoardState>) {
@@ -32,7 +33,7 @@ const boardSlice = createSlice({
     }
   },
   extraReducers: builder => {
-    builder.addCase(startTurn, (state: BoardState, action: PayloadAction<any>) => {
+    builder.addCase(startTurn, (state: BoardState) => {
       state.activeIndex = 1;
       state.currentUserInTurn = true;
     });

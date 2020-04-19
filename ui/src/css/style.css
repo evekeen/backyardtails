@@ -8,41 +8,29 @@ body {
   justify-content: center;
 }
 
-.player_3 {
-  margin-left: 446px;
-  margin-right: 240px;
+.player {
   display: flex;
+  flex-direction: row;
+  align-items: end;
 }
 
-.player_3 ul {
-  margin-top: 69px;
+.player:hover {
+  cursor: grab;
 }
 
-.player_4 {
-  display: flex;
+.player:hover .player__name h3 {
+  font-weight: 500;
+  color: #bc5952;
 }
 
-.player_4 ul {
-  margin-top: 69px;
+.player:hover .ll-card__box {
+  border: 2px solid #EEC6A4;
 }
 
-.player_2 {
-  display: flex;
-}
-
-.player_2 ul {
-  margin-top: 69px;
-}
-
-h3 {
+.player__name h3 {
   font-weight: 300;
   text-transform: uppercase;
   text-align: center;
-}
-
-h3:hover {
-  font-weight: 500;
-  color: #bc5952;
 }
 
 .ll-card__box {
@@ -51,10 +39,7 @@ h3:hover {
   background: #fff8f8;
   box-shadow: 17px 17px 43px rgba(196, 191, 191, 0.9), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(196, 191, 191, 0.2), -17px 17px 34px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
   border-radius: 10px;
-}
-
-.ll-card__box:hover {
-  border: 2px solid #EEC6A4;
+  border: 2px solid transparent;
 }
 
 .ll-card__cover {

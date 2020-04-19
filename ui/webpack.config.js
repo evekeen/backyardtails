@@ -26,6 +26,8 @@ module.exports = {
       './src/img/king.png',
       './src/img/countess.png',
       './src/img/princess.png',
+      './src/img/mish.svg',
+      './src/img/cover.jpg',
     ]
   },
 
@@ -62,7 +64,7 @@ module.exports = {
         exclude: /node_modules/
       },
       {
-        test: /\.(svg|png|gif)$/,
+        test: /\.(svg|png|gif|jpg)$/,
         loader: 'file-loader',
         options: {
           name: 'img/[name].[ext]'
