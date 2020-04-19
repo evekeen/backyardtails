@@ -9,19 +9,27 @@ interface BoardProps {
   discardPileTop: CardIndex | undefined;
   players: Player[];
   activeIndex: HandIndex;
+  selectPlayer: (player: Player) => void;
+  selectedPlayerIndex: HandIndex | undefined;
 }
 
 export const Board = (props: BoardProps) => {
   return (
     <div>
       <div className="top-row_wrapper">
-        <OtherPlayer player={props.players[2]}/>
+        {player(props.players[2], props.selectPlayer, props.selectedPlayerIndex)}
       </div>
       <div className="middle-row_wrapper">
-        <OtherPlayer player={props.players[1]}/>
+        {player(props.players[1], props.selectPlayer, props.selectedPlayerIndex)}
         <Decks/>
-        <OtherPlayer player={props.players[3]}/>
+        {player(props.players[3], props.selectPlayer, props.selectedPlayerIndex)}
       </div>
     </div>
   );
+}
+
+function player(player: Player, selectPlayer: (player: Player) => void, selectedPlayerIndex: HandIndex | undefined) {
+  return (
+    <OtherPlayer player={player} onClick={selectPlayer} selected={selectedPlayerIndex === player.index}/>
+  )
 }

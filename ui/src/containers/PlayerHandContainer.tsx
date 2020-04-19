@@ -10,7 +10,7 @@ const mapStateToProps = (state: AppState) => {
   return {
     active: state.board.currentUserInTurn,
     cards: [state.yourTurn.oldCard, state.yourTurn.newCard],
-    selectedUser: state.yourTurn.selectedUser,
+    selectedPlayer: state.yourTurn.selectedPlayer,
     selectedCard: state.yourTurn.selectedCard
   };
 }

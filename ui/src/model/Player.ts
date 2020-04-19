@@ -1,6 +1,7 @@
+import {HandIndex} from '../reducers/board';
 
 export interface Player {
-  index: number;
+  index: HandIndex;
   alive: boolean;
   shield: boolean;
   name: string;

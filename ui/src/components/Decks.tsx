@@ -1,11 +1,16 @@
 import * as React from 'react';
+import {Card} from './Card';
 
-export const Decks = () => {
+export interface DecksProps {
+
+}
+
+export const Decks = (props: DecksProps) => {
   return (
-    <div className="deck">
+    <div className="decks">
       <div className="played_cards">
-        <div className="ll-card__box"></div>
-        <div className="ll-card__cover"></div>
+        <Card card={1}/>
+        <div className="ll-card__cover"/>
       </div>
       <div className="unplayed_cards">
         <div className="ll-card__box">

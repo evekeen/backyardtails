@@ -5,6 +5,7 @@ import {updateCurrentUser, setTable, BoardState} from '../reducers/board';
 import {Button} from 'react-bootstrap';
 import {HandIndex} from '../reducers/board';
 import {Player} from '../model/Player';
+import _ = require('lodash');
 
 interface DebugPanelProps {
   loadCard: (turn: TurnData) => void;
@@ -13,23 +14,24 @@ interface DebugPanelProps {
   setTable: (board: BoardState) => void;
 }
 
-function player(name: string, score: number): Player {
-  return {
-    index: 1,
-    name: name,
-    score: score,
-    alive: true,
-    shield: false,
-  };
-}
+const names = ['Vasya', 'Petya', 'Masha', 'Phillip']
 
 const DebugPanel = (props: DebugPanelProps) => {
+  const indexes: HandIndex[] = Array.apply(null, Array(4)).map((x: any, index: number) => index);
+  const players = _.shuffle(indexes).map(index => ({
+    index,
+    name: names[index],
+    score: Math.round(Math.random() * 5),
+    alive: true,
+    shield: Math.random() > 0.7,
+  }));
   props.setTable({
     deckLeft: 5,
     discardPileTop: 1,
-    players: [player('Vasya', 1), player('Petya', 0), player('Masha', 3), player('Phillip', 2)],
+    players: players,
     activeIndex: 4,
-    currentUserInTurn: false
+    currentUserInTurn: false,
+    selectedPlayerIndex: undefined
   });
   props.loadCard({card: 3});
   return (

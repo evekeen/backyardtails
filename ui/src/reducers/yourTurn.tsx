@@ -1,6 +1,7 @@
-import {CardIndex} from './board';
+import {CardIndex, HandIndex} from './board';
 import {User} from '../model/User';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {Player} from '../model/Player';
 
 export interface YourTurnState {
   currentUserInTurn: boolean;
@@ -8,7 +9,7 @@ export interface YourTurnState {
   newCard: CardIndex | undefined;
 
   selectedCard: CardIndex | undefined;
-  selectedUser: User | undefined;
+  selectedPlayer: Player | undefined;
 }
 
 export interface TurnData {
@@ -30,10 +31,13 @@ const yourTurnSlice = createSlice({
     },
     selectCard(state: YourTurnState, action: PayloadAction<CardIndex>) {
       state.selectedCard = action.payload;
+    },
+    selectPlayer(state: YourTurnState, action: PayloadAction<Player>) {
+      state.selectedPlayer = action.payload;
     }
   }
 });
 
-export const {startTurn, selectCard, loadCard} = yourTurnSlice.actions;
+export const {startTurn, loadCard, selectCard, selectPlayer} = yourTurnSlice.actions;
 
 export default yourTurnSlice.reducer;

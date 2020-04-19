@@ -2,18 +2,19 @@ import {CardIndex} from '../reducers/board';
 import * as React from 'react';
 import {Button, Modal} from 'react-bootstrap';
 import {User} from '../model/User';
-import {CardImg} from './Card';
+import {Card} from './Card';
+import { Player } from '../model/Player';
 
 interface ActionDialogProps {
   card: CardIndex | undefined;
-  user: User | undefined,
+  player: Player | undefined,
   show: boolean;
   onHide: () => void;
   onSubmit: () => void;
 }
 
 export const ActionDialog = (props: ActionDialogProps) => {
-  const name = props.user?.name;
+  const name = props.player?.name;
   return (
     <Modal show={props.show} onHide={props.onHide}>
       <Modal.Header closeButton>
@@ -21,7 +22,9 @@ export const ActionDialog = (props: ActionDialogProps) => {
       </Modal.Header>
 
       <Modal.Body>
-        Use {props.card && (<CardImg card={props.card}/>)} on {name})}
+        <div className="move-description">
+          Use {props.card && (<Card card={props.card}/>)} on {name}
+        </div>
       </Modal.Body>
 
       <Modal.Footer>
