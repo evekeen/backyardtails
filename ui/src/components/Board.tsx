@@ -39,6 +39,6 @@ const Spring = () => {
 
 function player(player: Player, selectPlayer: (player: Player) => void, selectedPlayerIndex: HandIndex | undefined, selectable: boolean) {
   return (
-    <OtherPlayer player={player} onClick={selectPlayer} selected={selectedPlayerIndex === player.index} selectable={selectable}/>
+    <OtherPlayer player={player} onClick={selectPlayer} selected={player && selectedPlayerIndex === player.index} selectable={selectable}/>
   )
 }

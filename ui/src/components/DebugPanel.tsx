@@ -2,9 +2,9 @@ import * as React from 'react';
 import {connect} from 'react-redux';
 import {startTurn, loadCard, TurnData} from '../reducers/yourTurn';
 import {updateCurrentUser, setTable, BoardState, CardIndex} from '../reducers/board';
-import {Button} from 'react-bootstrap';
 import {HandIndex} from '../reducers/board';
 import _ = require('lodash');
+import {useEffect} from 'react';
 
 interface DebugPanelProps {
   loadCard: (turn: TurnData) => void;
@@ -16,6 +16,15 @@ interface DebugPanelProps {
 const names = ['Vasya', 'Petya', 'Masha', 'Phillip']
 
 const DebugPanel = (props: DebugPanelProps) => {
+  useEffect(() => initGame(props));
+  return (
+    <div className="debug-panel">
+    </div>
+  );
+  // <Button variant="secondary" onClick={() => props.startTurn({card: 5})}>Start turn</Button>
+};
+
+function initGame(props: DebugPanelProps) {
   const indexes: HandIndex[] = Array.apply(null, Array(4)).map((x: any, index: number) => index);
   const players = _.shuffle(indexes).map(index => ({
     index,
@@ -34,12 +43,7 @@ const DebugPanel = (props: DebugPanelProps) => {
   });
   props.loadCard({card: randomCard()});
   props.startTurn({card: randomCard()})
-  return (
-    <div className="debug-panel">
-    </div>
-  );
-  // <Button variant="secondary" onClick={() => props.startTurn({card: 5})}>Start turn</Button>
-};
+}
 
 function randomCard(): CardIndex {
   return Math.round(Math.random() * 7) + 1 as CardIndex;

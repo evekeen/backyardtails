@@ -5,7 +5,7 @@ import {Card} from './Card';
 import _ = require('lodash');
 
 export interface PlayerProps {
-  player: Player;
+  player?: Player;
   selectable: boolean;
   selected: boolean;
   onClick: (player: Player) => void;
