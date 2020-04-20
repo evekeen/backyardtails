@@ -36,9 +36,9 @@ const DebugPanel = (props: DebugPanelProps) => {
   props.startTurn({card: randomCard()})
   return (
     <div className="debug-panel">
-      // <Button variant="secondary" onClick={() => props.startTurn({card: 5})}>Start turn</Button>
     </div>
   );
+  // <Button variant="secondary" onClick={() => props.startTurn({card: 5})}>Start turn</Button>
 };
 
 function randomCard(): CardIndex {
