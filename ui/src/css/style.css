@@ -34,11 +34,11 @@ body {
   color: #bc5952;
 }
 
-.player:hover:not(.main-player):not(.disabled) .ll-card__box {
+.player:hover:not(.main-player):not(.disabled):not(.player-selected) .ll-card__box {
   background-color: #ccc;
 }
 
-.main-player:not(.disabled) .ll-card__box:hover {
+.main-player:not(.disabled) .ll-card__box:hover:not(.ll-card-selected) {
   background-color: #ccc;
   cursor: grab;
 }
