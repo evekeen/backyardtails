@@ -15,7 +15,7 @@ module.exports = {
   },
 
   entry: {
-    board: [
+    'love-letter': [
       './src/index.tsx',
       './src/css/style.css',
       './src/img/guard.png',

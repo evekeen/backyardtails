@@ -1,5 +1,4 @@
-import {CardIndex, HandIndex} from './board';
-import {User} from '../model/User';
+import {CardIndex} from './board';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Player} from '../model/Player';
 
