@@ -26,17 +26,23 @@ const DebugPanel = (props: DebugPanelProps) => {
   }));
   props.setTable({
     deckLeft: 5,
-    discardPileTop: Math.round(Math.random() * 8) as CardIndex,
+    discardPileTop: randomCard(),
     players: players,
     activeIndex: 4,
     currentUserInTurn: false,
     selectedPlayerIndex: undefined
   });
-  props.loadCard({card: 3});
+  props.loadCard({card: randomCard()});
   return (
-    <Button variant="secondary" onClick={() => props.startTurn({card: 5})}>Start turn</Button>
+    <div className="debug-panel">
+      <Button variant="secondary" onClick={() => props.startTurn({card: 5})}>Start turn</Button>
+    </div>
   );
 };
+
+function randomCard(): CardIndex {
+  return Math.round(Math.random() * 8) as CardIndex;
+}
 
 const mapDispatch = {startTurn, loadCard, updateCurrentUser, setTable};
 

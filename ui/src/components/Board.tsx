@@ -22,10 +22,18 @@ export const Board = (props: BoardProps) => {
       </div>
       <div className="middle-row_wrapper">
         {player(props.players[1], props.selectPlayer, props.selectedPlayerIndex, selectable)}
+        <Spring/>
         <Decks deckLeft={props.deckLeft} discardPileTop={props.discardPileTop}/>
+        <Spring/>
         {player(props.players[3], props.selectPlayer, props.selectedPlayerIndex, selectable)}
       </div>
     </div>
+  );
+}
+
+const Spring = () => {
+  return (
+    <div className="ll-spring"/>
   );
 }
 
