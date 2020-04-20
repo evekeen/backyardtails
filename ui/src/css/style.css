@@ -188,6 +188,8 @@ ol li span {
 .move-description {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .debug-panel {

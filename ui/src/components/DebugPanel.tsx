@@ -42,7 +42,7 @@ function initGame(props: DebugPanelProps) {
     selectedPlayerIndex: undefined
   });
   props.loadCard({card: randomCard()});
-  props.startTurn({card: randomCard()})
+  props.startTurn({card: randomCard()});
 }
 
 function randomCard(): CardIndex {

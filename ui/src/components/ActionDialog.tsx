@@ -27,7 +27,8 @@ export const ActionDialog = (props: ActionDialogProps) => {
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="primary" onClick={props.onSubmit}>Ok</Button>
+        <Button variant="primary" onClick={props.onSubmit}>Apply</Button>
+        <Button variant="secondary" onClick={props.onHide}>Cancel</Button>
       </Modal.Footer>
     </Modal>
   );
