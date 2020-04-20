@@ -21,7 +21,11 @@ export const PlayerHand = (props: PlayerHandProps) => {
   const selectCard = props.active ? props.selectCard : _.noop;
   const disabledClass = props.active ? '' : 'disabled';
   const showDialog = !!selectedCard && !!props.selectedPlayer;
-  const submit = props.active ? () => props.submitAction({card: selectedCard, player: props.selectedPlayer}) : _.noop;
+  const submitAction = props.active ? () => props.submitAction({card: selectedCard, player: props.selectedPlayer}) : _.noop;
+  const submit = () => {
+    submitAction();
+    props.cancelSelection();
+  };
 
   function secondCard() {
     if (props.cards.length <= 1) return undefined;
