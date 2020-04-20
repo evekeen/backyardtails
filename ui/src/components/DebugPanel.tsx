@@ -21,7 +21,6 @@ const DebugPanel = (props: DebugPanelProps) => {
     <div className="debug-panel">
     </div>
   );
-  // <Button variant="secondary" onClick={() => props.startTurn({card: 5})}>Start turn</Button>
 };
 
 function initGame(props: DebugPanelProps) {
@@ -42,7 +41,7 @@ function initGame(props: DebugPanelProps) {
     selectedPlayerIndex: undefined
   });
   props.loadCard({card: randomCard()});
-  props.startTurn({card: randomCard()});
+  setTimeout(() => props.startTurn({card: randomCard()}), 2000);
 }
 
 function randomCard(): CardIndex {

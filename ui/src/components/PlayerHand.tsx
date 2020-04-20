@@ -28,7 +28,7 @@ export const PlayerHand = (props: PlayerHandProps) => {
   };
 
   function secondCard() {
-    if (props.cards.length <= 1) return undefined;
+    if (props.cards.length <= 1 || !props.cards[1]) return undefined;
     const card = props.cards[1];
     return (
       <Card card={card} onClick={() => selectCard(card)} selected={selectedCard === card && props.cards[0] !== card}/>
