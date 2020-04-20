@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
 import {startTurn, loadCard, TurnData} from '../reducers/yourTurn';
-import {updateCurrentUser, setTable, BoardState, CardIndex} from '../reducers/board';
+import {updateCurrentUser, setTable, BoardState, CardType} from '../reducers/board';
 import {HandIndex} from '../reducers/board';
 import _ = require('lodash');
 import {useEffect} from 'react';
@@ -44,8 +44,19 @@ function initGame(props: DebugPanelProps) {
   setTimeout(() => props.startTurn({card: randomCard()}), 2000);
 }
 
-function randomCard(): CardIndex {
-  return Math.round(Math.random() * 7) + 1 as CardIndex;
+function randomCard(): CardType {
+  const cards = [
+    CardType.Guard, CardType.Guard, CardType.Guard, CardType.Guard, CardType.Guard,
+    CardType.Priest, CardType.Priest,
+    CardType.Baron, CardType.Baron,
+    CardType.Handmaid, CardType.Handmaid,
+    CardType.Prince, CardType.Prince,
+    CardType.King,
+    CardType.Countess,
+    CardType.Princess
+  ];
+  const index = Math.round(Math.random() * cards.length);
+  return cards[index];
 }
 
 const mapDispatch = {startTurn, loadCard, updateCurrentUser, setTable};

@@ -1,8 +1,8 @@
-import {CardIndex} from '../reducers/board';
+import {CardType} from '../reducers/board';
 import React = require('react');
 
 interface CardProps {
-  card?: CardIndex;
+  card?: CardType;
   onClick?: () => void;
   selected?: boolean;
 }
@@ -20,7 +20,7 @@ export const Card = (props: CardProps) => {
   );
 };
 
-export const CardImg = (props: { card?: CardIndex }) => {
+export const CardImg = (props: { card?: CardType }) => {
   if (!props.card) {
     return (
       <img src='dist/img/cover.jpg' alt='card cover'/>
@@ -36,7 +36,7 @@ export const CardImg = (props: { card?: CardIndex }) => {
 }
 
 interface CardDescriptionProps {
-  card: CardIndex;
+  card: CardType;
   visible: boolean;
 }
 
@@ -51,7 +51,7 @@ const CardDescription = (props: CardDescriptionProps) => {
   );
 }
 
-function getCardImg(card: CardIndex): string {
+function getCardImg(card: CardType): string {
   const name = cardNameMapping[card];
   return `dist/img/${name}.png`;
 }

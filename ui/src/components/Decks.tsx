@@ -1,10 +1,10 @@
 import * as React from 'react';
 import {Card} from './Card';
-import {CardIndex} from '../reducers/board';
+import {CardType} from '../reducers/board';
 
 export interface DecksProps {
   deckLeft: number;
-  discardPileTop: CardIndex | undefined;
+  discardPileTop: CardType | undefined;
 }
 
 export const Decks = (props: DecksProps) => {

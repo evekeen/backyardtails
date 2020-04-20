@@ -1,12 +1,12 @@
 import {Player} from '../model/Player';
-import {CardIndex, HandIndex} from '../reducers/board';
+import {CardType, HandIndex} from '../reducers/board';
 import * as React from 'react';
 import {OtherPlayer} from './OtherPlayer';
 import {Decks} from './Decks';
 
 interface BoardProps {
   deckLeft: number;
-  discardPileTop: CardIndex | undefined;
+  discardPileTop: CardType | undefined;
   players: Player[];
   activeIndex: HandIndex;
   selectPlayer: (player: Player) => void;

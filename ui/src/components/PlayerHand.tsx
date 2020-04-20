@@ -1,23 +1,23 @@
 import * as React from 'react';
 import _ = require('lodash');
 import {Card} from './Card';
-import {CardIndex} from '../reducers/board';
+import {CardType} from '../reducers/board';
 import {ActionDialog} from './ActionDialog';
 import {CardAction} from '../model/CardAction';
 import {Player} from '../model/Player';
 
 interface PlayerHandProps {
   active: boolean;
-  cards: CardIndex[];
-  selectedCard: CardIndex | undefined;
+  cards: CardType[];
+  selectedCard: CardType | undefined;
   selectedPlayer: Player | undefined;
-  selectCard: (card: CardIndex) => void;
+  selectCard: (card: CardType) => void;
   submitAction: (action: CardAction) => void;
   cancelSelection: () => void;
 }
 
 export const PlayerHand = (props: PlayerHandProps) => {
-  const selectedCard = props.active ? props.selectedCard : 0 as CardIndex;
+  const selectedCard = props.active ? props.selectedCard : 0 as CardType;
   const selectCard = props.active ? props.selectCard : _.noop;
   const disabledClass = props.active ? '' : 'disabled';
   const showDialog = !!selectedCard && !!props.selectedPlayer;
