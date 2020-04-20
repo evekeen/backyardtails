@@ -1,8 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Player} from '../model/Player';
 import * as _ from 'lodash';
-import { startTurn, selectPlayer } from './yourTurn';
-import {act} from 'react-dom/test-utils';
+import { startTurn, selectPlayer, cancelSelection} from './yourTurn';
 
 export type HandIndex = 1 | 2 | 3 | 4;
 export type CardIndex = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
@@ -39,6 +38,8 @@ const boardSlice = createSlice({
       state.currentUserInTurn = true;
     }).addCase(selectPlayer, (state: BoardState, action: PayloadAction<Player>) => {
       state.selectedPlayerIndex = action.payload.index;
+    }).addCase(cancelSelection, (state: BoardState) => {
+      state.selectedPlayerIndex = undefined;
     });
   }
 });

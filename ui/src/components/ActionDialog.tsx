@@ -1,7 +1,6 @@
 import {CardIndex} from '../reducers/board';
 import * as React from 'react';
 import {Button, Modal} from 'react-bootstrap';
-import {User} from '../model/User';
 import {Card} from './Card';
 import { Player } from '../model/Player';
 

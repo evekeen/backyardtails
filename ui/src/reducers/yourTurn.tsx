@@ -34,10 +34,14 @@ const yourTurnSlice = createSlice({
     },
     selectPlayer(state: YourTurnState, action: PayloadAction<Player>) {
       state.selectedPlayer = action.payload;
-    }
+    },
+    cancelSelection(state: YourTurnState) {
+      state.selectedCard = undefined;
+      state.selectedPlayer = undefined;
+    },
   }
 });
 
-export const {startTurn, loadCard, selectCard, selectPlayer} = yourTurnSlice.actions;
+export const {startTurn, loadCard, selectCard, selectPlayer, cancelSelection} = yourTurnSlice.actions;
 
 export default yourTurnSlice.reducer;

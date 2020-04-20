@@ -41,7 +41,7 @@ const DebugPanel = (props: DebugPanelProps) => {
 };
 
 function randomCard(): CardIndex {
-  return Math.round(Math.random() * 8) as CardIndex;
+  return Math.round(Math.random() * 8) + 1 as CardIndex;
 }
 
 const mapDispatch = {startTurn, loadCard, updateCurrentUser, setTable};

@@ -1,10 +1,10 @@
 import {submitAction} from '../reducers/cardActions';
-import {selectCard} from '../reducers/yourTurn';
+import {selectCard, cancelSelection} from '../reducers/yourTurn';
 import {connect} from 'react-redux';
 import {PlayerHand} from '../components/PlayerHand';
 import {AppState} from '../components/App';
 
-const mapDispatchToProps = {submitAction, selectCard}
+const mapDispatchToProps = {submitAction, selectCard, cancelSelection}
 
 const mapStateToProps = (state: AppState) => {
   return {

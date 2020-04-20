@@ -171,11 +171,6 @@ ol li span {
   margin-top: 60px;
 }
 
-.main-wrapper h3 {
-  display: block;
-  margin: 0 auto;
-}
-
 .main-player__cards {
   display: flex;
   justify-content: center;
