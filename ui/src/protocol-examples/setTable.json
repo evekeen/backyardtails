@@ -1,0 +1,39 @@
+{
+  "type": "board/setTable",
+  "payload": {
+    "deckLeft": 5,
+    "discardPileTop": 6,
+    "players": [
+      {
+        "index": 1,
+        "name": "Petya",
+        "score": 0,
+        "alive": true,
+        "shield": true
+      },
+      {
+        "index": 3,
+        "name": "Phillip",
+        "score": 1,
+        "alive": true,
+        "shield": false
+      },
+      {
+        "index": 0,
+        "name": "Vasya",
+        "score": 1,
+        "alive": true,
+        "shield": false
+      },
+      {
+        "index": 2,
+        "name": "Masha",
+        "score": 1,
+        "alive": true,
+        "shield": false
+      }
+    ],
+    "activeIndex": 4,
+    "currentUserInTurn": false
+  }
+}

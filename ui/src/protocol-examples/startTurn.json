@@ -1,0 +1,6 @@
+{
+  "type": "yourTurn/startTurn",
+  "payload": {
+    "card": 5
+  }
+}

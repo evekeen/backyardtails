@@ -88,7 +88,7 @@ export class WsClient {
   };
 
   private reportConnected(): void {
-    console.debug('WebSocket is authorized and ready to work');
+    console.debug('WebSocket is ready to work');
     this.stopTimers();
     this._connected = true;
     this.autoReconnect = true;
@@ -119,14 +119,13 @@ export class WsClient {
 
   private onMessage = (msg: any) => {
     console.info('received', msg);
-    const data = msg.data;
     this.lastMsgTime = Date.now();
-    if (data === KEEP_ALIVE_MSG) return;
-    if (data === WS_READY_MSG) {
+    if (msg === KEEP_ALIVE_MSG) return;
+    if (msg === WS_READY_MSG) {
       this.reportConnected();
       return;
     }
-    this.localDispatch(JSON.parse(msg.data));
+    this.localDispatch(JSON.parse(msg));
   };
 
   private deleteWs(): void {

@@ -1,0 +1,14 @@
+{
+  "type": "cardAction",
+  "remote": true,
+  "action": {
+    "card": 1,
+    "player": {
+      "index": 3,
+      "name": "Phillip",
+      "score": 1,
+      "alive": true,
+      "shield": false
+    }
+  }
+}
