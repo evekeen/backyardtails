@@ -3,24 +3,24 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
-#app {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  margin: 10px;
-}
-
 .game-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-width: min-content;
-  min-height: min-content;
+  justify-content: space-between;  
+  height: 100%;
+  padding: 1vh;
+  margin: 0 auto;
 }
 
-.top-row_wrapper {
+.middle-row_wrapper {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
+}
+
+.top-row_wrapper, .main-wrapper {
+  display: flex;
+	justify-content: center;
+  margin: 0 auto;
 }
 
 .player-wrapper {
@@ -113,12 +113,6 @@ body {
   color: #acbc8a;
 }
 
-.middle-row_wrapper {
-  display: flex;
-  justify-content: space-between;
-  min-width: 1400px;
-}
-
 .decks {
   display: flex;
   justify-content: space-between;
@@ -133,10 +127,6 @@ body {
   margin-right: 30px;
 }
 
-.bottom-row_wrapper {
-  display: flex;
-  justify-content: center;
-}
 
 .rules {
   display: block;
@@ -196,4 +186,10 @@ ol li span {
   position: absolute;
   left: 20px;
   top: 20px;
+}
+
+@media screen and (max-width: 1440px) {
+  .top-row_wrapper, .middle-row_wrapper {
+    margin-bottom: 30px;
+  }
 }
