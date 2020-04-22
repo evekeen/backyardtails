@@ -1,4 +1,4 @@
-import {CardType} from '../reducers/board';
+import {CardType} from '../model/commonTypes';
 import React = require('react');
 
 interface CardProps {

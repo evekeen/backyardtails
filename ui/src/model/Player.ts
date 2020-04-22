@@ -1,4 +1,4 @@
-import {HandIndex} from '../reducers/board';
+import {HandIndex} from './commonTypes';
 
 export interface Player {
   index: HandIndex;

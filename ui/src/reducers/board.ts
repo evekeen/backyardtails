@@ -2,19 +2,7 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Player} from '../model/Player';
 import * as _ from 'lodash';
 import {startTurn, selectPlayer, cancelSelection} from './yourTurn';
-
-export type HandIndex = 1 | 2 | 3 | 4;
-
-export enum CardType {
-  Guard = 1,
-  Priest = 2,
-  Baron = 3,
-  Handmaid = 4,
-  Prince = 5,
-  King = 6,
-  Countess = 7,
-  Princess = 8
-}
+import {CardType, HandIndex} from '../model/commonTypes';
 
 export interface BoardState {
   deckLeft: number;

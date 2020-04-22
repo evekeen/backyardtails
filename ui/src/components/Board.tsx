@@ -1,5 +1,5 @@
 import {Player} from '../model/Player';
-import {CardType, HandIndex} from '../reducers/board';
+import {CardType, HandIndex} from '../model/commonTypes';
 import * as React from 'react';
 import {OtherPlayer} from './OtherPlayer';
 import {Decks} from './Decks';

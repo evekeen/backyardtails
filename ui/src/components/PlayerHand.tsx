@@ -1,7 +1,7 @@
 import * as React from 'react';
 import _ = require('lodash');
 import {Card} from './Card';
-import {CardType} from '../reducers/board';
+import {CardType} from '../model/commonTypes';
 import {ActionDialog} from './ActionDialog';
 import {CardAction} from '../model/CardAction';
 import {Player} from '../model/Player';

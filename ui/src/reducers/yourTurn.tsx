@@ -1,4 +1,4 @@
-import {CardType} from './board';
+import {CardType} from '../model/commonTypes';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Player} from '../model/Player';
 

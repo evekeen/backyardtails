@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
 import {startTurn, loadCard, TurnData} from '../reducers/yourTurn';
-import {updateCurrentUser, setTable, BoardState, CardType} from '../reducers/board';
-import {HandIndex} from '../reducers/board';
+import {updateCurrentUser, setTable, BoardState} from '../reducers/board';
+import {CardType, HandIndex} from '../model/commonTypes';
 import _ = require('lodash');
 import {useEffect} from 'react';
 

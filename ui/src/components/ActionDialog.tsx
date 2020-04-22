@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useState} from 'react';
-import {CardType} from '../reducers/board';
-import {Button, Form, Modal, Row} from 'react-bootstrap';
+import {CardType} from '../model/commonTypes';
+import {Button, Form, Modal} from 'react-bootstrap';
 import {Card, cardNameMapping} from './Card';
 import {Player} from '../model/Player';
 import _ = require('lodash');

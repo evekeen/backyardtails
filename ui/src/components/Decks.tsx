@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Card} from './Card';
-import {CardType} from '../reducers/board';
+import {CardType} from '../model/commonTypes';
 
 export interface DecksProps {
   deckLeft: number;
