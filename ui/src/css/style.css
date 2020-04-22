@@ -171,8 +171,13 @@ ol li span {
   margin-right: 30px;
 }
 
+.score {
+  margin: 0;
+}
+
 .score li {
   list-style: none;
+  margin-top: 2px;
 }
 
 .move-description {

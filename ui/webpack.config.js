@@ -27,6 +27,7 @@ module.exports = {
       './src/img/countess.png',
       './src/img/princess.png',
       './src/img/mish.svg',
+      './src/img/mish-active.svg',
       './src/img/cover.jpg',
     ]
   },

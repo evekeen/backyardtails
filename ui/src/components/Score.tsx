@@ -5,16 +5,23 @@ export interface ScoreProps {
 }
 
 export const Score = (props: ScoreProps) => {
-  const tokens: number[] = Array.apply(null, Array(props.score)).map((x: any, i: number) => i);
+  const tokens: number[] = Array.apply(null, Array(MAX_SCORE)).map((x: any, i: number) => i);
   return (
     <ul className="score">
-      {tokens.map(i => <li key={`token-${i}`}><LoveToken/></li>)}
+      {tokens.map(i => <li key={`token-${i}`}><LoveToken active={i <= props.score}/></li>)}
     </ul>
   );
 };
 
-const LoveToken = () => {
+interface TokenProps {
+  active: boolean;
+}
+
+const LoveToken = (props: TokenProps) => {
+  const src = props.active ? 'dist/img/mish.svg' : 'dist/img/mish-active.svg';
   return (
-    <img src="dist/img/mish.svg" alt="" width="50" height="auto"/>
+    <img src={src} alt="" width="50" height="auto"/>
   );
 };
+
+const MAX_SCORE = 5;
