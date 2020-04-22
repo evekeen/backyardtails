@@ -1,4 +1,4 @@
-import {CardType} from '../reducers/board';
+import {CardType} from './commonTypes';
 import {Player} from './Player';
 
 export interface CardAction {
