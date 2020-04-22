@@ -11,7 +11,7 @@ export const Decks = (props: DecksProps) => {
   return (
     <div className="decks">
       <div className="played_cards">
-        <Card card={props.discardPileTop}/>
+        <Card card={props.discardPileTop} showDescription={false}/>
         <div className="ll-card__cover"/>
       </div>
       <div className="unplayed_cards">

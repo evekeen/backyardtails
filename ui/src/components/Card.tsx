@@ -5,22 +5,29 @@ interface CardProps {
   card?: CardType;
   onClick?: () => void;
   selected?: boolean;
+  showDescription?: boolean;
 }
 
 export const Card = (props: CardProps) => {
   const selected = props.selected ? 'll-card-selected' : '';
+  const showDescription = props.showDescription !== false;
   return (
     <div className="ll-card" onClick={() => props.onClick && props.onClick()}>
       <div className={`ll-card__box ${selected}`}>
         <div className={`ll-card__cover`}>
-          <CardImg card={props.card}/>
+          <CardImg card={props.card} showDescription={showDescription}/>
         </div>
       </div>
     </div>
   );
 };
 
-export const CardImg = (props: { card?: CardType }) => {
+interface CardImgProps {
+  card?: CardType;
+  showDescription: boolean;
+}
+
+const CardImg = (props: CardImgProps) => {
   if (!props.card) {
     return (
       <img src='dist/img/cover.jpg' alt='card cover'/>
@@ -30,7 +37,7 @@ export const CardImg = (props: { card?: CardType }) => {
   return (
     <>
       <img src={getCardImg(props.card)} alt={name}/>
-      <CardDescription card={props.card} visible={true}/>
+      {props.showDescription && <CardDescription card={props.card} visible={true}/>}
     </>
   );
 }
