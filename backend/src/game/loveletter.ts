@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 export interface Player {
   id: string;
   name: string;
-  hand: Hand | undefined;
+  hand?: Hand;
 }
 
 /*
