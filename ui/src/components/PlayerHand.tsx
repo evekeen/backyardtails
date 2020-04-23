@@ -1,35 +1,52 @@
 import * as React from 'react';
-import {useState} from 'react';
+import _ = require('lodash');
 import {Card} from './Card';
-import {CardIndex} from '../reducers/board';
+import {CardType} from '../model/commonTypes';
 import {ActionDialog} from './ActionDialog';
 import {CardAction} from '../model/CardAction';
-import {User} from '../model/User';
+import {Player} from '../model/Player';
 
 interface PlayerHandProps {
   active: boolean;
-  cards: CardIndex[];
-  selectedCard: CardIndex | undefined;
-  selectedUser: User | undefined;
-  selectCard: (card: CardIndex) => void;
+  cards: CardType[];
+  selectedCard: CardType | undefined;
+  selectedPlayer: Player | undefined;
+  selectCard: (card: CardType) => void;
   submitAction: (action: CardAction) => void;
+  cancelSelection: () => void;
 }
 
 export const PlayerHand = (props: PlayerHandProps) => {
-  const selectedCard = props.selectedCard
-  const [show, setShow] = useState(false);
-  const submit = () => props.submitAction({card: selectedCard, userId: props.selectedUser.id});
-  if (!props.active) {
+  const selectedCard = props.active ? props.selectedCard : 0 as CardType;
+  const selectCard = props.active ? props.selectCard : _.noop;
+  const disabledClass = props.active ? '' : 'disabled';
+  const showDialog = !!selectedCard && !!props.selectedPlayer;
+  const submitAction = props.active ? () => props.submitAction({card: selectedCard, player: props.selectedPlayer}) : _.noop;
+  const submit = () => {
+    submitAction();
+    props.cancelSelection();
+  };
+
+  function secondCard() {
+    if (props.cards.length <= 1 || !props.cards[1]) return undefined;
+    const card = props.cards[1];
     return (
-      <Card card={props.cards[0]}/>
+      <Card card={card} onClick={() => selectCard(card)} selected={selectedCard === card && props.cards[0] !== card}/>
     );
   }
+
   return (
-    <>
-      <Card card={props.cards[0]} onClick={() => props.selectCard(props.cards[0])} selected={selectedCard === props.cards[0]}/>
-      {props.cards.length > 1 &&
-      <Card card={props.cards[1]} onClick={() => props.selectCard(props.cards[1])} selected={selectedCard === props.cards[1]}/>}
-      <ActionDialog card={selectedCard} user={props.selectedUser} show={show} onHide={() => setShow(false)} onSubmit={submit}/>
-    </>
+    <div className="main-wrapper">
+      <div className='player-wrapper'>
+        <div className={`player main-player ${disabledClass}`}>
+          <h3>You</h3>
+          <div className="main-player__cards">
+            <Card card={props.cards[0]} onClick={() => selectCard(props.cards[0])} selected={selectedCard === props.cards[0]}/>
+            {secondCard()}
+          </div>
+        </div>
+      </div>
+      <ActionDialog card={selectedCard} player={props.selectedPlayer} show={showDialog} onHide={() => props.cancelSelection()} onSubmit={submit}/>
+    </div>
   );
 }

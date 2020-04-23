@@ -1,6 +1,7 @@
-import {CardIndex} from '../reducers/board';
+import {CardType} from './commonTypes';
+import {Player} from './Player';
 
 export interface CardAction {
-  card: CardIndex;
-  userId: number;
+  card: CardType;
+  player: Player;
 }

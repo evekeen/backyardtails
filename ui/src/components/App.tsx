@@ -10,7 +10,7 @@ import DebugPanel from './DebugPanel';
 
 export const App = () => {
   return (
-    <div>
+    <div className="game-container">
       <DebugPanel/>
       <ManagedBoard/>
       <PlayerHandContainer/>

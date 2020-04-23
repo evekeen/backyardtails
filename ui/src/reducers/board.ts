@@ -1,26 +1,25 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Player} from '../model/Player';
 import * as _ from 'lodash';
-import { startTurn } from './yourTurn';
-
-export type HandIndex = 1 | 2 | 3 | 4;
-export type CardIndex = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+import {startTurn, selectPlayer, cancelSelection} from './yourTurn';
+import {CardType, HandIndex} from '../model/commonTypes';
 
 export interface BoardState {
-  deckLeft: number,
-  discardPileTop: CardIndex | undefined,
-  players: Player[],
-  activeIndex: HandIndex,
+  deckLeft: number;
+  discardPileTop: CardType | undefined;
+  players: Player[];
+  activeIndex: HandIndex;
   currentUserInTurn: boolean;
+  selectedPlayerIndex: HandIndex | undefined;
 }
 
 const boardSlice = createSlice({
   name: 'board',
   initialState: {
     deckLeft: 0,
-    discardPileTop: undefined,
     players: [],
-    activeIndex: 1
+    activeIndex: 1,
+    currentUserInTurn: false,
   } as BoardState,
   reducers: {
     setTable(state: BoardState, action: PayloadAction<BoardState>) {
@@ -32,9 +31,13 @@ const boardSlice = createSlice({
     }
   },
   extraReducers: builder => {
-    builder.addCase(startTurn, (state: BoardState, action: PayloadAction<any>) => {
+    builder.addCase(startTurn, (state: BoardState) => {
       state.activeIndex = 1;
       state.currentUserInTurn = true;
+    }).addCase(selectPlayer, (state: BoardState, action: PayloadAction<Player>) => {
+      state.selectedPlayerIndex = action.payload.index;
+    }).addCase(cancelSelection, (state: BoardState) => {
+      state.selectedPlayerIndex = undefined;
     });
   }
 });

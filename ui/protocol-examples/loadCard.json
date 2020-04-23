@@ -1,0 +1,6 @@
+{
+  "type": "yourTurn/loadCard",
+  "payload": {
+    "card": 1
+  }
+}

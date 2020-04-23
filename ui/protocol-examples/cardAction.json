@@ -1,0 +1,10 @@
+{
+  "type": "cardAction",
+  "remote": true,
+  "action": {
+    "card": 1,
+    "player": {
+      "index": 3
+    }
+  }
+}

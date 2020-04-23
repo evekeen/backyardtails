@@ -1,3 +1,9 @@
-export class Player {
-  constructor(readonly index: number, readonly alive: boolean, readonly shield: boolean) {}
+import {HandIndex} from './commonTypes';
+
+export interface Player {
+  index: HandIndex;
+  alive: boolean;
+  shield: boolean;
+  name: string;
+  score: number;
 }
