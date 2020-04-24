@@ -1,3 +1,5 @@
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
 module.exports = {
   mode: "production",
 
@@ -15,7 +17,7 @@ module.exports = {
   },
 
   entry: {
-    'love-letter': [
+    'main': [
       './src/index.tsx',
       './src/css/style.css',
       './src/img/guard.png',
@@ -79,8 +81,17 @@ module.exports = {
   // assume a corresponding global variable exists and use that instead.
   // This is important because it allows us to avoid bundling all of our
   // dependencies, which allows browsers to cache those libraries between builds.
-  externals: {
-    "react": "React",
-    "react-dom": "ReactDOM"
-  }
+  // externals: {
+  //   "react": "React",
+  //   "react-dom": "ReactDOM"
+  // }
+
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: 'Love Letter',
+      hash: true,
+      // Load a custom template (lodash by default)
+      template: './src/index.html'
+    })
+  ]
 };

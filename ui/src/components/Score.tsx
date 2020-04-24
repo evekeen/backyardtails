@@ -18,7 +18,7 @@ interface TokenProps {
 }
 
 const LoveToken = (props: TokenProps) => {
-  const src = props.active ? 'dist/img/mish.svg' : 'dist/img/mish-active.svg';
+  const src = props.active ? 'img/mish.svg' : 'img/mish-active.svg';
   return (
     <img src={src} alt="" width="50" height="auto"/>
   );

@@ -30,7 +30,7 @@ interface CardImgProps {
 const CardImg = (props: CardImgProps) => {
   if (!props.card) {
     return (
-      <img src='dist/img/cover.jpg' alt='card cover'/>
+      <img src='img/cover.jpg' alt='card cover'/>
     )
   }
   const name = cardNameMapping[props.card];
@@ -60,7 +60,7 @@ const CardDescription = (props: CardDescriptionProps) => {
 
 function getCardImg(card: CardType): string {
   const name = cardNameMapping[card];
-  return `dist/img/${name}.png`;
+  return `img/${name}.png`;
 }
 
 export const cardNameMapping = {

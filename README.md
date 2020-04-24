@@ -7,6 +7,10 @@ It's the board game
 ```
 cd ui
 npm ci
+npm run build
+```
+or to start a dev server
+```
 npm run watch
 ```
 
