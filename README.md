@@ -13,7 +13,7 @@ npm run watch
 ### Run
 Open in a browser: `ui/index.html`
 
-## Backed
+## Backend
 
 ### Build
 ```
