@@ -6,7 +6,7 @@ It's the board game
 ### Build
 ```
 cd ui
-npm install
+npm ci
 npm run watch
 ```
 
@@ -18,7 +18,7 @@ Open in a browser: `ui/index.html`
 ### Build
 ```
 cd backend
-npm install
+npm ci
 tsc
 ```
 
