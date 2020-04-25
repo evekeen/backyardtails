@@ -5,12 +5,16 @@ import {updateCurrentUser, setTable, BoardState} from '../reducers/board';
 import {CardType, HandIndex} from '../model/commonTypes';
 import _ = require('lodash');
 import {useEffect} from 'react';
+import {joinGame} from '../reducers/game';
+import {addMessage} from '../reducers/status';
 
 interface DebugPanelProps {
   loadCard: (turn: TurnData) => void;
   startTurn: (turn: TurnData) => void;
   updateCurrentUser: (index: HandIndex) => void;
   setTable: (board: BoardState) => void;
+  joinGame: () => void;
+  addMessage: (message: string) => void;
 }
 
 const names = ['Vasya', 'Petya', 'Masha', 'Phillip']
@@ -32,6 +36,9 @@ function initGame(props: DebugPanelProps) {
     alive: true,
     shield: Math.random() > 0.7,
   }));
+
+  props.joinGame();
+
   props.setTable({
     deckLeft: 5,
     discardPileTop: randomCard(),
@@ -59,6 +66,6 @@ function randomCard(): CardType {
   return cards[index];
 }
 
-const mapDispatch = {startTurn, loadCard, updateCurrentUser, setTable};
+const mapDispatch = {startTurn, loadCard, updateCurrentUser, setTable, joinGame, addMessage};
 
 export default connect(null, mapDispatch)(DebugPanel);

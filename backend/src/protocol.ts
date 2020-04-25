@@ -5,7 +5,7 @@ import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
 import {Validation} from "io-ts";
 
-export const MessageType = t.union([t.literal("join"), t.literal("action"), t.literal("state")])
+export const MessageType = t.union([t.literal("join"), t.literal("cardAction"), t.literal("state")])
 
 export const Message = t.interface({
   type: MessageType

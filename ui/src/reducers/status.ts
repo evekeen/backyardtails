@@ -1,20 +1,27 @@
+import { now } from 'lodash';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import * as _ from 'lodash';
 
 export interface StatusState {
-  message: string;
+  log: StatusMessage[];
+}
+
+export interface StatusMessage {
+  text: string;
+  time: number;
 }
 
 const statusSlice = createSlice({
   name: 'status',
   initialState: {
-    message: undefined
+    log: []
   } as StatusState,
   reducers: {
-    setStatus(state: StatusState, action: PayloadAction<StatusState>) {
-      _.extend(state, action.payload);
+    addMessage(state: StatusState, action: PayloadAction<string>) {
+      state.log.unshift({text: action.payload, time: now()});
     }
   }
 });
+
+export const {addMessage} = statusSlice.actions;
 
 export default statusSlice.reducer;

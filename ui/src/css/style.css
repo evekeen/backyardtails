@@ -198,3 +198,10 @@ ol li span {
     margin-bottom: 30px;
   }
 }
+
+.status-messages {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+}

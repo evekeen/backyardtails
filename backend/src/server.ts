@@ -43,10 +43,13 @@ function authenticate(req: any, callback: (userId: string) => any) {
 }
 
 wss.on('connection', (ws: WebSocket, request: any) => {
+  console.log('connection');
   authenticate(request, userId => {
+    console.log(`authenticate ${request} ${userId}`);
     const playerController = new PlayerController(userId);
 
     playerController.on('join', joinMessageObj => {
+      console.log('join', joinMessageObj);
       pipe(JoinMessage.decode(joinMessageObj), fold(
         error => console.log("Failed to parse JoinMessage:" + error),
         joinMessage => {
@@ -78,13 +81,13 @@ wss.on('connection', (ws: WebSocket, request: any) => {
           ws.send(JSON.stringify(state));
         });
 
-        ws.send(`Hello ${userId}, you sent -> ${typedMessage}`);
+        ws.send(JSON.stringify({type: 'status/addMessage', payload: `Hello ${userId}, you sent -> ${JSON.stringify(typedMessage)}`}));
       }));
     });
 
     ws.on('error', (error) => console.log("Error: " + error));
 
-    ws.send(`Hi there ${userId}, I am a WebSocket server`);
+    ws.send(JSON.stringify({type: 'ready', userId: userId}));
   });
 });
 

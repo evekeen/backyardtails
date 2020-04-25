@@ -7,11 +7,13 @@ import {StatusState} from '../reducers/status';
 import {User} from '../model/User';
 import {YourTurnState} from '../reducers/yourTurn';
 import DebugPanel from './DebugPanel';
+import ManagedStatusPanel from '../containers/ManagedStatusPanel';
 
 export const App = () => {
   return (
     <div className="game-container">
       <DebugPanel/>
+      <ManagedStatusPanel/>
       <ManagedBoard/>
       <PlayerHandContainer/>
     </div>

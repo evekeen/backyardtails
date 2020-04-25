@@ -13,6 +13,7 @@ const WS_READY_MSG = 'ready';
 const KEEP_ALIVE_CHECK_INTERVAL = 30000;
 // equals to akka connection timeout
 const KEEP_ALIVE_MAX_INTERVAL = 60000;
+const RETRY_DELAY = 1000;
 
 export class WsClient {
   private ws: WebSocket;
@@ -121,11 +122,19 @@ export class WsClient {
     console.info('received', msg);
     this.lastMsgTime = Date.now();
     if (msg === KEEP_ALIVE_MSG) return;
-    if (msg === WS_READY_MSG) {
-      this.reportConnected();
-      return;
+    if (!msg || !msg.data) {
+      return
     }
-    this.localDispatch(JSON.parse(msg));
+    try {
+      const data = JSON.parse(msg.data);
+      if (data.type === WS_READY_MSG) {
+        this.reportConnected();
+        return;
+      }
+      this.localDispatch(data);
+    } catch (err) {
+      console.error(`Cannot parse message ${msg.data}`)
+    }
   };
 
   private deleteWs(): void {
@@ -158,8 +167,19 @@ export class WsClient {
   private dispatchToWs(action: any) {
     if (!this._connected) {
       console.warn('ignoring action due to ws connection broken', action)
+      if (action.retry >= 5) {
+        console.log(`Giving up trying to send ${action}`);
+        return;
+      } else {
+        const retry = (action.retry || 0) + 1;
+        setTimeout(
+          () => this.dispatchToWs({...action, retry: retry}),
+          retry * RETRY_DELAY
+        );
+        return;
+      }
     }
-    return (action: any) => this.ws.send(JSON.stringify(action));
+    return this.ws.send(JSON.stringify(action));
   };
 
   private onOpen = () => {
