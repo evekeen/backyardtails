@@ -23,9 +23,13 @@
     "morgan": "1.10.0",
     "nodemon": "2.0.3",
     "supertest": "4.0.2",
+    "ts-loader": "7.0.0",
     "ts-node": "8.9.0",
     "tsconfig-paths": "3.9.0",
     "tslint": "6.1.1",
+    "typescript": "3.8.3",
+    "webpack": "4.42.1",
+    "webpack-cli": "3.3.11",
     "winston": "3.2.1",
     "ws": "7.2.3"
   },
@@ -37,8 +41,9 @@
     "typescript": "3.8.3"
   },
   "scripts": {
-    "start": "node ./dist/server.js",
-    "build": "tsc"
+    "start": "node ./dist/main.js",
+    "build": "webpack",
+    "watch": "webpack --watch"
   },
   "author": "",
   "license": "ISC"
