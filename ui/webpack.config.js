@@ -20,6 +20,7 @@ module.exports = {
     'main': [
       './src/index.tsx',
       './src/css/style.css',
+      './node_modules/bootstrap/dist/css/bootstrap.min.css',
       './src/img/guard.png',
       './src/img/priest.png',
       './src/img/baron.png',
