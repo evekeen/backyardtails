@@ -8,6 +8,7 @@ export interface Player {
   hand: Hand;
   discardPile: Card[];
   score: number;
+  alive: boolean;
 }
 
 /*
@@ -147,7 +148,8 @@ export class LoveLetterGameState {
         immune: false
       },
       discardPile: [],
-      score: 0
+      score: 0,
+      alive: true
     };
   }
 
@@ -231,6 +233,10 @@ export class LoveLetterGameState {
   getPlayer(id: PlayerId): Player {
     return _.find(this.players, p => p.id == id)!;
   }
+
+  getPlayerIndex(id: PlayerId): number {
+    return _.indexOf(this.players, id);
+  }
 }
 
 export class LoveLetterGame implements Game<LoveLetterGameState> {
@@ -239,7 +245,6 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
   private firstPlayerIdx = -1;
 
   constructor(private players: PlayerId[]) {
-    this.state.nextTurn();
   }
 
   applyAction(action: GameAction<LoveLetterGameState>): ActionResult {
@@ -272,5 +277,6 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
     this.firstPlayerIdx = (this.firstPlayerIdx + 1) % this.players.length;
     const firstPlayer = this.players[this.firstPlayerIdx];
     this.state.start(firstPlayer);
+    console.log(JSON.stringify(this.state, null, "  "));
   }
 }

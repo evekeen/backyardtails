@@ -1,5 +1,6 @@
 import {GameId, LoveLetterGame, PlayerId} from "./loveletter";
 import {PlayerController} from "../PlayerController";
+import {SetTableMessage} from "../protocol";
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
@@ -20,20 +21,31 @@ export class GamesController {
     let pendingPlayers = this.pendingGames.get(usedGameId)
     if (pendingPlayers) {
       pendingPlayers.push(userId);
+      console.log(`User ${userId} has joined to ${usedGameId}. ${PLAYERS_COUNT - pendingPlayers.length} players left.`);
     } else {
       pendingPlayers = [userId];
       this.pendingGames.set(usedGameId, pendingPlayers);
+      console.log(`Pending game ${usedGameId} created!`);
+      console.log(`User ${userId} has joined to ${usedGameId}. ${PLAYERS_COUNT - 1} players left.`);
     }
 
     if (pendingPlayers.length == PLAYERS_COUNT) {
       this.pendingGames.delete(usedGameId);
       const game = new LoveLetterGame(pendingPlayers);
       this.games.set(usedGameId, game);
+      console.log(`Created game ${usedGameId} with players ${pendingPlayers}`)
+      game.init()
+
+      pendingPlayers.forEach((player: PlayerId) => {
+        const controller = this.playerControllers.get(player);
+        controller && controller.dispatch<SetTableMessage>()
+      });
     }
   }
 
   private static generateGameId(): string {
-    return "Нарба" + Math.ceil(Math.random() * 100);
+    return "Нарба";
+    // return "Нарба" + Math.ceil(Math.random() * 100);
   }
 
   private subscribe(userId: PlayerId, playerController: PlayerController) {

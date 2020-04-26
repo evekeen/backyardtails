@@ -48,11 +48,14 @@ wss.on('connection', (ws: WebSocket, request: any) => {
     console.log(`authenticate ${request} ${userId}`);
     const playerController = new PlayerController(userId);
 
-    playerController.on('join', joinMessageObj => {
+    playerController.on('connection/join', joinMessageObj => {
       console.log('join', joinMessageObj);
       pipe(JoinMessage.decode(joinMessageObj), fold(
         error => console.log("Failed to parse JoinMessage:" + error),
-        joinMessage => gamesController.onJoin(userId, joinMessage.payload.gameId, playerController)));
+        joinMessage => {
+          console.log(`Joining userd ${userId} to a game...`);
+          gamesController.onJoin(userId, joinMessage.payload.gameId, playerController)
+        }));
     });
 
     // Wait for hello message.
