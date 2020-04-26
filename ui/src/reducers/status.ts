@@ -8,6 +8,7 @@ export interface StatusState {
 export interface StatusMessage {
   text: string;
   time: number;
+  closed?: boolean;
 }
 
 const statusSlice = createSlice({
@@ -18,10 +19,13 @@ const statusSlice = createSlice({
   reducers: {
     addMessage(state: StatusState, action: PayloadAction<string>) {
       state.log.unshift({text: action.payload, time: now()});
+    },
+    closeMessage(state: StatusState, action: PayloadAction<number>) {
+      state.log.splice(action.payload, 1);
     }
   }
 });
 
-export const {addMessage} = statusSlice.actions;
+export const {addMessage, closeMessage} = statusSlice.actions;
 
 export default statusSlice.reducer;
