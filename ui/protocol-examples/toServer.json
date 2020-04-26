@@ -1,7 +1,5 @@
 {
   "type": "type",
-  "action": {
-    "payload": {},
-    "meta": "remote"
-  }
+  "payload": {},
+  "meta": "remote"
 }
