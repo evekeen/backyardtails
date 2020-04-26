@@ -1,6 +1,6 @@
-import {GameId, LoveLetterGame, Player, PlayerId} from "./loveletter";
-import {PlayerController} from "../PlayerController";
-import {createLoadCardMessage, createSetTableMessage, LoadCardMessage, SetTableMessage} from '../protocol';
+import {GameId, LoveLetterGame, Player, PlayerId} from './loveletter';
+import {PlayerController} from '../PlayerController';
+import {CardAction, createLoadCardMessage, createSetTableMessage, RemoteAction} from '../protocol';
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
@@ -11,7 +11,7 @@ export class GamesController {
 
   onJoin(userId: PlayerId, gameId: GameId | undefined, playerController: PlayerController): void {
     const usedGameId = gameId || GamesController.generateGameId();
-    this.subscribe(userId, playerController);
+    this.subscribe(userId, usedGameId, playerController);
 
     let currentGame = this.games.get(usedGameId);
     if (currentGame && currentGame.hasPlayer(userId)) {
@@ -36,12 +36,8 @@ export class GamesController {
       console.log(`Created game ${usedGameId} with players ${pendingPlayers}`)
       game.init()
 
-      game.state.players.forEach((player: Player) => {
-        const controller = this.playerControllers.get(player.id);
-        if (!controller) return;
-        controller.dispatch<SetTableMessage>("board/setTable", createSetTableMessage(player.id, game.state));
-        controller.dispatch<LoadCardMessage>("yourTurn/loadCard", createLoadCardMessage(player));
-      });
+      this.sendEveryone(usedGameId, (player, game) => createSetTableMessage(player.id, game.state));
+      this.sendEveryone(usedGameId, (player, game) => createLoadCardMessage(player));
     }
   }
 
@@ -50,10 +46,42 @@ export class GamesController {
     // return "Нарба" + Math.ceil(Math.random() * 100);
   }
 
-  private subscribe(userId: PlayerId, playerController: PlayerController) {
+  private subscribe(userId: PlayerId, gameId: GameId, playerController: PlayerController) {
     this.playerControllers.set(userId, playerController);
-    playerController.on('cardAction', () => {
-      // Handle card action
+    playerController.on('cardAction', (action: CardAction) => {
+      console.log(`action: ${action}`);
+      const controller = this.playerControllers.get(userId);
+      if (!controller) {
+        console.log(`Cannot find player controller ${userId}`);
+        return;
+      }
+      controller.dispatch({
+        type: 'feedback/showFeedback',
+        payload: {
+          card: action.payload.card,
+          success: true,
+          playerCard: undefined
+        }
+      });
+
+      const game = this.games.get(gameId)!!;
+      const playerSuffix = action.payload.playerIndex ? ` on ${game.state.players[action.payload.playerIndex].id}` : '';
+      this.sendEveryone(gameId, () => ({
+        type: 'status/addMessage',
+        payload: `${userId} played ${action.payload.card}${playerSuffix}`
+      }));
+    });
+  }
+
+  private sendEveryone(gameId: GameId, messageCreator: (player: Player, game: LoveLetterGame) => RemoteAction): void {
+    const game = this.games.get(gameId)!!;
+    game.state.players.forEach((player: Player) => {
+      const controller = this.playerControllers.get(player.id);
+      if (!controller) {
+        console.log(`Cannot find player controller ${player.id}`);
+        return;
+      }
+      controller.dispatch(messageCreator(player, game));
     });
   }
 }

@@ -33,6 +33,10 @@ interface PlayerDescription {
   shield: boolean
 }
 
+export interface RemoteAction {
+  type: string;
+}
+
 export interface SetTableMessage {
   type: "board/setTable",
   payload: {
@@ -49,6 +53,22 @@ export interface LoadCardMessage {
   payload: {
     card: number;
   };
+}
+
+export interface ShowFeedback {
+  type: "feedback/showFeedback",
+  payload: {
+    card: number;
+    success: boolean;
+    playerCard: number | undefined;
+  };
+}
+
+export interface CardAction {
+  payload: {
+    card: number;
+    playerIndex: number | undefined;
+  }
 }
 
 export enum ErrorCode {
