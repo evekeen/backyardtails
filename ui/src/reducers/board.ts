@@ -1,18 +1,21 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Player} from '../model/Player';
 import * as _ from 'lodash';
-import {startTurn, selectPlayer, cancelSelection, YourTurnState} from './yourTurn';
+import {startTurn, selectPlayer, cancelSelection} from './yourTurn';
 import {CardType, PlayerIndex} from '../model/commonTypes';
 import {submitAction} from './cardActions';
 
-export interface BoardState {
+export interface BoardState extends ActivePlayerContext {
   deckLeft: number;
   discardPileTop: CardType | undefined;
   players: Player[];
-  turnIndex: PlayerIndex | undefined;
   currentPlayerInTurn?: boolean;
-  currentPlayerIndex: PlayerIndex | undefined;
   selectedPlayerIndex: PlayerIndex | undefined;
+}
+
+interface ActivePlayerContext {
+  turnIndex: PlayerIndex | undefined;
+  currentPlayerIndex: PlayerIndex | undefined
 }
 
 const boardSlice = createSlice({
@@ -52,8 +55,8 @@ const boardSlice = createSlice({
   }
 });
 
-function isCurrentPlayerInTurn(state: { turnIndex: PlayerIndex | undefined; currentPlayerIndex: PlayerIndex | undefined}) {
-  return !!state.turnIndex && state.turnIndex === state.currentPlayerIndex;
+function isCurrentPlayerInTurn(state: ActivePlayerContext) {
+  return state.turnIndex !== undefined && state.turnIndex === state.currentPlayerIndex;
 }
 
 export const {setTable, setPlayerInTurn} = boardSlice.actions;

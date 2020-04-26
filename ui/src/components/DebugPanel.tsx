@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import {startTurn, loadCard, TurnData} from '../reducers/yourTurn';
 import {setPlayerInTurn, setTable, BoardState} from '../reducers/board';
 import {CardType, PlayerIndex} from '../model/commonTypes';
-import _ = require('lodash');
 import {useEffect} from 'react';
 import {addMessage} from '../reducers/status';
 
@@ -16,7 +15,6 @@ interface DebugPanelProps {
 }
 
 const DebugPanel = (props: DebugPanelProps) => {
-  useEffect(() => initGame(props));
   return (
     <div className="debug-panel">
     </div>

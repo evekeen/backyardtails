@@ -19,15 +19,20 @@ export const Board = (props: BoardProps) => {
   return (
     <div>
       <div className="top-row_wrapper">
-        {player(props.players[2], props)}
+        {player(props.players[getIndex(props, 2)], props)}
       </div>
       <div className="middle-row_wrapper">
-        {player(props.players[1], props)}
+        {player(props.players[getIndex(props, 1)], props)}
         <Decks deckLeft={props.deckLeft} discardPileTop={props.discardPileTop}/>
-        {player(props.players[3], props)}
+        {player(props.players[getIndex(props, 3)], props)}
       </div>
     </div>
   );
+}
+
+function getIndex(props: BoardProps, position: PlayerIndex): PlayerIndex {
+  const currentIndex = props.currentPlayerIndex;
+  return (currentIndex + position) % PLAYERS_NUMBER as PlayerIndex;
 }
 
 function player(player: Player, props: BoardProps) {
@@ -35,7 +40,9 @@ function player(player: Player, props: BoardProps) {
     <OtherPlayer player={player}
                  selected={player && props.selectedPlayerIndex === player?.index}
                  selectable={props.currentPlayerInTurn}
-                 active={props.turnIndex && props.turnIndex === player?.index}
+                 active={props.turnIndex !== undefined && props.turnIndex === player?.index}
                  onClick={props.selectPlayer}/>
   )
 }
+
+const PLAYERS_NUMBER = 4;
