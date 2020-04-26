@@ -81,9 +81,9 @@ export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameS
       discardPileTop: discardPileTop && getCardIndex(discardPileTop) || undefined,
       turnIndex: state.getPlayerIndex(state.activeTurnPlayerId),
       currentPlayerIndex: state.getPlayerIndex(playerId)!,
-      players: state.players.map(player => {
+      players: state.players.map((player, index) => {
         return ({
-          index: state.getPlayerIndex(playerId)!,
+          index: index,
           name: player.id,
           score: player.score,
           alive: player.alive,
