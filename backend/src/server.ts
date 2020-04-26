@@ -74,13 +74,13 @@ wss.on('connection', (ws: WebSocket, request: any) => {
           playerController.onMessage(type, message);
         }))
 
-        playerController.on('stateReady', state => {
-          console.log(`Sending state to ${playerController.userId}`)
-          ws.send(JSON.stringify(state));
-        });
-
         ws.send(JSON.stringify({type: 'status/addMessage', payload: `Hello ${userId}, you sent -> ${JSON.stringify(typedMessage)}`}));
       }));
+    });
+
+    playerController.on('stateReady', state => {
+      console.log(`Sending state to ${playerController.userId}`)
+      ws.send(JSON.stringify(state));
     });
 
     ws.on('error', (error) => console.log("Error: " + error));
