@@ -230,5 +230,6 @@ ol li span {
 }
 
 .status-messages > .toast {
+  min-width: 300px;
   max-width: 600px;
 }
