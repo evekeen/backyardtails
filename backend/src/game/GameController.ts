@@ -1,6 +1,6 @@
 import {GameId, LoveLetterGame, Player, PlayerId} from './loveletter';
 import {PlayerController} from '../PlayerController';
-import {CardAction, createLoadCardMessage, createSetTableMessage, RemoteAction} from '../protocol';
+import {CardAction, createLoadCardMessage, createSetTableMessage, createTextMessage, RemoteAction} from '../protocol';
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
@@ -38,6 +38,7 @@ export class GamesController {
 
       this.sendEveryone(usedGameId, (player, game) => createSetTableMessage(player.id, game.state));
       this.sendEveryone(usedGameId, (player, game) => createLoadCardMessage(player));
+      this.sendEveryone(usedGameId, (player, game) => createTextMessage(`It's ${game.state.activeTurnPlayerId}'s turn`));
     }
   }
 
@@ -68,10 +69,7 @@ export class GamesController {
       });
 
       const playerSuffix = action.payload.playerIndex ? ` on ${game.state.players[action.payload.playerIndex].id}` : '';
-      this.sendEveryone(gameId, () => ({
-        type: 'status/addMessage',
-        payload: `${userId} played ${action.payload.card}${playerSuffix}`
-      }));
+      this.sendEveryone(gameId, () => createTextMessage(`${userId} played ${action.payload.card}${playerSuffix}`));
     });
   }
 

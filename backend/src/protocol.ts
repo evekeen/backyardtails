@@ -35,6 +35,7 @@ interface PlayerDescription {
 
 export interface RemoteAction {
   type: string;
+  payload: any;
 }
 
 export interface SetTableMessage {
@@ -127,5 +128,12 @@ export function createLoadCardMessage(player: Player): LoadCardMessage {
     payload: {
       card: player.hand.card!!
     }
+  };
+}
+
+export function createTextMessage (text: string): RemoteAction {
+  return {
+    type: 'status/addMessage',
+    payload: text
   };
 }
