@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack",
     "watch": "webpack-dev-server --open --mode development",
-    "watch-prod": "webpack-dev-server --open --mode development --env.WS_URL=ws://loveletter-dev.us-west-2.elasticbeanstalk.com:8999",
+    "watch-prod": "webpack-dev-server --open --mode production",
     "copy": "cp package.json dist"
   },
   "repository": {
