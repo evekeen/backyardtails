@@ -39,8 +39,8 @@ function initGame(props: DebugPanelProps) {
     deckLeft: 5,
     discardPileTop: randomCard(),
     players: players,
-    turnIndex: 4,
-    currentPlayerIndex: 1,
+    turnIndex: 3,
+    currentPlayerIndex: 0,
     selectedPlayerIndex: undefined
   });
   props.loadCard({card: randomCard()});

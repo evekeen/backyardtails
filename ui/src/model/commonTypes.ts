@@ -1,4 +1,4 @@
-export type PlayerIndex = 1 | 2 | 3 | 4;
+export type PlayerIndex = 0 | 1 | 2 | 3;
 
 export enum CardType {
   Guard = 1,

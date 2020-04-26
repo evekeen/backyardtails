@@ -5,9 +5,11 @@ import {ActionDialog} from './ActionDialog';
 import {CardAction} from '../model/CardAction';
 import {Player} from '../model/Player';
 import _ = require('lodash');
+import {Score} from './Score';
 
 interface PlayerHandProps {
   active: boolean;
+  player: Player;
   cards: CardType[];
   selectedCard: CardType | undefined;
   selectedPlayer: Player | undefined;
@@ -44,6 +46,7 @@ export const PlayerHand = (props: PlayerHandProps) => {
             {secondCard()}
           </div>
         </div>
+        <Score score={props.player?.score || 0}/>
       </div>
       <ActionDialog card={selectedCard} player={props.selectedPlayer} show={showDialog(selectedCard, props)}
                     onHide={() => props.cancelSelection()} onSubmit={submit}/>

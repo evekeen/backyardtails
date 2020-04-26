@@ -9,6 +9,7 @@ const mapDispatchToProps = {submitAction, selectCard, cancelSelection}
 const mapStateToProps = (state: AppState) => {
   return {
     active: state.board.currentPlayerInTurn,
+    player: state.board.players[state.board.currentPlayerIndex],
     cards: [state.yourTurn.oldCard, state.yourTurn.newCard],
     selectedPlayer: state.yourTurn.selectedPlayer,
     selectedCard: state.yourTurn.selectedCard
