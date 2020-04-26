@@ -1,8 +1,8 @@
 {
   "type": "cardAction",
-  "remote": true,
-  "action": {
-    "card": 1,
-    "playerIndex": 3
-  }
+  "payload": {
+    "card": 2,
+    "playerIndex": 1
+  },
+  "meta": "remote"
 }

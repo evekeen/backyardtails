@@ -3,6 +3,8 @@
   "payload": {
     "deckLeft": 5,
     "discardPileTop": 6,
+    "turnIndex": 3,
+    "currentPlayerIndex": 0,
     "players": [
       {
         "index": 1,
@@ -32,8 +34,6 @@
         "alive": true,
         "shield": false
       }
-    ],
-    "activeIndex": 4,
-    "currentUserInTurn": false
+    ]
   }
 }
