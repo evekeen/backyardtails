@@ -1,9 +1,12 @@
 import {CardType} from '../model/commonTypes';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Player} from '../model/Player';
+import {BoardState} from './board';
+import {submitAction} from './cardActions';
+import {CardAction} from '../model/CardAction';
 
 export interface YourTurnState {
-  currentUserInTurn: boolean;
+  currentPlayerInTurn: boolean;
   oldCard: CardType | undefined;
   newCard: CardType | undefined;
 
@@ -18,11 +21,11 @@ export interface TurnData {
 const yourTurnSlice = createSlice({
   name: 'yourTurn',
   initialState: {
-    currentUserInTurn: false
+    currentPlayerInTurn: false
   } as YourTurnState,
   reducers: {
     startTurn(state: YourTurnState, action: PayloadAction<TurnData>) {
-      state.currentUserInTurn = true;
+      state.currentPlayerInTurn = true;
       state.newCard = action.payload.card;
     },
     loadCard(state: YourTurnState, action: PayloadAction<TurnData>) {
@@ -38,6 +41,13 @@ const yourTurnSlice = createSlice({
       state.selectedCard = undefined;
       state.selectedPlayer = undefined;
     },
+  },
+  extraReducers: builder => {
+    builder.addCase(submitAction, (state: YourTurnState, action: PayloadAction<CardAction>) => {
+      state.oldCard = action.payload.card === state.oldCard ? state.newCard : state.oldCard;
+      state.newCard = undefined;
+      state.currentPlayerInTurn = false;
+    });
   }
 });
 

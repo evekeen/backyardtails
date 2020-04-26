@@ -45,7 +45,7 @@ export class WsClient {
   remoteMiddleware = (store: Store<any, any>) => {
     this.init(store.dispatch);
     return (next: any) => (action: any) => {
-      if (action.remote) {
+      if (action.meta === 'remote') {
         console.info('dispatching remote action', action);
         this.dispatchToWs(action);
       } else {

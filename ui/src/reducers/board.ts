@@ -1,8 +1,9 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Player} from '../model/Player';
 import * as _ from 'lodash';
-import {startTurn, selectPlayer, cancelSelection} from './yourTurn';
+import {startTurn, selectPlayer, cancelSelection, YourTurnState} from './yourTurn';
 import {CardType, PlayerIndex} from '../model/commonTypes';
+import {submitAction} from './cardActions';
 
 export interface BoardState {
   deckLeft: number;
@@ -45,6 +46,8 @@ const boardSlice = createSlice({
       state.selectedPlayerIndex = action.payload.index;
     }).addCase(cancelSelection, (state: BoardState) => {
       state.selectedPlayerIndex = undefined;
+    }).addCase(submitAction, (state: BoardState) => {
+      state.currentPlayerInTurn = false;
     });
   }
 });
