@@ -52,7 +52,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
       console.log('join', joinMessageObj);
       pipe(JoinMessage.decode(joinMessageObj), fold(
         error => console.log("Failed to parse JoinMessage:" + error),
-        joinMessage => gamesController.onJoin(userId, joinMessage.gameId, playerController)));
+        joinMessage => gamesController.onJoin(userId, joinMessage.payload.gameId, playerController)));
     });
 
     // Wait for hello message.

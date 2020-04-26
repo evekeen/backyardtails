@@ -1,8 +1,15 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createAction, createSlice} from '@reduxjs/toolkit';
 
-export const joinGame = () => ({
-  type: 'join',
-  remote: true
+export interface GameDescriptor {
+  gameId?: string;
+  userId?: string;
+}
+
+export const joinGame = createAction("connection/join", (desc: GameDescriptor) => {
+  return {
+    meta: "remote",
+    payload: desc
+  };
 });
 
 interface ConnectionState {

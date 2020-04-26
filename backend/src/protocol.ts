@@ -5,15 +5,18 @@ import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
 import {Validation} from "io-ts";
 
-export const MessageType = t.union([t.literal("join"), t.literal("cardAction"), t.literal("state")])
+export const MessageType = t.union([t.literal("connection/join"), t.literal("cardAction"), t.literal("state")])
 
 export const Message = t.interface({
   type: MessageType
 })
 
 export const JoinMessage = t.interface({
-  type: t.literal("join"),
-  gameId: t.union([t.string, t.undefined]),
+  type: t.literal("connection/join"),
+  payload: t.interface({
+    gameId: t.union([t.string, t.undefined]),
+    userId: t.union([t.string, t.undefined])
+  }),
 });
 
 export const BoardStateMessage = t.interface({

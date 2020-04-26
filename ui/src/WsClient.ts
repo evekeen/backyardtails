@@ -97,7 +97,7 @@ export class WsClient {
     this.lastMsgTime = Date.now();
     // this.keepAliveCheckTimer = window.setInterval(this.keepAliveCheck, KEEP_ALIVE_CHECK_INTERVAL);
     this.localDispatch(connected());
-    this.dispatchToWs(joinGame());
+    this.dispatchToWs(joinGame({}));
   }
 
   private setupReconnect = () => {
