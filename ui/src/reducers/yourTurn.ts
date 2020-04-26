@@ -1,7 +1,6 @@
 import {CardType} from '../model/commonTypes';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Player} from '../model/Player';
-import {BoardState} from './board';
 import {submitAction} from './cardActions';
 import {CardAction} from '../model/CardAction';
 
