@@ -1,6 +1,6 @@
 import {GameId, LoveLetterGame, Player, PlayerId} from "./loveletter";
 import {PlayerController} from "../PlayerController";
-import {createSetTableMessage, SetTableMessage} from "../protocol";
+import {createLoadCardMessage, createSetTableMessage, LoadCardMessage, SetTableMessage} from '../protocol';
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
@@ -38,7 +38,9 @@ export class GamesController {
 
       game.state.players.forEach((player: Player) => {
         const controller = this.playerControllers.get(player.id);
-        controller && controller.dispatch<SetTableMessage>("board/setTable", createSetTableMessage(player.id, game.state));
+        if (!controller) return;
+        controller.dispatch<SetTableMessage>("board/setTable", createSetTableMessage(player.id, game.state));
+        controller.dispatch<LoadCardMessage>("yourTurn/loadCard", createLoadCardMessage(player));
       });
     }
   }

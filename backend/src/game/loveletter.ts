@@ -6,7 +6,7 @@ export type PlayerId = string
 export interface Player {
   id: string;
   hand: Hand;
-  discardPile: Card[];
+  discardPile: CardType[];
   score: number;
   alive: boolean;
 }
@@ -22,82 +22,52 @@ Countess 	7	1	If a player holds both this card and either the King or Prince car
 Princess	8	1	If a player plays this card for any reason, they are eliminated from the round.
 */
 
-export enum Card {
-  GUARD = "Guard",
-  PRIEST = "Priest",
-  BARON = "Baron",
-  HANDMAID = "Handmaid",
-  PRINCE = "Prince",
-  KING = "King",
-  COUNTESS = "Countess",
-  PRINCESS = "Princess"
+export enum CardType {
+  Guard = 1,
+  Priest = 2,
+  Baron = 3,
+  Handmaid = 4,
+  Prince = 5,
+  King = 6,
+  Countess = 7,
+  Princess = 8
 }
 
-const counts: {[key: string]: number} = {
-   Guard: 5,
-   Priest: 2,
-   Baron: 2,
-   Handmaid: 2,
-   Prince: 2,
-   King: 1,
-   Countess: 1,
-   Princess: 1,
-}
+const cards = [
+  CardType.Guard, CardType.Guard, CardType.Guard, CardType.Guard, CardType.Guard,
+  CardType.Priest, CardType.Priest,
+  CardType.Baron, CardType.Baron,
+  CardType.Handmaid, CardType.Handmaid,
+  CardType.Prince, CardType.Prince,
+  CardType.King,
+  CardType.Countess,
+  CardType.Princess
+];
 
-const strength: {[key: string]: number} = {
-  Guard: 1,
-  Priest: 2,
-  Baron: 3,
-  Handmaid: 4,
-  Prince: 5,
-  King: 6,
-  Countess: 7,
-  Princess: 8,
-}
-
-const idx: {[key: string]: number} = {
-  Guard: 0,
-  Priest: 1,
-  Baron: 2,
-  Handmaid: 3,
-  Prince: 4,
-  King: 5,
-  Countess: 6,
-  Princess: 7,
-}
-
-export function getStrength(card: string | undefined): number {
-  return (card && card in strength) ? strength[card] : -1;
-}
-
-export function getCount(card: string): number {
-  return counts[card];
-}
-
-export function getCardIndex(card: string): number {
-  return idx[card];
+export function getCardIndex(card: CardType): number {
+  return card - 1;
 }
 
 export interface Hand {
-  card?: Card;
-  pendingCard?: Card;
+  card?: CardType;
+  pendingCard?: CardType;
   immune: boolean;
 }
 
 export interface Deck {
   size(): number;
-  take(): Card
+  take(): CardType
   init(): void;
 }
 
 class LoveLetterDeck implements Deck {
-  private deck: Card[] = [];
+  private deck: CardType[] = [];
 
   size(): number {
     return this.deck.length;
   }
 
-  take(): Card {
+  take(): CardType {
     if (this.deck.length) {
       return this.deck.pop()!;
     }
@@ -105,8 +75,7 @@ class LoveLetterDeck implements Deck {
   }
 
   init(): void {
-    const deck =_.flatMap(Object.values(Card), card => Array(getCount(card)).fill(card))
-    const shuffled = _.shuffle(deck)
+    const shuffled = _.shuffle(cards)
     if (shuffled.length > 0)
       shuffled.pop();
     this.deck = shuffled;
@@ -118,7 +87,7 @@ interface GameState {
   activePlayerIds: PlayerId[];
   deadPlayerIds: PlayerId[];
   activeTurnPlayerId: PlayerId | undefined;
-  discarded: Card[];
+  discarded: CardType[];
   deck: Deck;
 }
 
@@ -200,10 +169,8 @@ export class LoveLetterGameState {
       this.setWinner(this.activePlayerIds[0]);
     } else if (this.deck.size() == 0) {
       const playersLeft = this.activePlayerIds.map(id => this.getPlayer(id));
-      const maxHeldCardStrength = playersLeft.map(p => getStrength(p.hand.card)).reduce((a, b) => Math.max(a, b));
-      const byHandStrength = _.groupBy(playersLeft, player => {
-        getStrength(player.hand.card);
-      });
+      const maxHeldCardStrength = playersLeft.map(p => p.hand.card).reduce((a, b) => Math.max(a || 0, b || 0)) || 0;
+      const byHandStrength = _.groupBy(playersLeft, player => player.hand.card);
 
       const potentialWinners = byHandStrength[maxHeldCardStrength];
       if (potentialWinners.length == 1) {

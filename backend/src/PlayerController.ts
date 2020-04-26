@@ -11,8 +11,10 @@ export class PlayerController extends EventEmitter {
   }
 
   dispatch<T>(type: string, state: T) {
-    if (type == 'board/setTable') {
+    if (SUPPORTED_ACTIONS.indexOf(type) !== -1) {
       this.emit('stateReady', state);
     }
   }
 }
+
+const SUPPORTED_ACTIONS = ['board/setTable', 'yourTurn/loadCard'];

@@ -4,7 +4,7 @@ import * as WebSocket from 'ws';
 import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
 import {Validation} from "io-ts";
-import {getCardIndex, LoveLetterGameState, PlayerId} from "./game/loveletter";
+import {getCardIndex, LoveLetterGameState, Player, PlayerId} from './game/loveletter';
 import _ = require("lodash");
 
 export const MessageType = t.union([t.literal("connection/join"), t.literal("cardAction"), t.literal("state")])
@@ -42,6 +42,13 @@ export interface SetTableMessage {
     turnIndex: number | undefined;
     currentPlayerIndex: number
   }
+}
+
+export interface LoadCardMessage {
+  type: "yourTurn/loadCard",
+  payload: {
+    card: number;
+  };
 }
 
 export enum ErrorCode {
@@ -92,4 +99,13 @@ export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameS
       })
     }
   }
+}
+
+export function createLoadCardMessage(player: Player): LoadCardMessage {
+  return {
+    type: "yourTurn/loadCard",
+    payload: {
+      card: player.hand.card!!
+    }
+  };
 }

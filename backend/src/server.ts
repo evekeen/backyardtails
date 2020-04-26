@@ -3,7 +3,7 @@ import * as http from 'http';
 import * as WebSocket from 'ws';
 import {AddressInfo} from "net";
 import * as session from 'express-session';
-import {ErrorCode, error, Message, MessageType, websocketReporter, BoardStateMessage, JoinMessage} from "./protocol";
+import {ErrorCode, error, Message, JoinMessage} from "./protocol";
 import {ThrowReporter} from "io-ts/lib/ThrowReporter";
 import * as Either from 'fp-ts/lib/Either';
 import {pipe} from "fp-ts/lib/pipeable";
@@ -79,7 +79,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
     });
 
     playerController.on('stateReady', state => {
-      console.log(`Sending state to ${playerController.userId}`)
+      console.log(`Sending ${state.type} to ${playerController.userId}`)
       ws.send(JSON.stringify(state));
     });
 
