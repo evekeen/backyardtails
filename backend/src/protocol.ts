@@ -78,7 +78,7 @@ export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameS
     type: "board/setTable",
     payload: {
       deckLeft: state.deck.size(),
-      discardPileTop: discardPileTop && getCardIndex(discardPileTop) || 5,
+      discardPileTop: discardPileTop && getCardIndex(discardPileTop) || undefined,
       turnIndex: state.getPlayerIndex(state.activeTurnPlayerId),
       currentPlayerIndex: state.getPlayerIndex(playerId)!,
       players: state.players.map(player => {
