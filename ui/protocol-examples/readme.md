@@ -18,8 +18,22 @@ server is ready to receive messages
 
 #from client to server
 
-## toServer
+## general-shape
 general shape of the message
+```
+{
+  "type": type,
+  "payload": data,
+  "meta": "remote"
+}
+```
+### Types
+to join a game
+```
+connection/join
+```
 
-## cardAction
 when a player plays a card on a player
+```
+cardAction
+```

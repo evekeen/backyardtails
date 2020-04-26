@@ -64,6 +64,10 @@ body {
   width: 166px;
 }
 
+.player-active .ll-card__box {
+  box-shadow: 17px 17px 43px rgba(184, 104, 104, 0.9), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(196, 191, 191, 0.2), -17px 17px 34px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+}
+
 .ll-card__cover {
   position: relative;
 }
@@ -176,7 +180,7 @@ ol li span {
 }
 
 .main-wrapper .score {
-  padding: 0;
+  padding-left: 10px;
 }
 
 .score li {
