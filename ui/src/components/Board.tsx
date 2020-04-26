@@ -35,7 +35,7 @@ function player(player: Player, props: BoardProps) {
     <OtherPlayer player={player}
                  selected={player && props.selectedPlayerIndex === player?.index}
                  selectable={props.currentPlayerInTurn}
-                 active={props.turnIndex === player?.index}
+                 active={props.turnIndex && props.turnIndex === player?.index}
                  onClick={props.selectPlayer}/>
   )
 }
