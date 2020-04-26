@@ -9,7 +9,7 @@ on:
     branches: [ master ]
     paths:
       - 'ui/**'
-      - '.github/**'
+      - '.github/workflows/ui.yml'
   pull_request:
     branches: [ master ]
 
