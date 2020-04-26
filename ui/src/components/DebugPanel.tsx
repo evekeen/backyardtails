@@ -15,8 +15,6 @@ interface DebugPanelProps {
   addMessage: (message: string) => void;
 }
 
-const names = ['Vasya', 'Petya', 'Masha', 'Phillip']
-
 const DebugPanel = (props: DebugPanelProps) => {
   useEffect(() => initGame(props));
   return (
@@ -26,23 +24,6 @@ const DebugPanel = (props: DebugPanelProps) => {
 };
 
 function initGame(props: DebugPanelProps) {
-  const indexes: PlayerIndex[] = Array.apply(null, Array(4)).map((x: any, index: number) => index);
-  const players = _.shuffle(indexes).map((i, index) => ({
-    index: index as PlayerIndex,
-    name: names[i],
-    score: Math.round(Math.random() * 5),
-    alive: true,
-    shield: Math.random() > 0.7,
-  }));
-
-  props.setTable({
-    deckLeft: 5,
-    discardPileTop: randomCard(),
-    players: players,
-    turnIndex: 3,
-    currentPlayerIndex: 0,
-    selectedPlayerIndex: undefined
-  });
   props.loadCard({card: randomCard()});
   setTimeout(() => props.startTurn({card: randomCard()}), 2000);
 }
