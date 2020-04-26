@@ -28,7 +28,7 @@ const MessageToast = (props: MessageToastProps) => {
   return (
     <Toast show={!props.closed} onClose={props.onClose}>
       <Toast.Header>
-        <strong className="mr-auto">Letter</strong>
+        <strong className="mr-auto">Love Letter</strong>
         <small>{ago} seconds ago</small>
       </Toast.Header>
       <Toast.Body>{props.text}</Toast.Body>
