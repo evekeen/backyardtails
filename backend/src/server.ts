@@ -73,8 +73,6 @@ wss.on('connection', (ws: WebSocket, request: any) => {
           const type = m.type
           playerController.onMessage(type, message);
         }))
-
-        ws.send(JSON.stringify({type: 'status/addMessage', payload: `Hello ${userId}, you sent -> ${JSON.stringify(typedMessage)}`}));
       }));
     });
 
