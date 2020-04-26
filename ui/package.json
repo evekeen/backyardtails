@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack",
     "watch": "webpack-dev-server --open --mode development",
+    "watch-prod": "webpack-dev-server --open --mode development --env.WS_URL=ws://loveletter-dev.us-west-2.elasticbeanstalk.com:8999",
     "copy": "cp package.json dist"
   },
   "repository": {
@@ -28,9 +29,11 @@
     "@types/react-redux": "7.1.7",
     "@types/webpack-env": "1.15.1",
     "@types/ws": "7.2.4",
+    "clean-webpack-plugin": "3.0.0",
     "css-loader": "3.5.2",
     "file-loader": "6.0.0",
     "html-loader": "1.1.0",
+    "html-webpack-plugin": "^4.2.0",
     "redux-devtools": "3.5.0",
     "redux-devtools-extension": "2.13.8",
     "source-map-loader": "0.2.4",

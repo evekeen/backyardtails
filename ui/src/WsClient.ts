@@ -32,7 +32,7 @@ export class WsClient {
   private keepAliveCheckTimer: number | undefined;
   private localDispatch: Dispatch<any>;
 
-  constructor(private readonly url: string = 'ws://localhost:8999') {
+  constructor(private readonly url: string) {
     window.addEventListener('unload', () => {
       this.terminated = true;
       if (this.ws) {

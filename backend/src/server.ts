@@ -105,7 +105,7 @@ server.on('upgrade', function upgrade(request, socket, head) {
 });
 
 //start our server
-server.listen(process.env.PORT || 8999, () => {
+server.listen(process.env.WS_PORT || 8999, () => {
   const address = server.address() as AddressInfo;
   console.log(`Server started on port ${address.port} :)`);
 });

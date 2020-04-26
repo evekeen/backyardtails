@@ -38,11 +38,13 @@
     "@types/express-session": "1.17.0",
     "@types/lodash": "4.14.150",
     "@types/ws": "7.2.4",
+    "clean-webpack-plugin": "3.0.0",
     "typescript": "3.8.3"
   },
   "scripts": {
-    "start": "node ./dist/main.js",
+    "start": "node ./dist/server.js",
     "build": "webpack",
+    "build-zip": "webpack;zip backend.zip -r dist/* -b dist -j -FS",
     "watch": "webpack --watch"
   },
   "author": "",

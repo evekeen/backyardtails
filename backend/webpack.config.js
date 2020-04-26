@@ -1,3 +1,5 @@
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
 module.exports = {
   mode: "development",
 
@@ -10,7 +12,7 @@ module.exports = {
   },
 
   entry: {
-    'main': ['./src/server.ts',]
+    'server': ['./src/server.ts',]
   },
 
   module: {
@@ -26,6 +28,10 @@ module.exports = {
       }
     ]
   },
+
+  plugins: [
+    new CleanWebpackPlugin()
+  ],
 
   target: 'node',
 

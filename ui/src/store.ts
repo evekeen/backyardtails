@@ -3,7 +3,9 @@ import loggerMiddleware from './middleware/logger'
 import reducers from './reducers'
 import {WsClient} from './WsClient';
 
-const wsClient = new WsClient();
+const url = process.env.WS_URL || 'ws://localhost:8999';
+
+const wsClient = new WsClient(url);
 
 export default function configureAppStore(preloadedState: any) {
   const store = configureStore({
