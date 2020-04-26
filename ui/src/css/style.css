@@ -6,7 +6,7 @@ body {
 .game-container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;  
+  justify-content: space-between;
   height: 100%;
   padding: 1vh;
   margin: 0 auto;
@@ -19,7 +19,7 @@ body {
 
 .top-row_wrapper, .main-wrapper {
   display: flex;
-	justify-content: center;
+  justify-content: center;
   margin: 0 auto;
 }
 
@@ -204,4 +204,8 @@ ol li span {
   top: 0;
   right: 0;
   z-index: 100;
+}
+
+.status-messages > .toast {
+  max-width: 500px;
 }
