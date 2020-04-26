@@ -8,7 +8,7 @@ export const Score = (props: ScoreProps) => {
   const tokens: number[] = Array.apply(null, Array(MAX_SCORE)).map((x: any, i: number) => i);
   return (
     <ul className="score">
-      {tokens.map(i => <li key={`token-${i}`}><LoveToken active={i <= props.score}/></li>)}
+      {tokens.map(i => <li key={`token-${i}`}><LoveToken active={i < props.score}/></li>)}
     </ul>
   );
 };
@@ -18,7 +18,7 @@ interface TokenProps {
 }
 
 const LoveToken = (props: TokenProps) => {
-  const src = props.active ? 'img/mish.svg' : 'img/mish-active.svg';
+  const src = props.active ? 'img/mish-active.svg' : 'img/mish.svg';
   return (
     <img src={src} alt=""/>
   );
