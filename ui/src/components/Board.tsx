@@ -16,23 +16,26 @@ interface BoardProps {
 }
 
 export const Board = (props: BoardProps) => {
-  const selectable = props.currentPlayerInTurn;
   return (
     <div>
       <div className="top-row_wrapper">
-        {player(props.players[2], props.selectPlayer, props.selectedPlayerIndex, selectable)}
+        {player(props.players[2], props)}
       </div>
       <div className="middle-row_wrapper">
-        {player(props.players[1], props.selectPlayer, props.selectedPlayerIndex, selectable)}
+        {player(props.players[1], props)}
         <Decks deckLeft={props.deckLeft} discardPileTop={props.discardPileTop}/>
-        {player(props.players[3], props.selectPlayer, props.selectedPlayerIndex, selectable)}
+        {player(props.players[3], props)}
       </div>
     </div>
   );
 }
 
-function player(player: Player, selectPlayer: (player: Player) => void, selectedPlayerIndex: PlayerIndex | undefined, selectable: boolean) {
+function player(player: Player, props: BoardProps) {
   return (
-    <OtherPlayer player={player} onClick={selectPlayer} selected={player && selectedPlayerIndex === player.index} selectable={selectable}/>
+    <OtherPlayer player={player}
+                 selected={player && props.selectedPlayerIndex === player?.index}
+                 selectable={props.currentPlayerInTurn}
+                 active={props.turnIndex === player?.index}
+                 onClick={props.selectPlayer}/>
   )
 }

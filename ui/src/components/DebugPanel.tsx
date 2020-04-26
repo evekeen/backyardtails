@@ -27,9 +27,9 @@ const DebugPanel = (props: DebugPanelProps) => {
 
 function initGame(props: DebugPanelProps) {
   const indexes: PlayerIndex[] = Array.apply(null, Array(4)).map((x: any, index: number) => index);
-  const players = _.shuffle(indexes).map(index => ({
-    index,
-    name: names[index],
+  const players = _.shuffle(indexes).map((i, index) => ({
+    index: index as PlayerIndex,
+    name: names[i],
     score: Math.round(Math.random() * 5),
     alive: true,
     shield: Math.random() > 0.7,
