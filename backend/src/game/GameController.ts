@@ -8,9 +8,9 @@ export class GamesController {
   private pendingGames = new Map<GameId, PlayerId[]>();
   private games = new Map<GameId, LoveLetterGame>();
 
-  onJoin(userId: string, gameId: string | undefined, playerController: PlayerController): void {
+  onJoin(userId: PlayerId, gameId: GameId | undefined, playerController: PlayerController): void {
     const usedGameId = gameId || GamesController.generateGameId();
-    this.playerControllers.set(userId, playerController);
+    this.subscribe(userId, playerController);
 
     let currentGame = this.games.get(usedGameId);
     if (currentGame && currentGame.hasPlayer(userId)) {
@@ -34,5 +34,12 @@ export class GamesController {
 
   private static generateGameId(): string {
     return "Нарба" + Math.ceil(Math.random() * 100);
+  }
+
+  private subscribe(userId: PlayerId, playerController: PlayerController) {
+    this.playerControllers.set(userId, playerController);
+    playerController.on('cardAction', () => {
+      // Handle card action
+    });
   }
 }
