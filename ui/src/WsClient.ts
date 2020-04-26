@@ -48,9 +48,8 @@ export class WsClient {
       if (action.meta === 'remote') {
         console.info('dispatching remote action', action);
         this.dispatchToWs(action);
-      } else {
-        next(action);
       }
+      next(action);
     };
   }
 
