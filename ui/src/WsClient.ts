@@ -1,4 +1,5 @@
 import {Dispatch, Store} from 'redux';
+import {connected, joinGame} from './reducers/connection';
 
 const CONNECT_TIMEOUT = 60000;
 
@@ -95,7 +96,9 @@ export class WsClient {
     this.autoReconnect = true;
     this.nextReconnectDelay = this.initReconnectDelay;
     this.lastMsgTime = Date.now();
-    this.keepAliveCheckTimer = window.setInterval(this.keepAliveCheck, KEEP_ALIVE_CHECK_INTERVAL);
+    // this.keepAliveCheckTimer = window.setInterval(this.keepAliveCheck, KEEP_ALIVE_CHECK_INTERVAL);
+    this.localDispatch(connected());
+    this.dispatchToWs(joinGame());
   }
 
   private setupReconnect = () => {

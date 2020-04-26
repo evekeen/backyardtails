@@ -5,7 +5,7 @@ import {updateCurrentUser, setTable, BoardState} from '../reducers/board';
 import {CardType, HandIndex} from '../model/commonTypes';
 import _ = require('lodash');
 import {useEffect} from 'react';
-import {joinGame} from '../reducers/game';
+import {joinGame} from '../reducers/connection';
 import {addMessage} from '../reducers/status';
 
 interface DebugPanelProps {
@@ -36,8 +36,6 @@ function initGame(props: DebugPanelProps) {
     alive: true,
     shield: Math.random() > 0.7,
   }));
-
-  props.joinGame();
 
   props.setTable({
     deckLeft: 5,
