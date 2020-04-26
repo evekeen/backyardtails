@@ -3,19 +3,22 @@ It's the board game
 
 ## Frontend
 
-### Build
+### Install dependencies
 ```
 cd ui
 npm ci
+```
+### Build
+```
 npm run build
 ```
-or to start a dev server
+### Run
+Open in a browser: `./ui/index.html`
+
+### Build & run
 ```
 npm run watch
 ```
-
-### Run
-Open in a browser: `ui/index.html`
 
 ## Backend
 
@@ -23,7 +26,7 @@ Open in a browser: `ui/index.html`
 ```
 cd backend
 npm ci
-tsc
+npm run build
 ```
 
 ### Start server
