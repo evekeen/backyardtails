@@ -1,9 +1,13 @@
 import * as _ from 'lodash';
 
+export type GameId = string;
+export type PlayerId = string
+
 export interface Player {
   id: string;
-  name: string;
-  hand?: Hand;
+  hand: Hand;
+  discardPile: Card[];
+  score: number;
 }
 
 /*
@@ -50,26 +54,32 @@ const strength: {[key: string]: number} = {
   Princess: 8,
 }
 
-export function getStrength(card: string): number {
-  return card in strength ? strength[card] : -1;
+export function getStrength(card: string | undefined): number {
+  return (card && card in strength) ? strength[card] : -1;
 }
 
 export function getCount(card: string): number {
   return counts[card];
 }
 
-export class Hand {
-  constructor(public card: Card, public immune: boolean) {
-  }
+export interface Hand {
+  card?: Card;
+  pendingCard?: Card;
+  immune: boolean;
 }
 
 export interface Deck {
+  size(): number;
   take(): Card
   init(): void;
 }
 
 class LoveLetterDeck implements Deck {
   private deck: Card[] = [];
+
+  size(): number {
+    return this.deck.length;
+  }
 
   take(): Card {
     if (this.deck.length) {
@@ -89,9 +99,9 @@ class LoveLetterDeck implements Deck {
 
 
 interface GameState {
-  activePlayers: Player[];
-  deadPlayers: Player[];
-  activeTurn: Player;
+  activePlayerIds: PlayerId[];
+  deadPlayerIds: PlayerId[];
+  activeTurnPlayerId: PlayerId | undefined;
   discarded: Card[];
   deck: Deck;
 }
@@ -111,59 +121,156 @@ export interface Game<State> {
 
   init(): void;
   applyAction(action: GameAction<State>): ActionResult;
-  join(player: Player): void;
-  leave(player: Player): void;
+  join(player: PlayerId): void;
+  leave(player: PlayerId): void;
 }
 
 export class LoveLetterGameState {
-  private idlePlayers: Player[] = [];
+  public players: Player[] = [];
+  public idlePlayersIds: PlayerId[] = [];
   public deck: Deck = new LoveLetterDeck();
-  public activePlayers: Player[] = [];
-  public deadPlayers: Player[] = [];
-  public activeTurn: Player | undefined;
+  public activePlayerIds: PlayerId[] = [];
+  public deadPlayerIds: PlayerId[] = [];
+  public activeTurnPlayerId: PlayerId | undefined;
+  public winnerId: PlayerId | undefined;
 
-  public addPlayer(player: Player) {
-    this.idlePlayers.push(player);
+  constructor(players: PlayerId[]) {
+    players.forEach((p) => this.players.push(this.newPlayer(p)));
   }
 
-  public removePlayer(player: Player) {
-    this.activePlayers = _.remove(this.activePlayers, p => p.id == player.id);
+  newPlayer(playerId: PlayerId): Player {
+    return {
+      id: playerId,
+      hand: {
+        card: undefined,
+        pendingCard: undefined,
+        immune: false
+      },
+      discardPile: [],
+      score: 0
+    };
   }
 
-  start() {
-    for (const player of this.idlePlayers)
-      this.activePlayers.push(player);
+  public addPlayer(player: PlayerId) {
+    this.idlePlayersIds.push(player);
+  }
 
-    this.idlePlayers = [];
+  public removePlayer(player: PlayerId) {
+    this.idlePlayersIds = _.remove(this.idlePlayersIds, id => id === player);
+    this.players = _.remove(this.players, p => p.id === player);
+    this.activePlayerIds = _.remove(this.activePlayerIds, id => id === player);
+  }
+
+  start(firstPlayerId: PlayerId) {
+    for (const idleId of this.idlePlayersIds)
+      this.players.push(this.newPlayer(idleId));
+    this.idlePlayersIds = [];
     this.deck.init();
+    this.activePlayerIds = this.players.map(p => p.id);
+    this.players.forEach(player => {
+      player.hand.card = this.deck.take();
+      player.hand.immune = false;
+      player.hand.pendingCard = undefined;
+      player.discardPile = [];
+    });
+    this.deadPlayerIds = [];
+    this.activeTurnPlayerId = firstPlayerId;
+    this.winnerId = undefined;
+  }
+
+  nextTurn() {
+    if (this.activePlayerIds.length == 1) {
+      this.setWinner(this.activePlayerIds[0]);
+    } else if (this.deck.size() == 0) {
+      const playersLeft = this.activePlayerIds.map(id => this.getPlayer(id));
+      const maxHeldCardStrength = playersLeft.map(p => getStrength(p.hand.card)).reduce((a, b) => Math.max(a, b));
+      const byHandStrength = _.groupBy(playersLeft, player => {
+        getStrength(player.hand.card);
+      });
+
+      const potentialWinners = byHandStrength[maxHeldCardStrength];
+      if (potentialWinners.length == 1) {
+        this.setWinner(potentialWinners[0].id);
+      } else {
+        const winnerId = _.maxBy(potentialWinners, p => p.discardPile.length)?.id
+        winnerId && this.setWinner(winnerId); // TODO What if tied even here?
+      }
+    } else {
+      const currentPlayerId = this.activeTurnPlayerId!; // should be initialized on start
+      let currentPlayerIndex = _.findIndex(this.players, p => p.id == currentPlayerId);
+      if (currentPlayerIndex < 0) {
+        console.log("WTF!" + currentPlayerId + "is not found among players!");
+        // TODO Restart?
+      } else {
+        let iterations = 0;
+        do {
+          currentPlayerIndex = (currentPlayerIndex + 1) % this.players.length;
+          iterations++;
+        } while (this.isDead(this.players[currentPlayerIndex].id) && iterations < this.players.length);
+
+        if (iterations == this.players.length) {
+          // TODO WTF?
+        } else {
+          const nextPlayer = this.players[currentPlayerIndex];
+          this.activeTurnPlayerId = nextPlayer.id;
+          nextPlayer.hand.pendingCard = this.deck.take();
+        }
+      }
+    }
+  }
+
+  private setWinner(winnerId: PlayerId) {
+    this.getPlayer(winnerId).score += 1;
+    this.winnerId = winnerId;
+  }
+
+  private isDead(id: PlayerId): boolean {
+    return id in this.deadPlayerIds;
+  }
+
+  getPlayer(id: PlayerId): Player {
+    return _.find(this.players, p => p.id == id)!;
   }
 }
 
 export class LoveLetterGame implements Game<LoveLetterGameState> {
-  public state = new LoveLetterGameState();
-  private firstPlayer: Player | undefined;
+  public state = new LoveLetterGameState(this.players);
+  private actions: GameAction<LoveLetterGameState>[] = [];
+  private firstPlayerIdx = -1;
+
+  constructor(private players: PlayerId[]) {
+    this.state.nextTurn();
+  }
 
   applyAction(action: GameAction<LoveLetterGameState>): ActionResult {
-    if (action.player.id !== this.state.activeTurn!.id) {
+    if (action.player.id !== this.state.activeTurnPlayerId) {
       return {}; // TODO fail
     }
 
+    this.actions.push(action);
     this.state = action.apply(this.state);
+    this.state.nextTurn();
 
     return {
       newState: this.state
     }
   }
 
-  join(player: Player) {
+  join(player: PlayerId) {
     this.state.addPlayer(player)
   }
 
-  leave(player: Player) {
+  leave(player: PlayerId) {
     this.state.removePlayer(player);
   }
 
+  hasPlayer(player: PlayerId) {
+    return player in this.players;
+  }
+
   init() {
-    this.state.start();
+    this.firstPlayerIdx = (this.firstPlayerIdx + 1) % this.players.length;
+    const firstPlayer = this.players[this.firstPlayerIdx];
+    this.state.start(firstPlayer);
   }
 }

@@ -52,11 +52,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
       console.log('join', joinMessageObj);
       pipe(JoinMessage.decode(joinMessageObj), fold(
         error => console.log("Failed to parse JoinMessage:" + error),
-        joinMessage => {
-          gamesController.onJoin(userId, joinMessage.gameId).then(game => {
-            playerController.join(game);
-          })
-      }));
+        joinMessage => gamesController.onJoin(userId, joinMessage.gameId, playerController)));
     });
 
     // Wait for hello message.
@@ -67,15 +63,13 @@ wss.on('connection', (ws: WebSocket, request: any) => {
 
       pipe(parsedMessage, Either.map(message => {
         const typedMessage = Message.decode(message);
-        ThrowReporter.report(typedMessage)
-        // websocketReporter(ws).report(typedMessage)
 
-        pipe(typedMessage, Either.map(mes => {
-          const type = mes.type
+        // websocketReporter(ws).report(typedMessage)
+        pipe(typedMessage, fold(_ => ThrowReporter.report(typedMessage), m => {
+          console.log('received: %s', JSON.stringify(m));
+          const type = m.type
           playerController.onMessage(type, message);
         }))
-
-        console.log('received: %s', typedMessage);
 
         playerController.on('stateReady', state => {
           ws.send(JSON.stringify(state));
