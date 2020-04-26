@@ -26,7 +26,7 @@ const wss = new WebSocket.Server({ noServer: true });
 const gamesController = new GamesController();
 
 function generateUserId(): string {
-  return "RandomUser" + Math.ceil(Math.random() * 100);
+  return "User " + Math.ceil(Math.random() * 100);
 }
 
 function authenticate(req: any, callback: (userId: string) => any) {
@@ -53,7 +53,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
       pipe(JoinMessage.decode(joinMessageObj), fold(
         error => console.log("Failed to parse JoinMessage:" + error),
         joinMessage => {
-          console.log(`Joining userd ${userId} to a game...`);
+          console.log(`Joining user ${userId} to a game...`);
           gamesController.onJoin(userId, joinMessage.payload.gameId, playerController)
         }));
     });
