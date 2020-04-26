@@ -39,5 +39,5 @@ jobs:
         application_name: loveletter-front
         environment_name: ${{ secrets.ENVIRONMENT_NAME }}
         region: us-west-2
-        version_label: ${{ env.GITHUB_RUN_NUMBER }}
+        version_label: ${GITHUB_RUN_NUMBER}
         deployment_package: backend/backend.zip
