@@ -49,7 +49,10 @@ export class GamesController {
   private subscribe(userId: PlayerId, gameId: GameId, playerController: PlayerController) {
     this.playerControllers.set(userId, playerController);
     playerController.on('cardAction', (action: CardAction) => {
-      console.log(`action: ${action}`);
+
+      const game = this.games.get(gameId)!!;
+      // TODO game.applyAction()
+
       const controller = this.playerControllers.get(userId);
       if (!controller) {
         console.log(`Cannot find player controller ${userId}`);
@@ -64,7 +67,6 @@ export class GamesController {
         }
       });
 
-      const game = this.games.get(gameId)!!;
       const playerSuffix = action.payload.playerIndex ? ` on ${game.state.players[action.payload.playerIndex].id}` : '';
       this.sendEveryone(gameId, () => ({
         type: 'status/addMessage',
