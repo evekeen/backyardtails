@@ -23,6 +23,7 @@ export const PlayerHand = (props: PlayerHandProps) => {
   const selectCard = props.active ? props.selectCard : _.noop;
   const disabledClass = props.active ? '' : 'disabled';
   const activeClass = props.active ? 'player-active' : '';
+  const deadClass = props.player?.alive ? 'player-dead' : '';
   const submitAction = props.active ? () => props.submitAction({card: selectedCard, playerIndex: props.selectedPlayer?.index}) : _.noop;
   const submit = () => {
     submitAction();
@@ -40,7 +41,7 @@ export const PlayerHand = (props: PlayerHandProps) => {
   return (
     <div className="main-wrapper">
       <div className='player-wrapper'>
-        <div className={`player main-player ${disabledClass} ${activeClass}`}>
+        <div className={`player main-player ${disabledClass} ${activeClass} ${deadClass}`}>
           <h3>You</h3>
           <div className="main-player__cards">
             <Card card={props.cards[0]} onClick={() => selectCard(props.cards[0])} selected={selectedCard === props.cards[0]}/>

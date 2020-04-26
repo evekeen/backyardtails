@@ -16,10 +16,11 @@ export const OtherPlayer = (props: PlayerProps) => {
   const disabledClass = props.selectable ? '' : 'disabled';
   const selectedClass = props.selected ? 'player-selected' : '';
   const activeClass = props.active ? 'player-active' : '';
+  const deadClass = props.player?.alive ? 'player-dead' : '';
   const select = props.selectable ? props.onClick : _.noop;
   return (
     <div className='player-wrapper'>
-      <div className={`player ${selectedClass} ${disabledClass} ${activeClass}`} onClick={() => select(props.player)}>
+      <div className={`player ${selectedClass} ${disabledClass} ${activeClass} ${deadClass}`} onClick={() => select(props.player)}>
         <h3>{props.player?.name || 'Unknown'}</h3>
         <Card/>
       </div>
