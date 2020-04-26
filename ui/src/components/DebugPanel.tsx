@@ -60,7 +60,7 @@ function randomCard(): CardType {
     CardType.Countess,
     CardType.Princess
   ];
-  const index = Math.round(Math.random() * cards.length);
+  const index = Math.floor(Math.random() * cards.length);
   return cards[index];
 }
 

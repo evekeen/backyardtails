@@ -184,7 +184,13 @@ ol li span {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-evenly;
+}
+
+.card-description {
+  margin: 15px 20px 0 20px;
+  font-weight: 300;
+  font-size: 14px;
 }
 
 .debug-panel {

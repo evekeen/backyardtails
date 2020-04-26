@@ -74,7 +74,7 @@ export const cardNameMapping = {
   8: 'Princess'
 }
 
-const cardDescriptionMapping = {
+export const cardDescriptionMapping = {
   1: 'Player designates another player and names a type of card. If the guess is right, that player is eliminated from the round.',
   2: 'Player is allowed to see another player\'s hand.',
   3: 'Player will choose another player and privately compare hands. The player with the lower-strength hand is eliminated from the round.',

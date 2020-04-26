@@ -1,10 +1,10 @@
 import * as React from 'react';
-import _ = require('lodash');
 import {Card} from './Card';
-import {CardType} from '../model/commonTypes';
+import {CardType, needPlayerSelected} from '../model/commonTypes';
 import {ActionDialog} from './ActionDialog';
 import {CardAction} from '../model/CardAction';
 import {Player} from '../model/Player';
+import _ = require('lodash');
 
 interface PlayerHandProps {
   active: boolean;
@@ -20,8 +20,7 @@ export const PlayerHand = (props: PlayerHandProps) => {
   const selectedCard = props.active ? props.selectedCard : 0 as CardType;
   const selectCard = props.active ? props.selectCard : _.noop;
   const disabledClass = props.active ? '' : 'disabled';
-  const showDialog = !!selectedCard && !!props.selectedPlayer;
-  const submitAction = props.active ? () => props.submitAction({card: selectedCard, playerIndex: props.selectedPlayer.index}) : _.noop;
+  const submitAction = props.active ? () => props.submitAction({card: selectedCard, playerIndex: props.selectedPlayer?.index}) : _.noop;
   const submit = () => {
     submitAction();
     props.cancelSelection();
@@ -46,7 +45,14 @@ export const PlayerHand = (props: PlayerHandProps) => {
           </div>
         </div>
       </div>
-      <ActionDialog card={selectedCard} player={props.selectedPlayer} show={showDialog} onHide={() => props.cancelSelection()} onSubmit={submit}/>
+      <ActionDialog card={selectedCard} player={props.selectedPlayer} show={showDialog(selectedCard, props)}
+                    onHide={() => props.cancelSelection()} onSubmit={submit}/>
     </div>
   );
+}
+
+function showDialog(selectedCard: CardType, props: PlayerHandProps): boolean {
+  if (!selectedCard) return false;
+  if (!needPlayerSelected(selectedCard)) return true;
+  return !!selectedCard && !!props.selectedPlayer;
 }

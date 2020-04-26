@@ -10,3 +10,9 @@ export enum CardType {
   Countess = 7,
   Princess = 8
 }
+
+export function needPlayerSelected(card: CardType): boolean {
+  return NO_PLAYER_CARDS.indexOf(card) === -1;
+}
+
+const NO_PLAYER_CARDS = [CardType.Handmaid, CardType.Countess, CardType.Princess];

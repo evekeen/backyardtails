@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {useState} from 'react';
-import {CardType} from '../model/commonTypes';
+import {CardType, needPlayerSelected} from '../model/commonTypes';
 import {Button, Form, Modal} from 'react-bootstrap';
-import {Card, cardNameMapping} from './Card';
+import {Card, cardDescriptionMapping, cardNameMapping} from './Card';
 import {Player} from '../model/Player';
 import _ = require('lodash');
 
@@ -15,7 +15,6 @@ interface ActionDialogProps {
 }
 
 export const ActionDialog = (props: ActionDialogProps) => {
-  const name = props.player?.name;
   const guard = props.card === CardType.Guard;
   const [guardChoice, setGuardChoice] = useState<CardType>(undefined);
   const disabled = guard && !guardChoice;
@@ -28,9 +27,7 @@ export const ActionDialog = (props: ActionDialogProps) => {
       </Modal.Header>
 
       <Modal.Body>
-        <div className="move-description">
-          Use {props.card && (<Card card={props.card} showDescription={false}/>)} on {name}
-        </div>
+        <MoveDescription card={props.card} player={props.player}/>
         {guard && (<GuardChoice choice={guardChoice} setGuardChoice={setGuardChoice}/>)}
       </Modal.Body>
 
@@ -42,18 +39,50 @@ export const ActionDialog = (props: ActionDialogProps) => {
   );
 }
 
+interface MoveDescriptionProps {
+  card: CardType | undefined;
+  player: Player | undefined,
+}
+
+const MoveDescription = (props: MoveDescriptionProps) => {
+  const description = renderDescription(props);
+  if (!needPlayerSelected(props.card)) return (
+    <>
+      <div className="move-description">
+        <Card card={props.card} showDescription={false}/>
+      </div>
+      {description}
+    </>
+  );
+  return (
+    <>
+      <div className="move-description">
+        Play <Card card={props.card} showDescription={false}/> on {props.player?.name}
+      </div>
+      {description}
+    </>
+  );
+}
+
+function renderDescription(props: MoveDescriptionProps) {
+  return (
+    <div className="card-description">
+      {cardDescriptionMapping[props.card]}
+    </div>
+  );
+}
+
 interface GuardChoiceProps {
   choice: CardType | undefined;
   setGuardChoice: (choice: CardType) => void;
 }
 
 const GuardChoice = (props: GuardChoiceProps) => {
-  const cards = [CardType.Priest, CardType.Baron, CardType.Handmaid, CardType.Prince, CardType.King, CardType.Countess, CardType.Princess];
   return (
     <fieldset>
       <Form.Group>
         <Form.Label as="legend">Guess card</Form.Label>
-        {cards.map((card: CardType) => (
+        {GUARD_CHOICES.map((card: CardType) => (
           <Form.Check
             checked={card === props.choice}
             type='radio'
@@ -71,3 +100,5 @@ const GuardChoice = (props: GuardChoiceProps) => {
     </fieldset>
   );
 }
+
+const GUARD_CHOICES = [CardType.Priest, CardType.Baron, CardType.Handmaid, CardType.Prince, CardType.King, CardType.Countess, CardType.Princess];
