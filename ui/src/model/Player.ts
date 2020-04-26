@@ -1,7 +1,7 @@
-import {HandIndex} from './commonTypes';
+import {PlayerIndex} from './commonTypes';
 
 export interface Player {
-  index: HandIndex;
+  index: PlayerIndex;
   alive: boolean;
   shield: boolean;
   name: string;

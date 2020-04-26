@@ -1,7 +1,6 @@
-import {CardType} from './commonTypes';
-import {Player} from './Player';
+import {CardType, PlayerIndex} from './commonTypes';
 
 export interface CardAction {
   card: CardType;
-  player: Player;
+  playerIndex: PlayerIndex;
 }

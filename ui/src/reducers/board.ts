@@ -2,15 +2,16 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Player} from '../model/Player';
 import * as _ from 'lodash';
 import {startTurn, selectPlayer, cancelSelection} from './yourTurn';
-import {CardType, HandIndex} from '../model/commonTypes';
+import {CardType, PlayerIndex} from '../model/commonTypes';
 
 export interface BoardState {
   deckLeft: number;
   discardPileTop: CardType | undefined;
   players: Player[];
-  activeIndex: HandIndex;
-  currentUserInTurn: boolean;
-  selectedPlayerIndex: HandIndex | undefined;
+  turnIndex: PlayerIndex | undefined;
+  currentPlayerInTurn?: boolean;
+  currentPlayerIndex: PlayerIndex | undefined;
+  selectedPlayerIndex: PlayerIndex | undefined;
 }
 
 const boardSlice = createSlice({
@@ -18,22 +19,28 @@ const boardSlice = createSlice({
   initialState: {
     deckLeft: 0,
     players: [],
-    activeIndex: 1,
-    currentUserInTurn: false,
+    turnIndex: undefined,
+    currentPlayerIndex: undefined,
+    currentPlayerInTurn: false,
   } as BoardState,
   reducers: {
     setTable(state: BoardState, action: PayloadAction<BoardState>) {
-      _.extend(state, action.payload);
+      _.extend(state, action.payload, {
+        currentPlayerInTurn: isCurrentPlayerInTurn(action.payload)
+      });
     },
-    updateCurrentUser(state: BoardState, action: PayloadAction<HandIndex>) {
-      state.activeIndex = action.payload;
-      state.currentUserInTurn = state.activeIndex === 1;
+    setCurrentPlayer(state: BoardState, action: PayloadAction<PlayerIndex>) {
+      state.currentPlayerIndex = action.payload;
+    },
+    setPlayerInTurn(state: BoardState, action: PayloadAction<PlayerIndex>) {
+      state.turnIndex = action.payload;
+      state.currentPlayerInTurn = isCurrentPlayerInTurn(state);
     }
   },
   extraReducers: builder => {
     builder.addCase(startTurn, (state: BoardState) => {
-      state.activeIndex = 1;
-      state.currentUserInTurn = true;
+      state.turnIndex = state.currentPlayerIndex;
+      state.currentPlayerInTurn = true;
     }).addCase(selectPlayer, (state: BoardState, action: PayloadAction<Player>) => {
       state.selectedPlayerIndex = action.payload.index;
     }).addCase(cancelSelection, (state: BoardState) => {
@@ -42,6 +49,10 @@ const boardSlice = createSlice({
   }
 });
 
-export const {setTable, updateCurrentUser} = boardSlice.actions;
+function isCurrentPlayerInTurn(state: { turnIndex: PlayerIndex | undefined; currentPlayerIndex: PlayerIndex | undefined}) {
+  return !!state.turnIndex && state.turnIndex === state.currentPlayerIndex;
+}
+
+export const {setTable, setPlayerInTurn} = boardSlice.actions;
 
 export default boardSlice.reducer;

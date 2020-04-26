@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
 import {startTurn, loadCard, TurnData} from '../reducers/yourTurn';
-import {updateCurrentUser, setTable, BoardState} from '../reducers/board';
-import {CardType, HandIndex} from '../model/commonTypes';
+import {setPlayerInTurn, setTable, BoardState} from '../reducers/board';
+import {CardType, PlayerIndex} from '../model/commonTypes';
 import _ = require('lodash');
 import {useEffect} from 'react';
 import {joinGame} from '../reducers/connection';
@@ -11,7 +11,7 @@ import {addMessage} from '../reducers/status';
 interface DebugPanelProps {
   loadCard: (turn: TurnData) => void;
   startTurn: (turn: TurnData) => void;
-  updateCurrentUser: (index: HandIndex) => void;
+  setPlayerInTurn: (index: PlayerIndex) => void;
   setTable: (board: BoardState) => void;
   joinGame: () => void;
   addMessage: (message: string) => void;
@@ -28,7 +28,7 @@ const DebugPanel = (props: DebugPanelProps) => {
 };
 
 function initGame(props: DebugPanelProps) {
-  const indexes: HandIndex[] = Array.apply(null, Array(4)).map((x: any, index: number) => index);
+  const indexes: PlayerIndex[] = Array.apply(null, Array(4)).map((x: any, index: number) => index);
   const players = _.shuffle(indexes).map(index => ({
     index,
     name: names[index],
@@ -41,8 +41,8 @@ function initGame(props: DebugPanelProps) {
     deckLeft: 5,
     discardPileTop: randomCard(),
     players: players,
-    activeIndex: 4,
-    currentUserInTurn: false,
+    turnIndex: 4,
+    currentPlayerIndex: 1,
     selectedPlayerIndex: undefined
   });
   props.loadCard({card: randomCard()});
@@ -64,6 +64,6 @@ function randomCard(): CardType {
   return cards[index];
 }
 
-const mapDispatch = {startTurn, loadCard, updateCurrentUser, setTable, joinGame, addMessage};
+const mapDispatch = {startTurn, loadCard, setPlayerInTurn, setTable, joinGame, addMessage};
 
 export default connect(null, mapDispatch)(DebugPanel);

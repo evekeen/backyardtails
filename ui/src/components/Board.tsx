@@ -1,5 +1,5 @@
 import {Player} from '../model/Player';
-import {CardType, HandIndex} from '../model/commonTypes';
+import {CardType, PlayerIndex} from '../model/commonTypes';
 import * as React from 'react';
 import {OtherPlayer} from './OtherPlayer';
 import {Decks} from './Decks';
@@ -8,13 +8,15 @@ interface BoardProps {
   deckLeft: number;
   discardPileTop: CardType | undefined;
   players: Player[];
-  activeIndex: HandIndex;
+  turnIndex: PlayerIndex;
+  currentPlayerInTurn: boolean;
+  currentPlayerIndex: PlayerIndex | undefined;
   selectPlayer: (player: Player) => void;
-  selectedPlayerIndex: HandIndex | undefined;
+  selectedPlayerIndex: PlayerIndex | undefined;
 }
 
 export const Board = (props: BoardProps) => {
-  const selectable = props.activeIndex === 1;
+  const selectable = props.currentPlayerInTurn;
   return (
     <div>
       <div className="top-row_wrapper">
@@ -37,7 +39,7 @@ const Spring = () => {
   );
 }
 
-function player(player: Player, selectPlayer: (player: Player) => void, selectedPlayerIndex: HandIndex | undefined, selectable: boolean) {
+function player(player: Player, selectPlayer: (player: Player) => void, selectedPlayerIndex: PlayerIndex | undefined, selectable: boolean) {
   return (
     <OtherPlayer player={player} onClick={selectPlayer} selected={player && selectedPlayerIndex === player.index} selectable={selectable}/>
   )
