@@ -26,7 +26,7 @@ body {
 .player-wrapper {
   display: flex;
   flex-direction: row;
-  align-items: end;
+  align-items: flex-end;
 }
 
 .player:hover:not(.main-player):not(.disabled) {
@@ -175,9 +175,17 @@ ol li span {
   margin: 0;
 }
 
+.main-wrapper .score {
+  padding: 0;
+}
+
 .score li {
   list-style: none;
-  margin-top: 2px;
+  margin-top: 4px;
+}
+
+.score li img {
+  height: 30px;
 }
 
 .move-description {
