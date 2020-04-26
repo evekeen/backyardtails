@@ -59,7 +59,7 @@ const CardDescription = (props: CardDescriptionProps) => {
 }
 
 function getCardImg(card: CardType): string {
-  const name = cardNameMapping[card];
+  const name = cardNameMapping[card].toLowerCase();
   return `img/${name}.png`;
 }
 
