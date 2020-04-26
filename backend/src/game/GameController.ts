@@ -1,6 +1,7 @@
 import {GameId, LoveLetterGame, Player, PlayerId} from './loveletter';
 import {PlayerController} from '../PlayerController';
 import {CardAction, createLoadCardMessage, createSetTableMessage, createTextMessage, RemoteAction} from '../protocol';
+import {cardNameMapping} from './commonTypes';
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
@@ -69,7 +70,8 @@ export class GamesController {
       });
 
       const playerSuffix = action.payload.playerIndex ? ` on ${game.state.players[action.payload.playerIndex].id}` : '';
-      this.sendEveryone(gameId, () => createTextMessage(`${userId} played ${action.payload.card}${playerSuffix}`));
+      const cardName = cardNameMapping[action.payload.card];
+      this.sendEveryone(gameId, () => createTextMessage(`${userId} played ${cardName}${playerSuffix}`));
     });
   }
 

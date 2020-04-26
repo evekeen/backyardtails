@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import {CardType} from './commonTypes';
 
 export type GameId = string;
 export type PlayerId = string
@@ -21,17 +22,6 @@ King	6	    1	Player trades hands with any other player.
 Countess 	7	1	If a player holds both this card and either the King or Prince card, this card must be played immediately.
 Princess	8	1	If a player plays this card for any reason, they are eliminated from the round.
 */
-
-export enum CardType {
-  Guard = 1,
-  Priest = 2,
-  Baron = 3,
-  Handmaid = 4,
-  Prince = 5,
-  King = 6,
-  Countess = 7,
-  Princess = 8
-}
 
 const cards = [
   CardType.Guard, CardType.Guard, CardType.Guard, CardType.Guard, CardType.Guard,

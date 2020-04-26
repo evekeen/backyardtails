@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {useState} from 'react';
-import {CardType, needPlayerSelected} from '../model/commonTypes';
+import {CardType, needPlayerSelected, cardDescriptionMapping, cardNameMapping} from '../model/commonTypes';
 import {Button, Form, Modal} from 'react-bootstrap';
-import {Card, cardDescriptionMapping, cardNameMapping} from './Card';
+import {Card} from './Card';
 import {Player} from '../model/Player';
 import _ = require('lodash');
 

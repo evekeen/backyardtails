@@ -17,7 +17,7 @@ export const ActionFeedback = (props: ActionFeedbackProps) => {
       </Modal.Header>
 
       <Modal.Body>
-        <p>You move {props.feedback?.success ? 'succeeded' : 'failed'}</p>
+        <p>Your move {props.feedback?.success ? 'succeeded' : 'failed'}</p>
         {props.feedback?.playerCard && <Card card={props.feedback?.playerCard} showDescription={false}/>}
       </Modal.Body>
 

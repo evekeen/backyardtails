@@ -1,4 +1,4 @@
-import {CardType} from '../model/commonTypes';
+import {cardDescriptionMapping, cardNameMapping, CardType} from '../model/commonTypes';
 import React = require('react');
 
 interface CardProps {
@@ -61,26 +61,4 @@ const CardDescription = (props: CardDescriptionProps) => {
 function getCardImg(card: CardType): string {
   const name = cardNameMapping[card].toLowerCase();
   return `img/${name}.png`;
-}
-
-export const cardNameMapping = {
-  1: 'Guard',
-  2: 'Priest',
-  3: 'Baron',
-  4: 'Handmaid',
-  5: 'Prince',
-  6: 'King',
-  7: 'Countess',
-  8: 'Princess'
-}
-
-export const cardDescriptionMapping = {
-  1: 'Player designates another player and names a type of card. If the guess is right, that player is eliminated from the round.',
-  2: 'Player is allowed to see another player\'s hand.',
-  3: 'Player will choose another player and privately compare hands. The player with the lower-strength hand is eliminated from the round.',
-  4: 'Player cannot be affected by any other player\'s card until the next turn.',
-  5: 'Player can choose any player (including themselves) to discard their hand and draw a new one. If the discarded card is the Princess, the discarding player is eliminated.',
-  6: 'Player trades hands with any other player.',
-  7: 'If a player holds both this card and either the King or Prince card, this card must be played immediately.',
-  8: 'If a player plays this card for any reason, they are eliminated from the round.'
 }

@@ -6,6 +6,7 @@ import * as Either from 'fp-ts/lib/Either';
 import {Validation} from "io-ts";
 import {getCardIndex, LoveLetterGameState, Player, PlayerId} from './game/loveletter';
 import _ = require("lodash");
+import {CardType} from './game/commonTypes';
 
 export const MessageType = t.union([t.literal("connection/join"), t.literal("cardAction"), t.literal("state")])
 
@@ -67,7 +68,7 @@ export interface ShowFeedback {
 
 export interface CardAction {
   payload: {
-    card: number;
+    card: CardType;
     playerIndex: number | undefined;
   }
 }
