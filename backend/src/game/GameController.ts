@@ -1,4 +1,4 @@
-import {GameId, LoveLetterGame, PlayerId} from "./loveletter";
+import {GameId, LoveLetterGame, Player, PlayerId} from "./loveletter";
 import {PlayerController} from "../PlayerController";
 import {createSetTableMessage, SetTableMessage} from "../protocol";
 
@@ -36,9 +36,9 @@ export class GamesController {
       console.log(`Created game ${usedGameId} with players ${pendingPlayers}`)
       game.init()
 
-      pendingPlayers.forEach((player: PlayerId) => {
-        const controller = this.playerControllers.get(player);
-        controller && controller.dispatch<SetTableMessage>(createSetTableMessage(game.state));
+      game.state.players.forEach((player: Player) => {
+        const controller = this.playerControllers.get(player.id);
+        controller && controller.dispatch<SetTableMessage>("board/setTable", createSetTableMessage(player.id, game.state));
       });
     }
   }

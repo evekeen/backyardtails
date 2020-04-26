@@ -12,7 +12,7 @@ export class PlayerController extends EventEmitter {
 
   dispatch<T>(type: string, state: T) {
     if (type == 'board/setTable') {
-      this.on('stateReady', state);
+      this.emit('stateReady', state);
     }
   }
 }

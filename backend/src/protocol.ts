@@ -5,6 +5,7 @@ import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
 import {Validation} from "io-ts";
 import {getCardIndex, LoveLetterGameState, PlayerId} from "./game/loveletter";
+import _ = require("lodash");
 
 export const MessageType = t.union([t.literal("connection/join"), t.literal("cardAction"), t.literal("state")])
 
@@ -38,8 +39,8 @@ export interface SetTableMessage {
     deckLeft: number;
     discardPileTop: number;
     players: PlayerDescription[];
-    activeIndex: number;
-    currentUserInTurn: boolean
+    turnIndex: number;
+    currentPlayerIndex: number
   }
 }
 
@@ -71,7 +72,7 @@ export function error(code: ErrorCode, message: any): ErrorResponse {
 }
 
 export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameState): SetTableMessage {
-  const player = state.getPlayer(player);
+  const player = state.getPlayer(playerId);
   const discardPileTop = _.last(player.discardPile);
   return {
     type: "board/setTable",
@@ -82,7 +83,7 @@ export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameS
       currentPlayerIndex: state.getPlayerIndex(playerId),
       players: state.players.map(player => {
         return ({
-          index: state.getPlayerIndex(player),
+          index: state.getPlayerIndex(playerId),
           name: player.id,
           score: player.score,
           alive: player.alive,

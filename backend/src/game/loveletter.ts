@@ -249,8 +249,8 @@ export class LoveLetterGameState {
     return _.find(this.players, p => p.id == id)!;
   }
 
-  getPlayerIndex(id: PlayerId): number {
-    return _.findIndex(this.players, p => p.id == id);
+  getPlayerIndex(id: PlayerId | undefined): number {
+    return id && _.findIndex(this.players, p => p.id == id) || -1;
   }
 }
 
