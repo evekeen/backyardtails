@@ -1,6 +1,6 @@
 import {GameId, LoveLetterGame, PlayerId} from "./loveletter";
 import {PlayerController} from "../PlayerController";
-import {SetTableMessage} from "../protocol";
+import {createSetTableMessage, SetTableMessage} from "../protocol";
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
@@ -38,7 +38,7 @@ export class GamesController {
 
       pendingPlayers.forEach((player: PlayerId) => {
         const controller = this.playerControllers.get(player);
-        controller && controller.dispatch<SetTableMessage>()
+        controller && controller.dispatch<SetTableMessage>(createSetTableMessage(game.state));
       });
     }
   }

@@ -55,12 +55,27 @@ const strength: {[key: string]: number} = {
   Princess: 8,
 }
 
+const idx: {[key: string]: number} = {
+  Guard: 0,
+  Priest: 1,
+  Baron: 2,
+  Handmaid: 3,
+  Prince: 4,
+  King: 5,
+  Countess: 6,
+  Princess: 7,
+}
+
 export function getStrength(card: string | undefined): number {
   return (card && card in strength) ? strength[card] : -1;
 }
 
 export function getCount(card: string): number {
   return counts[card];
+}
+
+export function getCardIndex(card: string): number {
+  return idx[card];
 }
 
 export interface Hand {
@@ -235,7 +250,7 @@ export class LoveLetterGameState {
   }
 
   getPlayerIndex(id: PlayerId): number {
-    return _.indexOf(this.players, id);
+    return _.findIndex(this.players, p => p.id == id);
   }
 }
 
