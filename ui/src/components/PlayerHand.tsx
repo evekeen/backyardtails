@@ -23,7 +23,7 @@ export const PlayerHand = (props: PlayerHandProps) => {
   const selectCard = props.active ? props.selectCard : _.noop;
   const disabledClass = props.active ? '' : 'disabled';
   const activeClass = props.active ? 'player-active' : '';
-  const deadClass = props.player?.alive ? 'player-dead' : '';
+  const deadClass = !props.player?.alive ? 'player-dead' : '';
   const submitAction = props.active ? () => props.submitAction({card: selectedCard, playerIndex: props.selectedPlayer?.index}) : _.noop;
   const submit = () => {
     submitAction();

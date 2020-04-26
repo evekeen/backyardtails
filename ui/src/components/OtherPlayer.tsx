@@ -16,7 +16,7 @@ export const OtherPlayer = (props: PlayerProps) => {
   const disabledClass = props.selectable ? '' : 'disabled';
   const selectedClass = props.selected ? 'player-selected' : '';
   const activeClass = props.active ? 'player-active' : '';
-  const deadClass = props.player?.alive ? 'player-dead' : '';
+  const deadClass = !props.player?.alive ? 'player-dead' : '';
   const select = props.selectable ? props.onClick : _.noop;
   return (
     <div className='player-wrapper'>
