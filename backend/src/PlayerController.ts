@@ -2,7 +2,7 @@ import {EventEmitter} from 'events';
 import {JoinMessage} from "./protocol";
 
 export class PlayerController extends EventEmitter {
-  constructor(private userId: string) {
+  constructor(public userId: string) {
     super();
   }
 

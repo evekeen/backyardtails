@@ -37,9 +37,9 @@ export interface SetTableMessage {
   type: "board/setTable",
   payload: {
     deckLeft: number;
-    discardPileTop: number;
+    discardPileTop: number | undefined;
     players: PlayerDescription[];
-    turnIndex: number;
+    turnIndex: number | undefined;
     currentPlayerIndex: number
   }
 }
@@ -78,12 +78,12 @@ export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameS
     type: "board/setTable",
     payload: {
       deckLeft: state.deck.size(),
-      discardPileTop: discardPileTop && getCardIndex(discardPileTop) || -1,
+      discardPileTop: discardPileTop && getCardIndex(discardPileTop) || 5,
       turnIndex: state.getPlayerIndex(state.activeTurnPlayerId),
-      currentPlayerIndex: state.getPlayerIndex(playerId),
+      currentPlayerIndex: state.getPlayerIndex(playerId)!,
       players: state.players.map(player => {
         return ({
-          index: state.getPlayerIndex(playerId),
+          index: state.getPlayerIndex(playerId)!,
           name: player.id,
           score: player.score,
           alive: player.alive,

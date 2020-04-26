@@ -75,6 +75,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
         }))
 
         playerController.on('stateReady', state => {
+          console.log(`Sending state to ${playerController.userId}`)
           ws.send(JSON.stringify(state));
         });
 
