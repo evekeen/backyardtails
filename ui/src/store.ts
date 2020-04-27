@@ -4,7 +4,7 @@ import reducers from './reducers'
 import {WsClient} from './WsClient';
 
 const prod = process.env.NODE_ENV === 'production';
-const url = prod ? 'ws://loveletter-dev.us-west-2.elasticbeanstalk.com:8999' : 'ws://localhost:8999';
+const url = prod ? 'wss://ll-backend.us-east-1.elasticbeanstalk.com:8999' : 'ws://localhost:8999';
 
 const wsClient = new WsClient(url);
 
