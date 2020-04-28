@@ -1,11 +1,13 @@
 import * as _ from 'lodash';
 import {CardType} from './commonTypes';
+import {CardAction} from "../protocol";
 
 export type GameId = string;
 export type PlayerId = string
 
 export interface Player {
   id: string;
+  index: number;
   hand: Hand;
   discardPile: CardType[];
   score: number;
@@ -81,21 +83,24 @@ interface GameState {
   deck: Deck;
 }
 
-interface GameAction<State> {
-  player: Player
+export interface GameAction<State> {
+  playerId: PlayerId
 
-  apply(gameState: State): State;
+  apply(gameState: State): Promise<ActionResult>;
 }
 
-export interface ActionResult {
 
+// TODO Field for each card type? Union type?
+export interface ActionResult {
+  killed?: boolean;
+  opponentCard?: CardType;
 }
 
 export interface Game<State> {
   state: State
 
   init(): void;
-  applyAction(action: GameAction<State>): ActionResult;
+  applyAction(action: GameAction<State>): Promise<ActionResult>;
   join(player: PlayerId): void;
   leave(player: PlayerId): void;
 }
@@ -110,12 +115,14 @@ export class LoveLetterGameState {
   public winnerId: PlayerId | undefined;
 
   constructor(players: PlayerId[]) {
-    players.forEach((p) => this.players.push(this.newPlayer(p)));
+    players.forEach((p) => this.newPlayer(p));
   }
 
   newPlayer(playerId: PlayerId): Player {
-    return {
+    const playerIndex = this.players.length;
+    const player = {
       id: playerId,
+      index: playerIndex,
       hand: {
         card: undefined,
         pendingCard: undefined,
@@ -125,6 +132,15 @@ export class LoveLetterGameState {
       score: 0,
       alive: true
     };
+    this.players.push(player);
+    return player;
+  }
+
+  public killPlayer(playerId: PlayerId) {
+    const player = this.getPlayer(playerId);
+    player.alive = false;
+    this.deadPlayerIds.push(player.id);
+    this.activePlayerIds = _.remove(this.activePlayerIds, (id) => id === playerId);
   }
 
   public addPlayer(player: PlayerId) {
@@ -139,18 +155,23 @@ export class LoveLetterGameState {
 
   start(firstPlayerId: PlayerId) {
     for (const idleId of this.idlePlayersIds)
-      this.players.push(this.newPlayer(idleId));
+      this.newPlayer(idleId);
+
     this.idlePlayersIds = [];
     this.deck.init();
     this.activePlayerIds = this.players.map(p => p.id);
+
     this.players.forEach(player => {
       player.hand.card = this.deck.take();
       player.hand.immune = false;
       player.hand.pendingCard = undefined;
       player.discardPile = [];
     });
+
     this.deadPlayerIds = [];
     this.activeTurnPlayerId = firstPlayerId;
+    const firstPlayer = this.getPlayer(firstPlayerId)
+    firstPlayer.hand.pendingCard = this.deck.take();
     this.winnerId = undefined;
   }
 
@@ -188,6 +209,7 @@ export class LoveLetterGameState {
           const nextPlayer = this.players[currentPlayerIndex];
           this.activeTurnPlayerId = nextPlayer.id;
           nextPlayer.hand.pendingCard = this.deck.take();
+          nextPlayer.hand.immune = false;
         }
       }
     }
@@ -199,16 +221,15 @@ export class LoveLetterGameState {
   }
 
   private isDead(id: PlayerId): boolean {
-    return id in this.deadPlayerIds;
+    return !this.getPlayer(id).alive;
   }
 
   getPlayer(id: PlayerId): Player {
     return _.find(this.players, p => p.id == id)!;
   }
 
-  getPlayerIndex(id: PlayerId | undefined): number | undefined {
-    if (id === undefined) return undefined;
-    return _.findIndex(this.players, p => p.id == id);
+  getActivePlayer(): Player {
+    return this.getPlayer(this.activeTurnPlayerId!);
   }
 }
 
@@ -220,18 +241,17 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
   constructor(private players: PlayerId[]) {
   }
 
-  applyAction(action: GameAction<LoveLetterGameState>): ActionResult {
-    if (action.player.id !== this.state.activeTurnPlayerId) {
-      return {}; // TODO fail
+  applyAction(action: GameAction<LoveLetterGameState>): Promise<ActionResult> {
+    if (action.playerId !== this.state.activeTurnPlayerId) {
+      return Promise.reject();
     }
 
-    this.actions.push(action);
-    this.state = action.apply(this.state);
-    this.state.nextTurn();
-
-    return {
-      newState: this.state
-    }
+    const actionResult = action.apply(this.state)
+    actionResult.then(() => {
+      this.actions.push(action);
+      this.state.nextTurn();
+    });
+    return actionResult;
   }
 
   join(player: PlayerId) {
@@ -251,5 +271,63 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
     const firstPlayer = this.players[this.firstPlayerIdx];
     this.state.start(firstPlayer);
     console.log(JSON.stringify(this.state, null, "  "));
+  }
+
+  getActionForCard(action: CardAction): (me: Player, target: Player, s: LoveLetterGameState) => ActionResult {
+    switch (action.payload.card) {
+      case CardType.Guard:
+        return (me, target, state) => {
+          const killed = target.hand.card === action.payload.guess;
+          if (killed) {
+            state.killPlayer(target.id);
+          }
+          return {killed};
+        };
+      case CardType.Priest:
+        return (me, target) => {
+          return {opponentCard: target.hand.card};
+        }
+      case CardType.Baron:
+        return (me, target, state) => {
+          const playerCard = me.hand.card!;
+          const targetPlayerCard = target.hand.card!;
+          if (playerCard > targetPlayerCard){
+            state.killPlayer(target.id)
+          } else if (playerCard < targetPlayerCard) {
+            state.killPlayer(me.id);
+          }
+          return {};
+        }
+      case CardType.Handmaid:
+        return (me) => {
+          me.hand.immune = true;
+          return {};
+        };
+      case CardType.Prince:
+        return (me, target, state) => {
+          if (target.hand.card == CardType.Princess) {
+            state.killPlayer(target.id)
+          } else {
+            target.hand.card = state.deck.take();
+          }
+          return {};
+        }
+      case CardType.King:
+        return (me, target, state) => {
+          const playerCard = me.hand.card;
+          me.hand.card = target.hand.card;
+          target.hand.card = playerCard;
+          return {};
+        }
+      case CardType.Countess:
+        return () => {
+          return {};
+        }
+      case CardType.Princess:
+        return (me, target, state) => {
+          state.killPlayer(me.id);
+          return {};
+        }
+    }
   }
 }

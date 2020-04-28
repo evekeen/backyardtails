@@ -57,6 +57,13 @@ export interface LoadCardMessage {
   };
 }
 
+export interface StartTurnMessage {
+  type: "yourTurn/startTurn",
+  payload: {
+    card: number;
+  }
+}
+
 export interface ShowFeedback {
   type: "feedback/showFeedback",
   payload: {
@@ -70,6 +77,7 @@ export interface CardAction {
   payload: {
     card: CardType;
     playerIndex: number | undefined;
+    guess?: CardType;
   }
 }
 
@@ -108,8 +116,8 @@ export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameS
     payload: {
       deckLeft: state.deck.size(),
       discardPileTop: discardPileTop && getCardIndex(discardPileTop) || undefined,
-      turnIndex: state.getPlayerIndex(state.activeTurnPlayerId),
-      currentPlayerIndex: state.getPlayerIndex(playerId)!,
+      turnIndex: state.getPlayer(state.activeTurnPlayerId!).index,
+      currentPlayerIndex: state.getPlayer(playerId).index,
       players: state.players.map((player, index) => {
         return ({
           index: index,
@@ -128,6 +136,15 @@ export function createLoadCardMessage(player: Player): LoadCardMessage {
     type: "yourTurn/loadCard",
     payload: {
       card: player.hand.card!!
+    }
+  };
+}
+
+export function createStartTurnMessage(card: CardType): StartTurnMessage {
+  return {
+    type: "yourTurn/startTurn",
+    payload: {
+      card: card
     }
   };
 }
