@@ -11,14 +11,14 @@ interface ActionDialogProps {
   player: Player | undefined,
   show: boolean;
   onHide: () => void;
-  onSubmit: () => void;
+  onSubmit: (guardChoice?: CardType) => void;
 }
 
 export const ActionDialog = (props: ActionDialogProps) => {
   const guard = props.card === CardType.Guard;
   const [guardChoice, setGuardChoice] = useState<CardType>(undefined);
   const disabled = guard && !guardChoice;
-  const submit = disabled ? _.noop : props.onSubmit;
+  const submit = () => !disabled && props.onSubmit(guardChoice);
   const buttonType = disabled ? 'light' : 'primary'
   return (
     <Modal show={props.show} onHide={props.onHide}>

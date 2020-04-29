@@ -24,9 +24,13 @@ export const PlayerHand = (props: PlayerHandProps) => {
   const disabledClass = props.active ? '' : 'disabled';
   const activeClass = props.active ? 'player-active' : '';
   const deadClass = !props.player?.alive ? 'player-dead' : '';
-  const submitAction = props.active ? () => props.submitAction({card: selectedCard, playerIndex: props.selectedPlayer?.index}) : _.noop;
-  const submit = () => {
-    submitAction();
+  const submitAction = (guardChoice?: CardType) => props.active && props.submitAction({
+    card: selectedCard,
+    playerIndex: props.selectedPlayer?.index,
+    guardChoice: guardChoice
+  });
+  const submit = (guardChoice?: CardType) => {
+    submitAction(guardChoice);
     props.cancelSelection();
   };
 

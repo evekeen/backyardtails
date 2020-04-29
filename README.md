@@ -13,7 +13,7 @@ npm ci
 npm run build
 ```
 ### Run
-Open in a browser: `./ui/index.html`
+Open in a browser: `./dist/index.html`
 
 ### Build & run
 ```
