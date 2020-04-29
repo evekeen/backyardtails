@@ -46,7 +46,7 @@ export const PlayerHand = (props: PlayerHandProps) => {
     <div className="main-wrapper">
       <div className='player-wrapper'>
         <div className={`player main-player ${disabledClass} ${activeClass} ${deadClass}`}>
-          <h3>You</h3>
+          <h3>You <span className="your-name">{props.player?.name || ''}</span></h3>
           <div className="main-player__cards">
             <Card card={props.cards[0]} onClick={() => selectCard(props.cards[0])} selected={selectedCard === props.cards[0]}/>
             {secondCard()}
