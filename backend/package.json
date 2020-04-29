@@ -43,8 +43,9 @@
   },
   "scripts": {
     "start": "node ./dist/server.js",
-    "build": "webpack",
-    "build-zip": "webpack;zip backend.zip -r dist/* -b dist -j -FS",
+    "build": "webpack --mode development",
+    "build-prod": "webpack",
+    "build-zip": "webpack;./build.sh",
     "watch": "webpack --watch"
   },
   "author": "",
