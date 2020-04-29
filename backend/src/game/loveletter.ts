@@ -141,7 +141,7 @@ export class LoveLetterGameState {
     const player = this.getPlayer(playerId);
     player.alive = false;
     this.deadPlayerIds.push(player.id);
-    this.activePlayerIds = _.remove(this.activePlayerIds, (id) => id === playerId);
+    this.activePlayerIds = this.activePlayerIds.filter((id) => id !== playerId);
   }
 
   public addPlayer(player: PlayerId) {
@@ -177,9 +177,9 @@ export class LoveLetterGameState {
   }
 
   nextTurn() {
-    if (this.activePlayerIds.length == 1) {
+    if (this.activePlayerIds.length === 1) {
       this.setWinner(this.activePlayerIds[0]);
-    } else if (this.deck.size() == 0) {
+    } else if (this.deck.size() === 0) {
       const playersLeft = this.activePlayerIds.map(id => this.getPlayer(id));
       const maxHeldCardStrength = playersLeft.map(p => p.hand.card).reduce((a, b) => Math.max(a || 0, b || 0)) || 0;
       const byHandStrength = _.groupBy(playersLeft, player => player.hand.card);
