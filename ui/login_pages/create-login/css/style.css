@@ -1,0 +1,106 @@
+body {
+    background-color: #E5E5E5;
+    font-family: 'Roboto', sans-serif;
+}
+
+.login-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 1100px;
+    text-align: center;
+    margin: 150px auto;
+}
+
+.text {
+    font-size: 42px;
+    font-weight: 300;
+    line-height: 120%;
+
+    color: rgba(62, 62, 62, 0.9);
+}
+
+.link-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 50px auto;
+}
+
+.share {
+    width: 700px;
+    height: 80px;
+    margin-right: 50px;
+
+    background: linear-gradient(173.93deg, #EEF1F5 4.98%, #E6E9EF 94.88%);
+    box-shadow: inset 5px 5px 10px rgba(166, 180, 200, 0.75), inset -5px -5px 15px rgba(255, 255, 255, 0.75);
+    border-radius: 40px;
+
+    font-weight: 300;
+    font-size: 28px;
+    line-height: 70px;
+    text-decoration: none;
+    color: rgba(62, 62, 62, 0.9);
+}
+
+.copy-link {
+    width: 250px;
+    height: 80px;
+
+    font-weight: 300;
+    font-size: 28px;
+    line-height: 80px;
+    text-decoration: none;
+    color: rgba(62, 62, 62, 0.9);
+
+    background: linear-gradient(165.78deg, #EEF0F5 4.98%, #E6E9EF 94.88%);
+    box-shadow: 10px 10px 20px rgba(166, 180, 200, 0.7), -12px -12px 20px rgba(255, 255, 255, 0.8);
+    border-radius: 40px;
+}
+
+.copy-link:hover {
+    background: linear-gradient(165.78deg, #D6DEF0 24.65%, #A5B0C5 67.59%);
+}
+
+.form {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-name {
+    width: 600px;
+    height: 80px;
+    margin: 50px auto;
+
+    background: linear-gradient(171.1deg, #EEF1F5 4.98%, #E6E9EF 94.88%);
+    box-shadow: inset 5px 5px 10px rgba(166, 180, 200, 0.75), inset -5px -5px 15px rgba(255, 255, 255, 0.75);
+    border-radius: 40px;
+}
+
+input {
+    font-weight: lighter;
+    font-size: 28px;
+    line-height: 80px;
+    color: rgba(62, 62, 62, 0.9);
+    text-decoration: none;
+    border: none;
+    background: transparent;
+}
+
+.create-game{
+    width: 300px;
+    height: 80px;
+
+    font-weight: 300;
+    font-size: 28px;
+    color: rgba(62, 62, 62, 0.9);
+
+    background: linear-gradient(165.78deg, #EEF0F5 4.98%, #E6E9EF 94.88%);
+    box-shadow: 10px 10px 20px rgba(166, 180, 200, 0.7), -12px -12px 20px rgba(255, 255, 255, 0.8);
+    border-radius: 40px;
+}
+
+.create-game:hover {
+    background: linear-gradient(165.78deg, #D6DEF0 24.65%, #A5B0C5 67.59%);
+}
