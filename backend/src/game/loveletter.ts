@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import {CardType} from './commonTypes';
-import {CardAction} from "../protocol";
+import {CardAction} from '../protocol';
 
 export type GameId = string;
 export type PlayerId = string
@@ -63,7 +63,7 @@ class LoveLetterDeck implements Deck {
     if (this.deck.length) {
       return this.deck.pop()!;
     }
-    throw Error("Deck is empty. Cannot take cards.");
+    throw Error('Deck is empty. Cannot take cards.');
   }
 
   init(): void {
@@ -92,8 +92,9 @@ export interface GameAction<State> {
 
 // TODO Field for each card type? Union type?
 export interface ActionResult {
-  killed?: boolean;
+  success: boolean;
   opponentCard?: CardType;
+  opponentIndex?: number;
 }
 
 export interface Game<State> {
@@ -194,7 +195,7 @@ export class LoveLetterGameState {
       const currentPlayerId = this.activeTurnPlayerId!; // should be initialized on start
       let currentPlayerIndex = _.findIndex(this.players, p => p.id == currentPlayerId);
       if (currentPlayerIndex < 0) {
-        console.log("WTF!" + currentPlayerId + "is not found among players!");
+        console.log('WTF!' + currentPlayerId + 'is not found among players!');
         // TODO Restart?
       } else {
         let iterations = 0;
@@ -270,64 +271,66 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
     this.firstPlayerIdx = (this.firstPlayerIdx + 1) % this.players.length;
     const firstPlayer = this.players[this.firstPlayerIdx];
     this.state.start(firstPlayer);
-    console.log(JSON.stringify(this.state, null, "  "));
+    console.log(JSON.stringify(this.state, null, '  '));
   }
 
   getActionForCard(action: CardAction): (me: Player, target: Player, s: LoveLetterGameState) => ActionResult {
-    switch (action.payload.card) {
-      case CardType.Guard:
-        return (me, target, state) => {
-          const killed = target.hand.card === action.payload.guess;
-          if (killed) {
-            state.killPlayer(target.id);
-          }
-          return {killed};
-        };
-      case CardType.Priest:
-        return (me, target) => {
-          return {opponentCard: target.hand.card};
-        }
-      case CardType.Baron:
-        return (me, target, state) => {
-          const playerCard = me.hand.card!;
-          const targetPlayerCard = target.hand.card!;
-          if (playerCard > targetPlayerCard){
-            state.killPlayer(target.id)
-          } else if (playerCard < targetPlayerCard) {
-            state.killPlayer(me.id);
-          }
-          return {};
-        }
-      case CardType.Handmaid:
-        return (me) => {
-          me.hand.immune = true;
-          return {};
-        };
-      case CardType.Prince:
-        return (me, target, state) => {
-          if (target.hand.card == CardType.Princess) {
-            state.killPlayer(target.id)
-          } else {
-            target.hand.card = state.deck.take();
-          }
-          return {};
-        }
-      case CardType.King:
-        return (me, target, state) => {
-          const playerCard = me.hand.card;
-          me.hand.card = target.hand.card;
-          target.hand.card = playerCard;
-          return {};
-        }
-      case CardType.Countess:
-        return () => {
-          return {};
-        }
-      case CardType.Princess:
-        return (me, target, state) => {
-          state.killPlayer(me.id);
-          return {};
-        }
+    return (me, target, state) => this.createResult(getActionResult(action, me, target, state), target);
+  }
+
+  private createResult(res: ActionResult, player: Player): ActionResult {
+    return {
+      ...res,
+      opponentIndex: this.state.players.findIndex(p => p.id === player.id)
+    };
+  }
+}
+
+function getActionResult(action: CardAction, me: Player, target: Player, state: LoveLetterGameState): ActionResult {
+  const playerCard = me.hand.card === action.payload.card ? me.hand.pendingCard!! : me.hand.card!!;
+  switch (action.payload.card) {
+  case CardType.Guard:
+  {
+    const success = target.hand.card === action.payload.guess;
+    if (success) {
+      state.killPlayer(target.id);
     }
+    return {success};
+  }
+  case CardType.Priest:
+    return {success: true, opponentCard: target.hand.card};
+  case CardType.Baron:
+  {
+    const targetPlayerCard = target.hand.card!;
+    const success = playerCard > targetPlayerCard;
+    if (success) {
+      state.killPlayer(target.id)
+    } else if (playerCard < targetPlayerCard) {
+      state.killPlayer(me.id);
+    }
+    return {success};
+  }
+  case CardType.Handmaid:
+    me.hand.immune = true;
+    return {success: true};
+  case CardType.Prince:
+  {
+    const success = target.hand.card == CardType.Princess;
+    if (success) {
+      state.killPlayer(target.id);
+    } else {
+      target.hand.card = state.deck.take();
+    }
+    return {success};
+  }
+  case CardType.King:
+    me.hand.card = target.hand.card;
+    target.hand.card = playerCard;
+    return {success: true, opponentCard: me.hand.card};
+  case CardType.Countess:
+    return {success: true};
+  case CardType.Princess:
+    state.killPlayer(me.id);
+    return {success: true};
   }
 }

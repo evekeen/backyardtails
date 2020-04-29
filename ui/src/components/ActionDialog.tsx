@@ -1,24 +1,23 @@
 import * as React from 'react';
 import {useState} from 'react';
-import {CardType, needPlayerSelected, cardDescriptionMapping, cardNameMapping} from '../model/commonTypes';
+import {cardDescriptionMapping, cardNameMapping, CardType, needPlayerSelected} from '../model/commonTypes';
 import {Button, Form, Modal} from 'react-bootstrap';
 import {Card} from './Card';
 import {Player} from '../model/Player';
-import _ = require('lodash');
 
 interface ActionDialogProps {
   card: CardType | undefined;
   player: Player | undefined,
   show: boolean;
   onHide: () => void;
-  onSubmit: (guardChoice?: CardType) => void;
+  onSubmit: (guess?: CardType) => void;
 }
 
 export const ActionDialog = (props: ActionDialogProps) => {
   const guard = props.card === CardType.Guard;
-  const [guardChoice, setGuardChoice] = useState<CardType>(undefined);
-  const disabled = guard && !guardChoice;
-  const submit = () => !disabled && props.onSubmit(guardChoice);
+  const [guess, setGuess] = useState<CardType>(undefined);
+  const disabled = guard && !guess;
+  const submit = () => !disabled && props.onSubmit(guess);
   const buttonType = disabled ? 'light' : 'primary'
   return (
     <Modal show={props.show} onHide={props.onHide}>
@@ -28,7 +27,7 @@ export const ActionDialog = (props: ActionDialogProps) => {
 
       <Modal.Body>
         <MoveDescription card={props.card} player={props.player}/>
-        {guard && (<GuardChoice choice={guardChoice} setGuardChoice={setGuardChoice}/>)}
+        {guard && (<GuardGuess guess={guess} setGuess={setGuess}/>)}
       </Modal.Body>
 
       <Modal.Footer>
@@ -73,26 +72,26 @@ function renderDescription(props: MoveDescriptionProps) {
 }
 
 interface GuardChoiceProps {
-  choice: CardType | undefined;
-  setGuardChoice: (choice: CardType) => void;
+  guess: CardType | undefined;
+  setGuess: (choice: CardType) => void;
 }
 
-const GuardChoice = (props: GuardChoiceProps) => {
+const GuardGuess = (props: GuardChoiceProps) => {
   return (
     <fieldset>
       <Form.Group>
         <Form.Label as="legend">Guess card</Form.Label>
         {GUARD_CHOICES.map((card: CardType) => (
           <Form.Check
-            checked={card === props.choice}
+            checked={card === props.guess}
             type='radio'
             key={`check-${card}`}
             name='guardChoice'
             value={card}
             label={cardNameMapping[card]}
             onChange={(e: any) => {
-              const choice = parseInt(e.target.value, 10);
-              props.setGuardChoice(choice);
+              const guess = parseInt(e.target.value, 10);
+              props.setGuess(guess);
             }}
           />
         ))}

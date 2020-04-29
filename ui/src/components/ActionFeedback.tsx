@@ -2,6 +2,7 @@ import {CardActionFeedback} from '../reducers/feedback';
 import {Button, Modal} from 'react-bootstrap';
 import * as React from 'react';
 import {Card} from './Card';
+import {CardType} from '../model/commonTypes';
 
 interface ActionFeedbackProps {
   feedback: CardActionFeedback | undefined;
@@ -10,20 +11,104 @@ interface ActionFeedbackProps {
 
 export const ActionFeedback = (props: ActionFeedbackProps) => {
   const show = !!props.feedback;
+  const feedbackComponent = getFeedbackComponent(props);
   return (
-    <Modal show={show} onHide={props.hideFeedback}>
+    <Modal show={show} onHide={() =>props.hideFeedback()} className="ll-feedback">
       <Modal.Header closeButton>
         <Modal.Title>Your move</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
-        <p>Your move {props.feedback?.success ? 'succeeded' : 'failed'}</p>
-        {props.feedback?.playerCard && <Card card={props.feedback?.playerCard} showDescription={false}/>}
+        {React.createElement(feedbackComponent, props.feedback)}
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="primary" onClick={props.hideFeedback}>Ok</Button>
+        <Button variant="primary" onClick={() =>props.hideFeedback()}>Ok</Button>
       </Modal.Footer>
     </Modal>
   );
 }
+
+const getFeedbackComponent = (props: ActionFeedbackProps) => {
+  if (!props.feedback) return 'span';
+  return componentsMap[props.feedback.card];
+}
+
+const GuardFeedback = (props: CardActionFeedback) => {
+  const status = props.success ? 'right!' : 'wrong';
+  return (
+    <>
+      <p>You guessed it {status}</p>
+      <KillingStatus card={props.card} success={props.success} opponentName={props.opponentName}/>
+    </>
+  );
+}
+
+const PriestFeedback = (props: CardActionFeedback) => {
+  return (<div>{props.opponentName} has {<Card card={props.opponentCard} showDescription={false}/>}</div>);
+}
+
+const BaronFeedback = (props: CardActionFeedback) => {
+  const status = props.success ? 'won' : 'lost';
+  return (
+    <>
+      <p>You've {status} the duel</p>
+      <KillingStatus card={props.card} success={props.success} opponentName={props.opponentName}/>
+      <div>{props.opponentName} had {<Card card={props.opponentCard} showDescription={false}/>}</div>
+    </>
+  );
+}
+
+const HandmaidFeedback = () => {
+  return (<div>Now you have protection for one round</div>);
+}
+
+const PrinceFeedback = (props: CardActionFeedback) => {
+  return (<KillingStatus card={props.card} success={props.success} opponentName={props.opponentName}/>);
+}
+
+const KingFeedback = (props: CardActionFeedback) => {
+  return (
+    <>
+      <p>You've traded cards with {props.opponentName}</p>
+      <div>Now you have {<Card card={props.opponentCard} showDescription={false}/>}</div>
+    </>
+  );
+}
+
+const CountessFeedback = (props: CardActionFeedback) => {
+  return (<p>You've silently discarded the Countess</p>);
+}
+
+const PrincessFeedback = (props: CardActionFeedback) => {
+  return (<p>You've discarded the Princess and died immediately</p>);
+}
+
+interface KillingStatusProps {
+  card: CardType;
+  success: boolean;
+  opponentName: string;
+}
+
+const KillingStatus = (props: KillingStatusProps) => {
+  const killingCard = KILLING_CARDS.indexOf(props.card) !== -1;
+  const actionText = props.success ? 'have killed' : 'haven\'t killed';
+  return (
+    <>
+      {killingCard && (<p>You {actionText} {props.opponentName}</p>)}
+    </>
+  );
+}
+
+const KILLING_CARDS = [CardType.Guard, CardType.Baron, CardType.Prince, CardType.King];
+
+const componentsMap = {
+  [CardType.Guard]: GuardFeedback,
+  [CardType.Priest]: PriestFeedback,
+  [CardType.Baron]: BaronFeedback,
+  [CardType.Handmaid]: HandmaidFeedback,
+  [CardType.Prince]: PrinceFeedback,
+  [CardType.King]: KingFeedback,
+  [CardType.Countess]: CountessFeedback,
+  [CardType.Princess]: PrincessFeedback
+};

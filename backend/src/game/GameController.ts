@@ -1,14 +1,7 @@
 import {ActionResult, GameAction, GameId, LoveLetterGame, LoveLetterGameState, Player, PlayerId} from './loveletter';
 import {PlayerController} from '../PlayerController';
-import {
-  CardAction,
-  createLoadCardMessage,
-  createSetTableMessage,
-  createStartTurnMessage,
-  createTextMessage,
-  RemoteAction
-} from '../protocol';
-import {cardNameMapping, CardType} from './commonTypes';
+import {CardAction, createLoadCardMessage, createSetTableMessage, createStartTurnMessage, createTextMessage, RemoteAction} from '../protocol';
+import {cardNameMapping} from './commonTypes';
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
@@ -63,7 +56,7 @@ export class GamesController {
     playerController.on('cardAction', (action: CardAction) => {
       const game = this.games.get(gameId)!;
       const gameAction = this.createAction(game, playerController.userId, action);
-      game.applyAction(gameAction).then(() => {
+      game.applyAction(gameAction).then(res => {
         const controller = this.playerControllers.get(userId);
         if (!controller) {
           console.log(`Cannot find player controller ${userId}`);
@@ -71,17 +64,14 @@ export class GamesController {
         }
         controller.dispatch({
           type: 'feedback/showFeedback',
-          payload: {
-            card: action.payload.card,
-            success: true,
-            playerCard: undefined
-          }
+          payload: {...res, card: action.payload.card}
         });
 
         const playerSuffix = action.payload.playerIndex ? ` on ${game.state.players[action.payload.playerIndex].id}` : '';
         const cardName = cardNameMapping[action.payload.card];
 
         this.sendEveryone(gameId, () => createTextMessage(`${userId} played ${cardName}${playerSuffix}`));
+        // TODO report if a player is dead
         this.sendEveryone(gameId, (player, game) => createSetTableMessage(player.id, game.state));
 
         const player = game.state.getActivePlayer();

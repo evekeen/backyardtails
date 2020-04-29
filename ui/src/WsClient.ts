@@ -135,6 +135,7 @@ export class WsClient {
       }
       this.localDispatch(data);
     } catch (err) {
+      console.error(err);
       console.error(`Cannot parse message ${msg.data}`)
     }
   };

@@ -233,3 +233,10 @@ ol li span {
   min-width: 300px;
   max-width: 600px;
 }
+
+.ll-feedback .modal-body > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}

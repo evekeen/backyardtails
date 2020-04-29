@@ -4,8 +4,8 @@ import {CardType, needPlayerSelected} from '../model/commonTypes';
 import {ActionDialog} from './ActionDialog';
 import {CardAction} from '../model/CardAction';
 import {Player} from '../model/Player';
-import _ = require('lodash');
 import {Score} from './Score';
+import _ = require('lodash');
 
 interface PlayerHandProps {
   active: boolean;
@@ -24,13 +24,13 @@ export const PlayerHand = (props: PlayerHandProps) => {
   const disabledClass = props.active ? '' : 'disabled';
   const activeClass = props.active ? 'player-active' : '';
   const deadClass = !props.player?.alive ? 'player-dead' : '';
-  const submitAction = (guardChoice?: CardType) => props.active && props.submitAction({
+  const submitAction = (guess?: CardType) => props.active && props.submitAction({
     card: selectedCard,
     playerIndex: props.selectedPlayer?.index,
-    guardChoice: guardChoice
+    guess: guess
   });
-  const submit = (guardChoice?: CardType) => {
-    submitAction(guardChoice);
+  const submit = (guess?: CardType) => {
+    submitAction(guess);
     props.cancelSelection();
   };
 
