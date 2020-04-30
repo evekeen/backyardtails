@@ -1,5 +1,6 @@
+import _ = require('lodash');
 import {createAction, createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {setTable} from './board';
+import {BoardState, setTable} from './board';
 
 export interface ConnectionState extends GameParams{
   connecting: boolean;
@@ -50,7 +51,9 @@ const connectionSlice = createSlice({
       state.connected = true;
     },
     userJoined(state: ConnectionState, action: PayloadAction<User>) {
-      state.users.push(action.payload);
+      state.joined = true;
+      const users = state.users.concat(action.payload);
+      state.users = _.uniqBy(users, u => u.id);
     },
     userDisconnected(state: ConnectionState, action: PayloadAction<string>) {
       state.users.splice(state.users.findIndex(user => user.id === action.payload), 1);
@@ -66,7 +69,7 @@ const connectionSlice = createSlice({
     }).addCase(joinGame, (state: ConnectionState, action: PayloadAction<GameParams>) => {
       state.joining = true;
       Object.assign(state, action.payload);
-    }).addCase(setTable, (state: ConnectionState) => {
+    }).addCase(setTable, (state: ConnectionState, action: PayloadAction<BoardState>) => {
       state.joining = false;
       state.joined = true;
     });

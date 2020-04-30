@@ -1,6 +1,14 @@
 import {ActionResult, GameAction, GameId, LoveLetterGame, LoveLetterGameState, Player, PlayerId} from './loveletter';
 import {PlayerController} from '../PlayerController';
-import {CardAction, createLoadCardMessage, createSetTableMessage, createStartTurnMessage, createTextMessage, RemoteAction} from '../protocol';
+import {
+  CardAction,
+  createJoinedMessage,
+  createLoadCardMessage,
+  createSetTableMessage,
+  createStartTurnMessage,
+  createTextMessage,
+  RemoteAction
+} from '../protocol';
 import {cardNameMapping} from './commonTypes';
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
@@ -30,6 +38,10 @@ export class GamesController {
       console.log(`User ${userId} has joined to ${usedGameId}. ${PLAYERS_COUNT - 1} players left.`);
     }
 
+    pendingPlayers.forEach(playerId => {
+      pendingPlayers!!.forEach(id => this.send(playerId, createJoinedMessage(id)));
+    });
+
     if (pendingPlayers.length == PLAYERS_COUNT) {
       this.pendingGames.delete(usedGameId);
       const game = new LoveLetterGame(pendingPlayers);
@@ -42,12 +54,12 @@ export class GamesController {
       this.sendEveryone(usedGameId, (player, game) => createTextMessage(`It's ${game.state.activeTurnPlayerId}'s turn`));
 
       const player = game.state.getActivePlayer();
-      this.send(player, createStartTurnMessage(player.hand.pendingCard!));
+      this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
     }
   }
 
   private static generateGameId(): string {
-    return "Нарба";
+    return 'Нарба';
     // return "Нарба" + Math.ceil(Math.random() * 100);
   }
 
@@ -75,7 +87,7 @@ export class GamesController {
         this.sendEveryone(gameId, (player, game) => createSetTableMessage(player.id, game.state));
 
         const player = game.state.getActivePlayer();
-        this.send(player, createStartTurnMessage(player.hand.pendingCard!));
+        this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
       }).catch(() => {
         // TODO
       });
@@ -94,10 +106,10 @@ export class GamesController {
     });
   }
 
-  private send(player: Player, message: RemoteAction): void {
-    const controller = this.playerControllers.get(player.id);
+  private send(playerId: string, message: RemoteAction): void {
+    const controller = this.playerControllers.get(playerId);
     if (!controller) {
-      console.log(`Cannot find player controller ${player.id}`);
+      console.log(`Cannot find player controller ${playerId}`);
       return;
     }
     controller.dispatch(message);
@@ -108,7 +120,8 @@ export class GamesController {
     return this.action(action, player, gameAction);
   }
 
-  private action(cardAction: CardAction, playerId: PlayerId, action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): GameAction<LoveLetterGameState> {
+  private action(cardAction: CardAction, playerId: PlayerId,
+    action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): GameAction<LoveLetterGameState> {
     const playerIndex = cardAction.payload.playerIndex;
     const playedCard = cardAction.payload.card;
     return {

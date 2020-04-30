@@ -46,7 +46,7 @@ const JoinGameComponent = (props: JoinGameProps) => {
   const disabled = props.joining || props.joined || !name;
   return (
     <div className="login-wrapper">
-      {users.map(user => <JoinedUser name={user.name}/>)}
+      {users.map(user => <JoinedUser key={user.id} name={user.name}/>)}
       <p className="pending-users">We are waiting for <span className="player-bold">{waiting}</span> more players.</p>
       <div className="form">
         <div className="input-name start-page-element">

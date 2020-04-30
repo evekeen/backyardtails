@@ -1,21 +1,21 @@
 import * as t from 'io-ts';
+import {Validation} from 'io-ts';
 import {Reporter} from 'io-ts/lib/Reporter';
 import * as WebSocket from 'ws';
 import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
-import {Validation} from "io-ts";
 import {getCardIndex, LoveLetterGameState, Player, PlayerId} from './game/loveletter';
-import _ = require("lodash");
 import {CardType} from './game/commonTypes';
+import _ = require('lodash');
 
-export const MessageType = t.union([t.literal("connection/join"), t.literal("cardAction"), t.literal("state")])
+export const MessageType = t.union([t.literal('connection/join'), t.literal('cardAction'), t.literal('state')])
 
 export const Message = t.interface({
   type: MessageType
 })
 
 export const JoinMessage = t.interface({
-  type: t.literal("connection/join"),
+  type: t.literal('connection/join'),
   payload: t.interface({
     gameId: t.union([t.string, t.undefined]),
     userId: t.union([t.string, t.undefined])
@@ -23,7 +23,7 @@ export const JoinMessage = t.interface({
 });
 
 export const BoardStateMessage = t.interface({
-  type: t.literal("state")
+  type: t.literal('state')
 });
 
 interface PlayerDescription {
@@ -39,8 +39,16 @@ export interface RemoteAction {
   payload: any;
 }
 
+export interface UserJoinedMessage {
+  type: 'connection/userJoined',
+  payload: {
+    id: string;
+    name: string;
+  };
+}
+
 export interface SetTableMessage {
-  type: "board/setTable",
+  type: 'board/setTable',
   payload: {
     deckLeft: number;
     discardPileTop: number | undefined;
@@ -51,21 +59,21 @@ export interface SetTableMessage {
 }
 
 export interface LoadCardMessage {
-  type: "yourTurn/loadCard",
+  type: 'yourTurn/loadCard',
   payload: {
     card: number;
   };
 }
 
 export interface StartTurnMessage {
-  type: "yourTurn/startTurn",
+  type: 'yourTurn/startTurn',
   payload: {
     card: number;
   }
 }
 
 export interface ShowFeedback {
-  type: "feedback/showFeedback",
+  type: 'feedback/showFeedback',
   payload: {
     card: number;
     success: boolean;
@@ -108,11 +116,21 @@ export function error(code: ErrorCode, message: any): ErrorResponse {
   }
 }
 
+export function createJoinedMessage(playerId: string): UserJoinedMessage {
+  return {
+    type: 'connection/userJoined',
+    payload: {
+      id: playerId,
+      name: playerId
+    }
+  };
+}
+
 export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameState): SetTableMessage {
   const player = state.getPlayer(playerId);
   const discardPileTop = _.last(player.discardPile);
   return {
-    type: "board/setTable",
+    type: 'board/setTable',
     payload: {
       deckLeft: state.deck.size(),
       discardPileTop: discardPileTop && getCardIndex(discardPileTop) || undefined,
@@ -133,7 +151,7 @@ export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameS
 
 export function createLoadCardMessage(player: Player): LoadCardMessage {
   return {
-    type: "yourTurn/loadCard",
+    type: 'yourTurn/loadCard',
     payload: {
       card: player.hand.card!!
     }
@@ -142,14 +160,14 @@ export function createLoadCardMessage(player: Player): LoadCardMessage {
 
 export function createStartTurnMessage(card: CardType): StartTurnMessage {
   return {
-    type: "yourTurn/startTurn",
+    type: 'yourTurn/startTurn',
     payload: {
       card: card
     }
   };
 }
 
-export function createTextMessage (text: string): RemoteAction {
+export function createTextMessage(text: string): RemoteAction {
   return {
     type: 'status/addMessage',
     payload: text
