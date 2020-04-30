@@ -14,6 +14,7 @@ const CreateGameComponent = (props: { openGame: (gameId?: string) => void }) => 
   const [cpUrl, setCpUrl] = useState<string>(undefined);
   const copied = cpUrl && cpUrl === url;
   const copiedClass = copied ? 'copied' : '';
+  const disabledClass = !url ? 'disabled' : '';
   const visibility = url ? 'visible' : 'hidden';
 
   return (
@@ -22,7 +23,7 @@ const CreateGameComponent = (props: { openGame: (gameId?: string) => void }) => 
       <div className="link-wrapper">
         <button className="start-page-element start-page-button" onClick={() => setGameId(uuid4())}>Create game</button>
         <CopyToClipboard text={url} onCopy={() => url && setCpUrl(url)}>
-          <span className={`start-page-element game-link ${copiedClass}`}>{url}</span>
+          <span className={`start-page-element game-link ${copiedClass} ${disabledClass}`}>{url}</span>
         </CopyToClipboard>
         <div className="clipboard-message">{copied && 'Copied'}</div>
       </div>
@@ -43,17 +44,19 @@ const JoinGameComponent = (props: JoinGameProps) => {
   const waiting = PLAYERS_NUMBER - users.length;
   const [name, setName] = useState('');
   const join = () => props.joinGame({gameId: props.gameId, userId: name});
-  const disabled = props.joining || props.joined || !name;
+  const joinStarted = props.joining || props.joined;
+  const disabledButton = joinStarted || !name;
+  const loadingClass = joinStarted ? 'loading' : '';
   return (
-    <div className="login-wrapper">
+    <div className={`login-wrapper ${loadingClass}`}>
       {users.map(user => <JoinedUser key={user.id} name={user.name}/>)}
-      <p className="pending-users">We are waiting for <span className="player-bold">{waiting}</span> more players.</p>
+      <p className="pending-users">Waiting for <b>{waiting}</b> more players.</p>
       <div className="form">
-        <div className="input-name start-page-element">
-          <input value={name} placeholder="Your Name" onChange={e => setName(e.target.value)}/>
+        <div className={`input-name start-page-element`}>
+          <input value={name} disabled={joinStarted} placeholder="Your Name" onChange={e => setName(e.target.value)}/>
         </div>
         <img src="img/jigsaw.svg" alt=""/>
-        <button disabled={disabled} className="start-page-element start-page-button" onClick={join}>Join game</button>
+        <button disabled={disabledButton} className="start-page-element start-page-button" onClick={join}>Join game</button>
       </div>
     </div>
   );

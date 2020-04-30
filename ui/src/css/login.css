@@ -30,11 +30,15 @@
 
 .start-page-element {
   height: 70px;
-  margin: 50px auto;
-
+  margin-top: 50px;
   background: linear-gradient(173.93deg, #eef1f5 4.98%, #e6e9ef 94.88%);
   box-shadow: inset 5px 5px 10px rgba(166, 180, 200, 0.75), inset -5px -5px 15px rgba(255, 255, 255, 0.75);
   border-radius: 40px;
+}
+
+.start-page-element:disabled, .start-page-element.disabled {
+  box-shadow: none;
+  background: #ddd;
 }
 
 .start-page-button {
@@ -43,6 +47,14 @@
   font-weight: 300;
   font-size: 28px;
   color: rgba(62, 62, 62, 0.9);
+}
+
+.start-page-button:focus {
+  outline: none;
+}
+
+.start-page-button:hover:not(:disabled) {
+  background: linear-gradient(165.78deg, #d6def0 24.65%, #a5b0c5 67.59%);
 }
 
 .game-link {
@@ -54,6 +66,10 @@
   text-decoration: none;
   color: rgba(62, 62, 62, 0.9);
   cursor: pointer;
+}
+
+.game-link.disabled {
+  cursor: auto;
 }
 
 .form {
@@ -78,13 +94,29 @@
   text-decoration: none;
   border: none;
   background: transparent;
-}
-
-.start-page-button:hover {
-  background: linear-gradient(165.78deg, #d6def0 24.65%, #a5b0c5 67.59%);
+  outline: none;
 }
 
 .clipboard-message {
   width: 100px;
+  margin-top: 50px;
   color: #bc5952;
+}
+
+.login-wrapper img {
+  margin-top: 50px;
+}
+
+.login-wrapper.loading img {
+  -webkit-animation:spin 4s linear infinite;
+  -moz-animation:spin 4s linear infinite;
+  animation:spin 4s linear infinite;
+}
+
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+.login-wrapper.loading .input-name, .login-wrapper.loading .start-page-button {
+  display: none;
 }
