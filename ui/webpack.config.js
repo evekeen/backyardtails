@@ -20,7 +20,8 @@ module.exports = {
   entry: {
     'main': [
       './src/index.tsx',
-      './src/css/style.css',
+      './src/css/main.css',
+      './src/css/login.css',
       './node_modules/bootstrap/dist/css/bootstrap.min.css',
       './src/img/guard.png',
       './src/img/priest.png',
@@ -33,6 +34,7 @@ module.exports = {
       './src/img/mish.svg',
       './src/img/mish-active.svg',
       './src/img/cover.jpg',
+      './src/img/jigsaw.svg',
     ]
   },
 

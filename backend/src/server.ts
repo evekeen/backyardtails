@@ -1,15 +1,15 @@
 import * as express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
-import {AddressInfo} from "net";
+import {AddressInfo} from 'net';
 import * as session from 'express-session';
-import {ErrorCode, error, Message, JoinMessage} from "./protocol";
-import {ThrowReporter} from "io-ts/lib/ThrowReporter";
+import {error, ErrorCode, JoinMessage, Message} from './protocol';
+import {ThrowReporter} from 'io-ts/lib/ThrowReporter';
 import * as Either from 'fp-ts/lib/Either';
-import {pipe} from "fp-ts/lib/pipeable";
-import {PlayerController} from "./PlayerController";
-import {GamesController} from "./game/GameController";
-import {fold} from "fp-ts/lib/Either";
+import {fold} from 'fp-ts/lib/Either';
+import {pipe} from 'fp-ts/lib/pipeable';
+import {PlayerController} from './PlayerController';
+import {GamesController} from './game/GameController';
 
 const app = express();
 
@@ -31,7 +31,8 @@ function generateUserId(): string {
 
 function authenticate(req: any, callback: (userId: string) => any) {
   sessionParser(req, {} as any, () => {
-    if (!req.session.userId) {
+    const requestUserId = req.session.userId || req.payload?.userId;
+    if (!requestUserId) {
       const userId = generateUserId();
       console.log("Generated userId: " + userId);
       req.session.userId = userId;
@@ -101,7 +102,7 @@ server.on('upgrade', function upgrade(request, socket, head) {
 });
 
 //start our server
-server.listen(process.env.WS_PORT || 8999, () => {
+server.listen(process.env.WS_PORT || 8081, () => {
   const address = server.address() as AddressInfo;
   console.log(`Server started on port ${address.port} :)`);
 });

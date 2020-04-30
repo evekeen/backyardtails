@@ -1,5 +1,5 @@
 import {Player} from '../model/Player';
-import {CardType, PlayerIndex} from '../model/commonTypes';
+import {CardType, PlayerIndex, PLAYERS_NUMBER} from '../model/commonTypes';
 import * as React from 'react';
 import {OtherPlayer} from './OtherPlayer';
 import {Decks} from './Decks';
@@ -44,5 +44,3 @@ function player(player: Player, props: BoardProps) {
                  onClick={props.selectPlayer}/>
   )
 }
-
-const PLAYERS_NUMBER = 4;

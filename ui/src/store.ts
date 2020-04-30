@@ -1,12 +1,12 @@
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit'
+import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit'
 import loggerMiddleware from './middleware/logger'
 import reducers from './reducers'
 import {WsClient} from './WsClient';
 
 const prod = process.env.NODE_ENV === 'production';
-const url = prod ? 'wss://ll-backend.us-east-1.elasticbeanstalk.com:8999' : 'ws://localhost:8999';
+const wsUrl = prod ? 'wss://ll-backend.us-east-1.elasticbeanstalk.com:8443' : 'ws://localhost:8081';
 
-const wsClient = new WsClient(url);
+const wsClient = new WsClient(wsUrl);
 
 export default function configureAppStore(preloadedState: any) {
   const store = configureStore({

@@ -1,0 +1,90 @@
+.login-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 1100px;
+  text-align: center;
+  margin: 150px auto;
+}
+
+.create-game-text {
+  font-size: 42px;
+  font-weight: 300;
+  line-height: 120%;
+  color: rgba(62, 62, 62, 0.9);
+}
+
+.pending-users {
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 120%;
+  color: rgba(62, 62, 62, 0.9);
+}
+
+.link-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.start-page-element {
+  height: 70px;
+  margin: 50px auto;
+
+  background: linear-gradient(173.93deg, #eef1f5 4.98%, #e6e9ef 94.88%);
+  box-shadow: inset 5px 5px 10px rgba(166, 180, 200, 0.75), inset -5px -5px 15px rgba(255, 255, 255, 0.75);
+  border-radius: 40px;
+}
+
+.start-page-button {
+  width: 300px;
+  box-shadow: 10px 10px 20px rgba(166, 180, 200, 0.7), -12px -12px 20px rgba(255, 255, 255, 0.8);
+  font-weight: 300;
+  font-size: 28px;
+  color: rgba(62, 62, 62, 0.9);
+}
+
+.game-link {
+  margin-left: 50px;
+  width: 700px;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 70px;
+  text-decoration: none;
+  color: rgba(62, 62, 62, 0.9);
+  cursor: pointer;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input-name {
+  width: 600px;
+  background: linear-gradient(171.1deg, #EEF1F5 4.98%, #E6E9EF 94.88%);
+  box-shadow: inset 5px 5px 10px rgba(166, 180, 200, 0.75), inset -5px -5px 15px rgba(255, 255, 255, 0.75);
+  border-radius: 40px;
+}
+
+.input-name input {
+  font-weight: lighter;
+  font-size: 28px;
+  line-height: 70px;
+  color: rgba(62, 62, 62, 0.9);
+  text-decoration: none;
+  border: none;
+  background: transparent;
+}
+
+.start-page-button:hover {
+  background: linear-gradient(165.78deg, #d6def0 24.65%, #a5b0c5 67.59%);
+}
+
+.clipboard-message {
+  width: 100px;
+  color: #bc5952;
+}

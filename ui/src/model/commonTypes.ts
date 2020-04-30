@@ -38,3 +38,5 @@ export const cardDescriptionMapping = {
   [CardType.Countess]: 'If a player holds both this card and either the King or Prince card, this card must be played immediately.',
   [CardType.Princess]: 'If a player plays this card for any reason, they are eliminated from the round.'
 }
+
+export const PLAYERS_NUMBER = 4;
