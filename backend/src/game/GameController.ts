@@ -47,7 +47,10 @@ export class GamesController {
   }
 
   onJoin(userId: PlayerId, name: string, gameId: GameId): void {
-    const pendingPlayers = this.pendingGames.get(gameId)!!;
+    const pendingPlayers = this.pendingGames.get(gameId);
+    if (!pendingPlayers) {
+      return;
+    }
     if (getReady(pendingPlayers).length >= PLAYERS_COUNT) {
       this.send(userId, MO_MORE_SEATS);
       return;
