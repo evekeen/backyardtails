@@ -168,7 +168,7 @@ export class WsClient {
 
   private dispatchToWs(action: any) {
     if (!this._connected) {
-      console.warn('ignoring action due to ws connection broken', action)
+      console.warn('ignoring action due to ws being disconnected', action)
       if (action.retry >= 5) {
         console.log(`Giving up trying to send ${action}`);
         return;

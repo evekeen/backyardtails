@@ -3,7 +3,7 @@ import * as http from 'http';
 import * as WebSocket from 'ws';
 import {AddressInfo} from 'net';
 import * as session from 'express-session';
-import {error, ErrorCode, JoinMessage, Message} from './protocol';
+import {error, ErrorCode, JoinMessage, Message, OpenGameMessage} from './protocol';
 import {ThrowReporter} from 'io-ts/lib/ThrowReporter';
 import * as Either from 'fp-ts/lib/Either';
 import {fold} from 'fp-ts/lib/Either';
@@ -26,13 +26,12 @@ const wss = new WebSocket.Server({ noServer: true });
 const gamesController = new GamesController();
 
 function generateUserId(): string {
-  return "User " + Math.ceil(Math.random() * 100);
+  return "u-" + Math.ceil(Math.random() * 100);
 }
 
 function authenticate(req: any, callback: (userId: string) => any) {
   sessionParser(req, {} as any, () => {
-    const requestUserId = req.session.userId || req.payload?.userId;
-    if (!requestUserId) {
+    if (!req.session.userId) {
       const userId = generateUserId();
       console.log("Generated userId: " + userId);
       req.session.userId = userId;
@@ -45,17 +44,35 @@ function authenticate(req: any, callback: (userId: string) => any) {
 
 wss.on('connection', (ws: WebSocket, request: any) => {
   console.log('connection');
-  authenticate(request, userId => {
-    console.log(`authenticate ${request} ${userId}`);
-    const playerController = new PlayerController(userId);
+  authenticate(request, sessionUserId => {
+    console.log(`authenticate ${request} ${sessionUserId}`);
+    const controller = new PlayerController(sessionUserId);
 
-    playerController.on('connection/join', joinMessageObj => {
-      console.log('join', joinMessageObj);
-      pipe(JoinMessage.decode(joinMessageObj), fold(
-        error => console.log("Failed to parse JoinMessage:" + error),
+    controller.on('connection/openGame', msg => {
+      console.log('openGame', msg);
+      pipe(OpenGameMessage.decode(msg), fold(() => console.log("Failed to parse: " + msg),
         joinMessage => {
-          console.log(`Joining user ${userId} to a game...`);
-          gamesController.onJoin(userId, joinMessage.payload.gameId, playerController)
+          const gameId = joinMessage.payload.gameId;
+          const userId = joinMessage.payload.userId;
+          controller.gameId = gameId;
+          controller.userId = userId;
+          console.log(`Added spectator ${userId} to a game...`);
+          gamesController.addSpectator(userId, gameId, controller)
+        }));
+    });
+
+    controller.on('connection/join', msg => {
+      console.log('join', msg);
+      pipe(JoinMessage.decode(msg), fold(() => console.log("Failed to parse: " + msg),
+        joinMessage => {
+          console.log(`Joining user ${controller.userId} to a game...`);
+          const gameId = joinMessage.payload.gameId;
+          if (gameId !== controller.gameId) {
+            console.log(`Incorrect gameId ${gameId}`);
+            return;
+          }
+          controller.name = joinMessage.payload.name;
+          gamesController.onJoin(controller.userId, joinMessage.payload.name, gameId);
         }));
     });
 
@@ -72,19 +89,22 @@ wss.on('connection', (ws: WebSocket, request: any) => {
         pipe(typedMessage, fold(_ => ThrowReporter.report(typedMessage), m => {
           console.log('received: %s', JSON.stringify(m));
           const type = m.type
-          playerController.onMessage(type, message);
+          controller.onMessage(type, message);
         }))
       }));
     });
 
-    playerController.on('stateReady', state => {
-      console.log(`Sending ${state.type} to ${playerController.userId}`)
+    controller.on('stateReady', state => {
+      console.log(`Sending ${state.type} to ${controller.userId}`)
       ws.send(JSON.stringify(state));
     });
 
     ws.on('error', (error) => console.log("Error: " + error));
-
-    ws.send(JSON.stringify({type: 'ready', userId: userId}));
+    ws.on('close', () => {
+      console.log(`Disconnected ${controller.userId}`);
+      gamesController.disconnect(controller.userId, controller.gameId!!)
+    });
+    ws.send(JSON.stringify({type: 'ready', userId: sessionUserId}));
   });
 });
 

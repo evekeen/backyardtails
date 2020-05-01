@@ -2,7 +2,7 @@ import {EventEmitter} from 'events';
 import {RemoteAction} from './protocol';
 
 export class PlayerController extends EventEmitter {
-  constructor(public userId: string) {
+  constructor(public userId: string, public gameId?: string, public name?: string) {
     super();
   }
 

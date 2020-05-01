@@ -1,14 +1,14 @@
 import React = require('react');
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {connect} from 'react-redux';
 import {v4 as uuid4} from 'uuid';
 // @ts-ignore
 import {CopyToClipboard} from 'react-copy-to-clipboard';
-import {GameParams, gameUrl, joinGame, openGame, User} from '../reducers/connection';
+import {GameParams, gameUrl, joinGame, JoinParams, MaybeJoinedUser, openGame, OpenGameParams, openJoinScreen} from '../reducers/connection';
 import {PLAYERS_NUMBER} from '../model/commonTypes';
 import {AppState} from './App';
 
-const CreateGameComponent = (props: { openGame: (gameId?: string) => void }) => {
+const CreateGameComponent = (props: { openJoinScreen: (gameId: string) => void }) => {
   const [gameId, setGameId] = useState<string>(undefined);
   const url = gameId ? gameUrl(gameId) : undefined;
   const [cpUrl, setCpUrl] = useState<string>(undefined);
@@ -27,7 +27,9 @@ const CreateGameComponent = (props: { openGame: (gameId?: string) => void }) => 
         </CopyToClipboard>
         <div className="clipboard-message">{copied && 'Copied'}</div>
       </div>
-      <button className="start-page-element start-page-button" style={{visibility}} onClick={() => props.openGame(gameId)}>Join</button>
+      <button className="start-page-element start-page-button" style={{visibility}} onClick={() => props.openJoinScreen(gameId)}>
+        Join
+      </button>
     </div>
   );
 }
@@ -35,21 +37,28 @@ const CreateGameComponent = (props: { openGame: (gameId?: string) => void }) => 
 interface JoinGameProps extends GameParams {
   joining: boolean;
   joined: boolean;
-  joinGame: (params: GameParams) => void;
-  users: User[];
+  openGame: (params: OpenGameParams) => void;
+  joinGame: (params: JoinParams) => void;
+  users: MaybeJoinedUser[];
 }
 
 const JoinGameComponent = (props: JoinGameProps) => {
-  const users = props.users || [];
-  const waiting = PLAYERS_NUMBER - users.length;
+  const {gameId, userId} = props;
+  const readyUsers = props.users.filter(u => u.ready);
+  const waiting = PLAYERS_NUMBER - readyUsers.length;
   const [name, setName] = useState('');
-  const join = () => props.joinGame({gameId: props.gameId, userId: name});
+  const join = () => props.joinGame({gameId, userId, name});
   const joinStarted = props.joining || props.joined;
   const disabledButton = joinStarted || !name;
   const loadingClass = joinStarted ? 'loading' : '';
+
+  useEffect(() => {
+    props.openGame({gameId, userId});
+  }, []);
+
   return (
     <div className={`login-wrapper ${loadingClass}`}>
-      {users.map(user => <JoinedUser key={user.id} name={user.name}/>)}
+      {readyUsers.map(user => <JoinedUser key={user.id} name={user.name}/>)}
       <p className="pending-users">Waiting for <b>{waiting}</b> more players.</p>
       <div className="form">
         <div className={`input-name start-page-element`}>
@@ -70,5 +79,5 @@ const JoinedUser = (props: { name: string }) => {
 
 const mapStateToProps = (state: AppState) => state.connection
 
-export const JoinGame = connect(mapStateToProps, {joinGame})(JoinGameComponent);
-export const CreateGame = connect(mapStateToProps, {openGame})(CreateGameComponent);
+export const CreateGame = connect(mapStateToProps, {openJoinScreen})(CreateGameComponent);
+export const JoinGame = connect(mapStateToProps, {openGame, joinGame})(JoinGameComponent);

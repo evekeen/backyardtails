@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useEffect} from 'react';
-import {loadUrl, User} from '../reducers/connection';
+import {loadUrl, MaybeJoinedUser} from '../reducers/connection';
 import {CreateGame, JoinGame} from '../components/StartPage';
 import ManagedStatusPanel from '../containers/ManagedStatusPanel';
 import PlayerHandContainer from '../containers/PlayerHandContainer';
@@ -12,11 +12,11 @@ import {PLAYERS_NUMBER} from '../model/commonTypes';
 
 const PageController = (props: PageControllerProps) => {
   useEffect(() => props.loadUrl(), []);
-  const numberOfUser = props.users?.length || 0;
+  const readyUsers = props.users?.filter(u => u.ready)?.length || 0;
 
   if (!props.gameId) {
     return (<CreateGame/>);
-  } else if (!props.userId || numberOfUser < PLAYERS_NUMBER || !props.joined) {
+  } else if (!props.name || readyUsers < PLAYERS_NUMBER || !props.joined) {
     return (<JoinGame/>);
   }
   return (
@@ -31,9 +31,9 @@ const PageController = (props: PageControllerProps) => {
 
 interface PageControllerProps {
   gameId?: string;
-  userId?: string;
+  name?: string;
   joined: boolean;
-  users: User[];
+  users: MaybeJoinedUser[];
   loadUrl: () => void;
 }
 

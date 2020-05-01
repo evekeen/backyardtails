@@ -1,12 +1,14 @@
 import * as _ from 'lodash';
 import {CardType} from './commonTypes';
 import {CardAction} from '../protocol';
+import {PlayerHandle} from './PlayerHandle';
 
 export type GameId = string;
 export type PlayerId = string
 
 export interface Player {
   id: string;
+  name: string;
   index: number;
   hand: Hand;
   discardPile: CardType[];
@@ -102,27 +104,28 @@ export interface Game<State> {
 
   init(): void;
   applyAction(action: GameAction<State>): Promise<ActionResult>;
-  join(player: PlayerId): void;
-  leave(player: PlayerId): void;
+  join(player: PlayerHandle): void;
+  leave(player: PlayerHandle): void;
 }
 
 export class LoveLetterGameState {
   public players: Player[] = [];
-  public idlePlayersIds: PlayerId[] = [];
+  public idlePlayersIds: PlayerHandle[] = [];
   public deck: Deck = new LoveLetterDeck();
   public activePlayerIds: PlayerId[] = [];
   public deadPlayerIds: PlayerId[] = [];
   public activeTurnPlayerId: PlayerId | undefined;
   public winnerId: PlayerId | undefined;
 
-  constructor(players: PlayerId[]) {
+  constructor(players: PlayerHandle[]) {
     players.forEach((p) => this.newPlayer(p));
   }
 
-  newPlayer(playerId: PlayerId): Player {
+  newPlayer(handle: PlayerHandle): Player {
     const playerIndex = this.players.length;
-    const player = {
-      id: playerId,
+    const player: Player = {
+      id: handle.id,
+      name: handle.name!!,
       index: playerIndex,
       hand: {
         card: undefined,
@@ -144,19 +147,20 @@ export class LoveLetterGameState {
     this.activePlayerIds = this.activePlayerIds.filter((id) => id !== playerId);
   }
 
-  public addPlayer(player: PlayerId) {
+  public addPlayer(player: PlayerHandle) {
     this.idlePlayersIds.push(player);
   }
 
-  public removePlayer(player: PlayerId) {
+  public removePlayer(player: PlayerHandle) {
     this.idlePlayersIds = _.remove(this.idlePlayersIds, id => id === player);
-    this.players = _.remove(this.players, p => p.id === player);
-    this.activePlayerIds = _.remove(this.activePlayerIds, id => id === player);
+    this.players = _.remove(this.players, p => p.id === player.id);
+    this.activePlayerIds = _.remove(this.activePlayerIds, id => id === player.id);
   }
 
-  start(firstPlayerId: PlayerId) {
-    for (const idleId of this.idlePlayersIds)
+  start(playerHandle: PlayerHandle) {
+    for (const idleId of this.idlePlayersIds) {
       this.newPlayer(idleId);
+    }
 
     this.idlePlayersIds = [];
     this.deck.init();
@@ -170,8 +174,8 @@ export class LoveLetterGameState {
     });
 
     this.deadPlayerIds = [];
-    this.activeTurnPlayerId = firstPlayerId;
-    const firstPlayer = this.getPlayer(firstPlayerId)
+    this.activeTurnPlayerId = playerHandle.id;
+    const firstPlayer = this.getPlayer(playerHandle.id);
     firstPlayer.hand.pendingCard = this.deck.take();
     this.winnerId = undefined;
   }
@@ -239,7 +243,7 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
   private actions: GameAction<LoveLetterGameState>[] = [];
   private firstPlayerIdx = -1;
 
-  constructor(private players: PlayerId[]) {
+  constructor(private players: PlayerHandle[]) {
   }
 
   applyAction(action: GameAction<LoveLetterGameState>): Promise<ActionResult> {
@@ -255,11 +259,11 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
     return actionResult;
   }
 
-  join(player: PlayerId) {
+  join(player: PlayerHandle) {
     this.state.addPlayer(player)
   }
 
-  leave(player: PlayerId) {
+  leave(player: PlayerHandle) {
     this.state.removePlayer(player);
   }
 

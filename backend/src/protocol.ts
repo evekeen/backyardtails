@@ -6,19 +6,29 @@ import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
 import {getCardIndex, LoveLetterGameState, Player, PlayerId} from './game/loveletter';
 import {CardType} from './game/commonTypes';
+import {PlayerHandle} from './game/PlayerHandle';
 import _ = require('lodash');
 
-export const MessageType = t.union([t.literal('connection/join'), t.literal('cardAction'), t.literal('state')])
+export const MessageType = t.union([t.literal('connection/openGame'), t.literal('connection/join'), t.literal('cardAction'), t.literal('state')])
 
 export const Message = t.interface({
   type: MessageType
 })
 
+export const OpenGameMessage = t.interface({
+  type: t.literal('connection/openGame'),
+  payload: t.interface({
+    gameId: t.string,
+    userId: t.string
+  }),
+});
+
 export const JoinMessage = t.interface({
   type: t.literal('connection/join'),
   payload: t.interface({
-    gameId: t.union([t.string, t.undefined]),
-    userId: t.union([t.string, t.undefined])
+    gameId: t.string,
+    userId: t.string,
+    name: t.string
   }),
 });
 
@@ -43,8 +53,14 @@ export interface UserJoinedMessage {
   type: 'connection/userJoined',
   payload: {
     id: string;
-    name: string;
+    name?: string;
+    ready: boolean;
   };
+}
+
+export interface UserDisconnectedMessage {
+  type: 'connection/userDisconnected',
+  payload: PlayerId;
 }
 
 export interface SetTableMessage {
@@ -116,13 +132,17 @@ export function error(code: ErrorCode, message: any): ErrorResponse {
   }
 }
 
-export function createJoinedMessage(playerId: string): UserJoinedMessage {
+export function createJoinedMessage(description: PlayerHandle): UserJoinedMessage {
   return {
     type: 'connection/userJoined',
-    payload: {
-      id: playerId,
-      name: playerId
-    }
+    payload: description
+  };
+}
+
+export function createUserDisconnectedMessage(userId: PlayerId): UserDisconnectedMessage {
+  return {
+    type: 'connection/userDisconnected',
+    payload: userId
   };
 }
 
@@ -139,7 +159,7 @@ export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameS
       players: state.players.map((player, index) => {
         return ({
           index: index,
-          name: player.id,
+          name: player.name,
           score: player.score,
           alive: player.alive,
           shield: player.hand.immune,
@@ -172,4 +192,9 @@ export function createTextMessage(text: string): RemoteAction {
     type: 'status/addMessage',
     payload: text
   };
+}
+
+export const MO_MORE_SEATS: RemoteAction = {
+  type: 'connection/noMoreSeats',
+  payload: 'Game has already started'
 }
