@@ -1,5 +1,5 @@
 import React = require('react');
-import {useEffect, useState} from 'react';
+import {KeyboardEvent, useEffect, useState} from 'react';
 import {connect} from 'react-redux';
 import {v4 as uuid4} from 'uuid';
 // @ts-ignore
@@ -56,13 +56,15 @@ const JoinGameComponent = (props: JoinGameProps) => {
     props.openGame({gameId, userId});
   }, []);
 
+  const onKeyDown = (e: KeyboardEvent) => e.key === 'Enter' && join();
+
   return (
     <div className={`login-wrapper ${loadingClass}`}>
       {readyUsers.map(user => <JoinedUser key={user.id} name={user.name}/>)}
       <p className="pending-users">Waiting for <b>{waiting}</b> more players.</p>
       <div className="form">
         <div className={`input-name start-page-element`}>
-          <input value={name} disabled={joinStarted} placeholder="Your Name" onChange={e => setName(e.target.value)}/>
+          <input value={name} disabled={joinStarted} placeholder="Your Name" onChange={e => setName(e.target.value)} onKeyDown={onKeyDown}/>
         </div>
         <img src="img/jigsaw.svg" alt=""/>
         <button disabled={disabledButton} className="start-page-element start-page-button" onClick={join}>Join game</button>
