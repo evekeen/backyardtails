@@ -22,24 +22,20 @@ export class GamesController {
   private pendingGames = new Map<GameId, PlayerHandle[]>();
   private games = new Map<GameId, LoveLetterGame>();
 
-  addSpectator(userId: PlayerId, gameId: GameId, playerController: PlayerController): void {
+  addSpectator(controller: PlayerController, gameId: GameId): void {
+    const userId = controller.userId!!;
     if (this.playerControllers.get(userId)) {
       console.log(`Ignored repeated connection for user ${userId}`);
       return;
     }
-    this.subscribe(userId, gameId, playerController);
-
-    let currentGame = this.games.get(gameId);
-    if (currentGame && currentGame.hasPlayer(userId)) {
-      // Send current state to joined user
-    }
+    this.subscribe(userId, gameId, controller);
 
     let pendingPlayers = this.pendingGames.get(gameId);
-    const status = {id: userId, ready: false};
+    const handle = {id: userId, ready: false};
     if (pendingPlayers) {
-      pendingPlayers.push(status);
+      pendingPlayers.push(handle);
     } else {
-      pendingPlayers = [status];
+      pendingPlayers = [handle];
       this.pendingGames.set(gameId, pendingPlayers);
       console.log(`Pending game ${gameId} created!`);
     }
@@ -49,6 +45,9 @@ export class GamesController {
 
   onJoin(controller: PlayerController, name: string, gameId: GameId): void {
     const userId = controller.userId!!;
+    if (!this.playerControllers.get(userId)) {
+      this.subscribe(userId, gameId, controller);
+    }
     const pendingPlayers = this.pendingGames.get(gameId);
     const game = this.games.get(gameId);
     if (pendingPlayers === undefined && game === undefined) {
@@ -58,7 +57,11 @@ export class GamesController {
     }
     // TODO refactor: need to create a function to send whole game state to a particular user on reconnect
     // TODO keep a log of messages sent to users, so they can be send again
-    if (game !== undefined) {
+    if (game !== undefined && game.hasPlayer(userId)) {
+      game.state.players.find(p => p.id === userId)!!.ready = true;
+      const handles = game.state.players.filter(p => p.ready);
+      game.state.players.forEach(h => this.broadcast(handles, createJoinedMessage(h)));
+
       controller.dispatch(createSetTableMessage(userId, game!!.state));
       controller.dispatch(createLoadCardMessage(game!!.state.getPlayer(userId)));
       const activePlayer = game!!.state.getActivePlayer();
@@ -70,7 +73,7 @@ export class GamesController {
     }
 
     if (pendingPlayers === undefined) {
-      console.log('WTF');
+      console.log('WTF', game);
       return;
     }
 
@@ -80,14 +83,20 @@ export class GamesController {
     }
     console.log(`User ${userId} has joined ${gameId} as ${name}`);
     const index = pendingPlayers.findIndex(p => p.id === userId);
-    pendingPlayers[index] = {...pendingPlayers[index], name, ready: true};
-    this.pendingGames.set(gameId, pendingPlayers);
-
+    const handle = {id: userId, name, ready: true};
+    if (index !== -1) {
+      pendingPlayers[index] = handle;
+      this.pendingGames.set(gameId, pendingPlayers);
+    } else {
+      pendingPlayers.push(handle);
+      this.pendingGames.set(gameId, pendingPlayers);
+    }
+    console.log(pendingPlayers);
     pendingPlayers.forEach(h => this.broadcast(pendingPlayers!!, createJoinedMessage(h)));
 
     const readyPlayers = getReady(pendingPlayers);
 
-    if (readyPlayers.length == PLAYERS_COUNT) {
+    if (readyPlayers.length === PLAYERS_COUNT) {
       this.pendingGames.delete(gameId);
       const game = new LoveLetterGame(readyPlayers);
       this.games.set(gameId, game);
@@ -117,6 +126,7 @@ export class GamesController {
     let otherPlayers: PlayerId[];
     if (game) {
       otherPlayers = game.state.players.filter(p => p.id !== userId).map(p => p.id);
+      game.state.players.find(p => p.id === userId)!!.ready = false;
     } else if (pending) {
       const other = pending.filter(h => h.id !== userId);
       this.pendingGames.set(gameId, other);

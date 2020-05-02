@@ -140,7 +140,7 @@ export function error(code: ErrorCode, message: any): ErrorResponse {
 export function createJoinedMessage(description: PlayerHandle): UserJoinedMessage {
   return {
     type: 'connection/userJoined',
-    payload: description
+    payload: _.pick(description, 'id', 'name', 'ready')
   };
 }
 

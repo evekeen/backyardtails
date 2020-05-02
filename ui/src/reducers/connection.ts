@@ -56,7 +56,6 @@ export const loadUrl = function (dispatch: Dispatch<any>, getState: () => AppSta
   const name = getState().connection.name;
 
   if (gameId && userId && name) {
-    dispatch(openGame({gameId, userId}));
     dispatch(joinGame({gameId, userId, name}));
   } else if (gameId) {
     dispatch(openGame({gameId, userId: userId || generateUserId()}));

@@ -65,7 +65,7 @@ const JoinGameComponent = (props: JoinGameProps) => {
       <p className="pending-users">Waiting for <b>{waiting}</b> more players.</p>
       <div className="form">
         <div className={`input-name start-page-element`}>
-          <input value={name} disabled={joinStarted} placeholder="Your Name" onChange={e => setName(e.target.value)} onKeyDown={onKeyDown}/>
+          <input value={name} disabled={joinStarted} placeholder="Your Name" onChange={e => setName(e.target.value)} onKeyDown={onKeyDown} autoFocus={true}/>
         </div>
         <img src="img/jigsaw.svg" alt=""/>
         <button disabled={disabledButton} className="start-page-element start-page-button" onClick={join}>Join game</button>

@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import {CardType} from './commonTypes';
 import {CardAction} from '../protocol';
 import {PlayerHandle} from './PlayerHandle';
+import {PLAYERS_NUMBER} from '../../../ui/src/model/commonTypes';
 
 export type GameId = string;
 export type PlayerId = string
@@ -14,6 +15,7 @@ export interface Player {
   discardPile: CardType[];
   score: number;
   alive: boolean;
+  ready: boolean;
 }
 
 /*
@@ -134,7 +136,8 @@ export class LoveLetterGameState {
       },
       discardPile: [],
       score: 0,
-      alive: true
+      alive: true,
+      ready: true
     };
     this.players.push(player);
     return player;
@@ -181,6 +184,10 @@ export class LoveLetterGameState {
   }
 
   nextTurn() {
+    if (this.players.filter(p => p.ready).length < PLAYERS_NUMBER) {
+      console.log('Not enough players connected');
+    }
+
     if (this.activePlayerIds.length === 1) {
       this.setWinner(this.activePlayerIds[0]);
     } else if (this.deck.size() === 0) {
@@ -267,8 +274,8 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
     this.state.removePlayer(player);
   }
 
-  hasPlayer(player: PlayerId) {
-    return player in this.players;
+  hasPlayer(id: PlayerId): boolean {
+    return !!this.players.find(p => p.id === id);
   }
 
   init() {

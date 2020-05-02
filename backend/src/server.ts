@@ -56,7 +56,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
         controller.gameId = gameId;
         controller.userId = userId;
         console.log(`Added spectator ${userId} to a game...`);
-        gamesController.addSpectator(userId, gameId, controller)
+        gamesController.addSpectator(controller, gameId)
       }));
   });
 
@@ -66,11 +66,12 @@ wss.on('connection', (ws: WebSocket, request: any) => {
       joinMessage => {
         const gameId = joinMessage.payload.gameId;
         const userId = joinMessage.payload.userId;
+        const name = joinMessage.payload.name;
         controller.gameId = gameId;
         controller.userId = userId;
-        controller.name = joinMessage.payload.name;
+        controller.name = name;
         console.log(`Joining user ${controller.userId} to a game...`);
-        gamesController.onJoin(controller, joinMessage.payload.name, gameId);
+        gamesController.onJoin(controller, name, gameId);
       }));
   });
 
