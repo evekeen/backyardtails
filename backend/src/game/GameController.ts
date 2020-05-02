@@ -30,7 +30,7 @@ export class GamesController {
     }
     this.subscribe(userId, gameId, controller);
 
-    if (this.games.has(userId)) {
+    if (this.games.has(gameId)) {
       console.log(`Game already exists ${gameId}`);
       const game = this.games.get(gameId)!!;
       if (game.hasPlayer(userId)) {
@@ -150,12 +150,17 @@ export class GamesController {
     this.broadcast(otherPlayers, createUserDisconnectedMessage(userId));
   }
 
-  private subscribe(userId: PlayerId, gameId: GameId, playerController: PlayerController) {
-    this.playerControllers.set(userId, playerController);
+  private subscribe(userId: PlayerId, gameId: GameId, controller: PlayerController) {
+    this.playerControllers.set(userId, controller);
 
-    playerController.on('cardAction', (action: CardAction) => {
-      const game = this.games.get(gameId)!;
-      const gameAction = this.createAction(game, playerController.userId!!, action);
+    controller.on('cardAction', (action: CardAction) => {
+      const game = this.games.get(gameId);
+      if (!game) {
+        console.log(`Game ${gameId} was not found`);
+        controller.dispatch(createGameNotFoundMessage(gameId));
+        return;
+      }
+      const gameAction = this.createAction(game, controller.userId!!, action);
       game.applyAction(gameAction).then(res => {
         const controller = this.playerControllers.get(userId);
         if (!controller) {
@@ -175,7 +180,7 @@ export class GamesController {
         this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
 
         const player = game.state.getActivePlayer();
-        playerController.dispatch(createStartTurnMessage(player.hand.pendingCard!));
+        controller.dispatch(createStartTurnMessage(player.hand.pendingCard!));
       }).catch(err => console.log(err));
     });
   }

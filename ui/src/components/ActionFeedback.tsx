@@ -35,11 +35,11 @@ const getFeedbackComponent = (props: ActionFeedbackProps) => {
 }
 
 const GuardFeedback = (props: CardActionFeedback) => {
-  const status = props.success ? 'right!' : 'wrong';
+  const status = props.killed ? 'right!' : 'wrong';
   return (
     <>
       <p>You guessed it {status}</p>
-      <KillingStatus card={props.card} success={props.success} opponentName={props.opponentName}/>
+      <KillingStatus card={props.card} killed={props.killed} opponentName={props.opponentName}/>
     </>
   );
 }
@@ -49,11 +49,11 @@ const PriestFeedback = (props: CardActionFeedback) => {
 }
 
 const BaronFeedback = (props: CardActionFeedback) => {
-  const status = props.success ? 'won' : 'lost';
+  const status = props.killed ? 'won' : 'lost';
   return (
     <>
       <p>You've {status} the duel</p>
-      <KillingStatus card={props.card} success={props.success} opponentName={props.opponentName}/>
+      <KillingStatus card={props.card} killed={props.killed} opponentName={props.opponentName}/>
       <div>{props.opponentName} had {<Card card={props.opponentCard} showDescription={false}/>}</div>
     </>
   );
@@ -64,7 +64,12 @@ const HandmaidFeedback = () => {
 }
 
 const PrinceFeedback = (props: CardActionFeedback) => {
-  return (<KillingStatus card={props.card} success={props.success} opponentName={props.opponentName}/>);
+  return (
+    <>
+      <p>You've made {props.opponentName} discard a card</p>
+      {props.killed && (<KillingStatus card={props.card} killed={props.killed} opponentName={props.opponentName}/>)}
+    </>
+  );
 }
 
 const KingFeedback = (props: CardActionFeedback) => {
@@ -86,13 +91,13 @@ const PrincessFeedback = (props: CardActionFeedback) => {
 
 interface KillingStatusProps {
   card: CardType;
-  success: boolean;
+  killed: boolean;
   opponentName: string;
 }
 
 const KillingStatus = (props: KillingStatusProps) => {
   const killingCard = KILLING_CARDS.indexOf(props.card) !== -1;
-  const actionText = props.success ? 'have killed' : 'haven\'t killed';
+  const actionText = props.killed ? 'have killed' : 'haven\'t killed';
   return (
     <>
       {killingCard && (<p>You {actionText} {props.opponentName}</p>)}

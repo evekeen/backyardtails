@@ -9,14 +9,14 @@ export interface FeedbackState {
 
 export interface CardActionFeedback {
   card: CardType;
-  success: boolean;
+  killed: boolean;
   opponentName: string;
   opponentCard?: CardType; // for priest and baron
 }
 
 interface CardActionFeedbackResponse {
   card: CardType;
-  success: boolean;
+  killed: boolean;
   opponentIndex: number;
   opponentCard?: CardType;
 }

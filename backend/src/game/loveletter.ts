@@ -96,7 +96,7 @@ export interface GameAction<State> {
 
 // TODO Field for each card type? Union type?
 export interface ActionResult {
-  success: boolean;
+  killed?: boolean;
   opponentCard?: CardType;
   opponentIndex?: number;
 }
@@ -302,46 +302,46 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
   switch (action.payload.card) {
   case CardType.Guard:
   {
-    const success = target.hand.card === action.payload.guess;
-    if (success) {
+    const killed = target.hand.card === action.payload.guess;
+    if (killed) {
       state.killPlayer(target.id);
     }
-    return {success};
+    return {killed};
   }
   case CardType.Priest:
-    return {success: true, opponentCard: target.hand.card};
+    return {killed: true, opponentCard: target.hand.card};
   case CardType.Baron:
   {
     const targetPlayerCard = target.hand.card!;
-    const success = playerCard > targetPlayerCard;
-    if (success) {
+    const killed = playerCard > targetPlayerCard;
+    if (killed) {
       state.killPlayer(target.id)
     } else if (playerCard < targetPlayerCard) {
       state.killPlayer(me.id);
     }
-    return {success};
+    return {killed};
   }
   case CardType.Handmaid:
     me.hand.immune = true;
-    return {success: true};
+    return {};
   case CardType.Prince:
   {
-    const success = target.hand.card == CardType.Princess;
-    if (success) {
+    const killed = target.hand.card == CardType.Princess;
+    if (killed) {
       state.killPlayer(target.id);
     } else {
       target.hand.card = state.deck.take();
     }
-    return {success};
+    return {killed};
   }
   case CardType.King:
     me.hand.card = target.hand.card;
     target.hand.card = playerCard;
-    return {success: true, opponentCard: me.hand.card};
+    return {opponentCard: me.hand.card};
   case CardType.Countess:
-    return {success: true};
+    return {};
   case CardType.Princess:
     state.killPlayer(me.id);
-    return {success: true};
+    return {killed: true};
   }
 }
