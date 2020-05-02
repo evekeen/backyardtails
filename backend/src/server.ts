@@ -45,8 +45,7 @@ function authenticate(req: any, callback: (userId: string) => any) {
 wss.on('connection', (ws: WebSocket, request: any) => {
   console.log('connection');
   authenticate(request, sessionUserId => {
-    console.log(`authenticate ${request} ${sessionUserId}`);
-    const controller = new PlayerController(sessionUserId);
+    const controller = new PlayerController();
 
     controller.on('connection/openGame', msg => {
       console.log('openGame', msg);
@@ -72,7 +71,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
             return;
           }
           controller.name = joinMessage.payload.name;
-          gamesController.onJoin(controller.userId, joinMessage.payload.name, gameId);
+          gamesController.onJoin(controller.userId!!, joinMessage.payload.name, gameId);
         }));
     });
 
@@ -102,7 +101,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
     ws.on('error', (error) => console.log("Error: " + error));
     ws.on('close', () => {
       console.log(`Disconnected ${controller.userId}`);
-      gamesController.disconnect(controller.userId, controller.gameId!!)
+      gamesController.disconnect(controller.userId, controller.gameId)
     });
     ws.send(JSON.stringify({type: 'ready', userId: sessionUserId}));
   });

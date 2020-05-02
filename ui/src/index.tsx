@@ -2,10 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {Provider} from 'react-redux'
 import {App} from './components/App';
-import createStore from './store';
-
-
-export const store = createStore({});
+import {store} from './store';
 
 ReactDOM.render(
   <Provider store={store}>

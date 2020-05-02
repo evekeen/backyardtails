@@ -40,21 +40,21 @@ interface JoinGameProps extends GameParams {
   openGame: (params: OpenGameParams) => void;
   joinGame: (params: JoinParams) => void;
   users: MaybeJoinedUser[];
+  name: string | undefined;
 }
 
 const JoinGameComponent = (props: JoinGameProps) => {
   const {gameId, userId} = props;
-  const readyUsers = props.users.filter(u => u.ready);
+  const readyUsers = props.users?.filter(u => u.ready) || [];
   const waiting = PLAYERS_NUMBER - readyUsers.length;
-  const [name, setName] = useState('');
+  const [name, setName] = useState(props.name || '');
   const join = () => props.joinGame({gameId, userId, name});
   const joinStarted = props.joining || props.joined;
   const disabledButton = joinStarted || !name;
   const loadingClass = joinStarted ? 'loading' : '';
 
-  useEffect(() => {
-    props.openGame({gameId, userId});
-  }, []);
+  useEffect(() => props.openGame({gameId, userId}), []);
+  useEffect(() => props.name && join(), [props.name]);
 
   const onKeyDown = (e: KeyboardEvent) => e.key === 'Enter' && join();
 
@@ -75,7 +75,7 @@ const JoinGameComponent = (props: JoinGameProps) => {
 
 const JoinedUser = (props: { name: string }) => {
   return (
-    <p className="joined-user"><span className="player-bold">{props.name}</span> already joined the game.</p>
+    <p className="joined-user"><b>{props.name}</b> joined</p>
   );
 }
 

@@ -8,6 +8,7 @@ export interface ConnectionState extends MaybeGameParams {
   users: MaybeJoinedUser[];
   joined: boolean;
   joining: boolean;
+  name: string | undefined;
 }
 
 export interface User {
@@ -41,7 +42,7 @@ export interface JoinParams extends GameParams {
 }
 
 function generateUserId(): string {
-  return "client-" + Math.ceil(Math.random() * 100);
+  return 'client-' + Math.ceil(Math.random() * 100);
 }
 
 export const loadUrl = createAction('loadUrl', () => {
@@ -91,7 +92,7 @@ const connectionSlice = createSlice({
           state.joining = false;
         }
       }
-      const users = state.users.filter(u => u.id !== action.payload.id).concat(action.payload);
+      const users = (state.users ?? []).filter(u => u.id !== action.payload.id).concat(action.payload);
       state.users = _.uniqBy(users, u => u.id);
     },
     userDisconnected(state: ConnectionState, action: PayloadAction<string>) {
@@ -114,6 +115,7 @@ const connectionSlice = createSlice({
       Object.assign(state, action.payload);
     }).addCase(joinGame, (state: ConnectionState, action: PayloadAction<JoinParams>) => {
       state.joining = true;
+      state.name = action.payload.name;
       Object.assign(state, action.payload);
     }).addCase(setTable, (state: ConnectionState) => {
       state.joining = false;

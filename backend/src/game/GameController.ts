@@ -72,7 +72,7 @@ export class GamesController {
       game.init()
 
       this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
-      this.sendToTheGame(gameId, (player, game) => createLoadCardMessage(player));
+      this.sendToTheGame(gameId, (player) => createLoadCardMessage(player));
       this.sendToTheGame(gameId, (player, game) => createTextMessage(`It's ${game.state.activeTurnPlayerId}'s turn`));
 
       const player = game.state.getActivePlayer();
@@ -80,14 +80,26 @@ export class GamesController {
     }
   }
 
-  disconnect(userId: PlayerId, gameId: GameId): void {
-    const players = this.pendingGames.get(gameId);
-    if (!players) {
+  disconnect(userId: PlayerId | undefined, gameId: GameId | undefined): void {
+    if (!userId) {
       return;
     }
-    const otherPlayers = players.filter(p => p.id !== userId);
-    this.pendingGames.set(gameId, otherPlayers);
     this.playerControllers.delete(userId);
+    if (!gameId) {
+      return;
+    }
+    let otherPlayers: PlayerId[];
+    const game = this.games.get(gameId);
+    if (game) {
+      otherPlayers = game.state.players
+        .filter(p => p.id !== userId)
+        .map(p => p.id);
+    } else {
+      const pending = this.pendingGames.get(gameId);
+      const other = pending!!.filter(h => h.id !== userId);
+      this.pendingGames.set(gameId, other);
+      otherPlayers = other.map(h => h.id);
+    }
     this.broadcast(otherPlayers, createUserDisconnectedMessage(userId));
   }
 
@@ -96,7 +108,7 @@ export class GamesController {
 
     playerController.on('cardAction', (action: CardAction) => {
       const game = this.games.get(gameId)!;
-      const gameAction = this.createAction(game, playerController.userId, action);
+      const gameAction = this.createAction(game, playerController.userId!!, action);
       game.applyAction(gameAction).then(res => {
         const controller = this.playerControllers.get(userId);
         if (!controller) {
@@ -138,8 +150,11 @@ export class GamesController {
     });
   }
 
-  private broadcast(handles: PlayerHandle[], message: RemoteAction): void {
-    handles.forEach(h => this.send(h.id, message));
+  private broadcast(handles: Array<PlayerHandle | PlayerId>, message: RemoteAction): void {
+    handles.forEach(h => {
+      const id = typeof h === 'string' ? h : h.id;
+      this.send(id, message)
+    });
   }
 
   private send(playerId: PlayerId, message: RemoteAction): void {
