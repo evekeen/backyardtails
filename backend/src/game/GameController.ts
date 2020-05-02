@@ -25,7 +25,7 @@ export class GamesController {
   onOpenGame(controller: PlayerController, gameId: GameId): void {
     const userId = controller.userId!!;
     if (this.playerControllers.get(userId)) {
-      console.log(`Ignored repeated connection for user ${userId}`);
+      console.log(`Repeated openGame for user ${userId}`);
       return;
     }
     this.subscribe(userId, gameId, controller);
@@ -136,7 +136,7 @@ export class GamesController {
     const pending = this.pendingGames.get(gameId);
 
     let otherPlayers: PlayerId[];
-    if (game) {
+    if (game && game.hasPlayer(userId)) {
       otherPlayers = game.state.players.filter(p => p.id !== userId).map(p => p.id);
       game.state.players.find(p => p.id === userId)!!.ready = false;
     } else if (pending) {
@@ -151,6 +151,7 @@ export class GamesController {
   }
 
   private subscribe(userId: PlayerId, gameId: GameId, controller: PlayerController) {
+    controller.removeAllListeners('cardAction');
     this.playerControllers.set(userId, controller);
 
     controller.on('cardAction', (action: CardAction) => {
@@ -175,12 +176,12 @@ export class GamesController {
         const playerSuffix = action.payload.playerIndex ? ` on ${game.state.players[action.payload.playerIndex].id}` : '';
         const cardName = cardNameMapping[action.payload.card];
 
-        this.sendToTheGame(gameId, () => createTextMessage(`${userId} played ${cardName}${playerSuffix}`));
+        this.sendToTheGame(gameId, () => createTextMessage(`${controller.name} played ${cardName}${playerSuffix}`));
         // TODO report if a player is dead
         this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
 
         const player = game.state.getActivePlayer();
-        controller.dispatch(createStartTurnMessage(player.hand.pendingCard!));
+        this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
       }).catch(err => console.log(err));
     });
   }

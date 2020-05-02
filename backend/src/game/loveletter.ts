@@ -184,6 +184,7 @@ export class LoveLetterGameState {
   }
 
   nextTurn() {
+    console.info('next turn');
     if (this.players.filter(p => p.ready).length < PLAYERS_NUMBER) {
       console.log('Not enough players connected');
     }
@@ -257,13 +258,11 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
     if (action.playerId !== this.state.activeTurnPlayerId) {
       return Promise.reject();
     }
-
-    const actionResult = action.apply(this.state)
-    actionResult.then(() => {
+    return action.apply(this.state).then(res => {
       this.actions.push(action);
       this.state.nextTurn();
+      return res;
     });
-    return actionResult;
   }
 
   join(player: PlayerHandle) {
