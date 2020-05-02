@@ -2,6 +2,7 @@ import {ActionResult, GameAction, GameId, LoveLetterGame, LoveLetterGameState, P
 import {PlayerController} from '../PlayerController';
 import {
   CardAction,
+  createGameNotFoundMessage,
   createJoinedMessage,
   createLoadCardMessage,
   createSetTableMessage,
@@ -46,13 +47,35 @@ export class GamesController {
     pendingPlayers.forEach(h => this.broadcast(pendingPlayers!!, createJoinedMessage(h)));
   }
 
-  onJoin(userId: PlayerId, name: string, gameId: GameId): void {
+  onJoin(controller: PlayerController, name: string, gameId: GameId): void {
+    const userId = controller.userId!!;
     const pendingPlayers = this.pendingGames.get(gameId);
-    if (!pendingPlayers) {
+    const game = this.games.get(gameId);
+    if (pendingPlayers === undefined && game === undefined) {
+      console.log(`Game ${gameId} was not found`);
+      controller.dispatch(createGameNotFoundMessage(gameId));
       return;
     }
+    // TODO refactor: need to create a function to send whole game state to a particular user on reconnect
+    // TODO keep a log of messages sent to users, so they can be send again
+    if (game !== undefined) {
+      controller.dispatch(createSetTableMessage(userId, game!!.state));
+      controller.dispatch(createLoadCardMessage(game!!.state.getPlayer(userId)));
+      const activePlayer = game!!.state.getActivePlayer();
+      if (activePlayer.id === userId) {
+        controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
+      }
+      controller.dispatch(createTextMessage(`It's ${activePlayer.id}'s turn`));
+      return;
+    }
+
+    if (pendingPlayers === undefined) {
+      console.log('WTF');
+      return;
+    }
+
     if (getReady(pendingPlayers).length >= PLAYERS_COUNT) {
-      this.send(userId, MO_MORE_SEATS);
+      controller.dispatch(MO_MORE_SEATS);
       return;
     }
     console.log(`User ${userId} has joined ${gameId} as ${name}`);
@@ -88,18 +111,20 @@ export class GamesController {
     if (!gameId) {
       return;
     }
-    let otherPlayers: PlayerId[];
     const game = this.games.get(gameId);
+    const pending = this.pendingGames.get(gameId);
+
+    let otherPlayers: PlayerId[];
     if (game) {
-      otherPlayers = game.state.players
-        .filter(p => p.id !== userId)
-        .map(p => p.id);
-    } else {
-      const pending = this.pendingGames.get(gameId);
-      const other = pending!!.filter(h => h.id !== userId);
+      otherPlayers = game.state.players.filter(p => p.id !== userId).map(p => p.id);
+    } else if (pending) {
+      const other = pending.filter(h => h.id !== userId);
       this.pendingGames.set(gameId, other);
       otherPlayers = other.map(h => h.id);
+    } else {
+      return;
     }
+
     this.broadcast(otherPlayers, createUserDisconnectedMessage(userId));
   }
 
@@ -129,9 +154,7 @@ export class GamesController {
 
         const player = game.state.getActivePlayer();
         playerController.dispatch(createStartTurnMessage(player.hand.pendingCard!));
-      }).catch(() => {
-        // TODO
-      });
+      }).catch(err => console.log(err));
     });
   }
 

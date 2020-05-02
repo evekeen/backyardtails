@@ -1,6 +1,8 @@
 import _ = require('lodash');
 import {createAction, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {setTable} from './board';
+import {Dispatch} from 'react';
+import {AppState} from '../components/App';
 
 export interface ConnectionState extends MaybeGameParams {
   connecting: boolean;
@@ -9,6 +11,7 @@ export interface ConnectionState extends MaybeGameParams {
   joined: boolean;
   joining: boolean;
   name: string | undefined;
+  gameNotFound: boolean;
 }
 
 export interface User {
@@ -45,17 +48,20 @@ function generateUserId(): string {
   return 'client-' + Math.ceil(Math.random() * 100);
 }
 
-export const loadUrl = createAction('loadUrl', () => {
+export const loadUrl = function (dispatch: Dispatch<any>, getState: () => AppState) {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const gameId = urlParams.get('gameId');
-  const userId = urlParams.get('userId') || generateUserId();
-  setUserId(userId);
-  return {
-    type: 'loadUrl',
-    payload: {gameId, userId}
-  };
-});
+  const userId = urlParams.get('userId');
+  const name = getState().connection.name;
+
+  if (gameId && userId && name) {
+    dispatch(openGame({gameId, userId}));
+    dispatch(joinGame({gameId, userId, name}));
+  } else if (gameId) {
+    dispatch(openGame({gameId, userId: userId || generateUserId()}));
+  }
+}
 
 export const joinGame = createAction('connection/join', (params: JoinParams) => {
   return {meta: 'remote', payload: params};
@@ -71,15 +77,18 @@ export const openJoinScreen = createAction('connection/openJoinScreen', (gameId:
   return {payload: gameId};
 });
 
+const INITIAL_STATE = {
+  connecting: true,
+  connected: false,
+  joining: false,
+  joined: false,
+  users: [],
+  gameNotFound: false
+} as ConnectionState;
+
 const connectionSlice = createSlice({
   name: 'connection',
-  initialState: {
-    connecting: true,
-    connected: false,
-    joining: false,
-    joined: false,
-    users: []
-  } as ConnectionState,
+  initialState: INITIAL_STATE,
   reducers: {
     connected(state: ConnectionState) {
       state.connecting = false;
@@ -101,18 +110,22 @@ const connectionSlice = createSlice({
     openGame(state: ConnectionState, action: PayloadAction<OpenGameParams>) {
       state.gameId = action.payload.gameId;
       state.userId = action.payload.userId;
+      state.name = undefined;
     },
     setUserId(state: ConnectionState, action: PayloadAction<string>) {
       state.userId = action.payload;
+    },
+    gameNotFound() {
+      return {...INITIAL_STATE, gameNotFound: true};
+    },
+    resetConnection() {
+      return {...INITIAL_STATE};
     }
   },
   extraReducers: builder => {
-    builder.addCase(loadUrl, (state: ConnectionState, action: PayloadAction<MaybeGameParams>) => {
-      Object.assign(state, action.payload);
-    }).addCase(openJoinScreen, (state: ConnectionState, action: PayloadAction<string>) => {
+    builder.addCase(openJoinScreen, (state: ConnectionState, action: PayloadAction<string>) => {
       state.gameId = action.payload;
-    }).addCase(openGame, (state: ConnectionState, action: PayloadAction<OpenGameParams>) => {
-      Object.assign(state, action.payload);
+      state.userId = state.userId || generateUserId();
     }).addCase(joinGame, (state: ConnectionState, action: PayloadAction<JoinParams>) => {
       state.joining = true;
       state.name = action.payload.name;
@@ -127,11 +140,12 @@ const connectionSlice = createSlice({
 const prod = process.env.NODE_ENV === 'production';
 const baseUrl = prod ? 'http://llfront.s3-website-us-east-1.amazonaws.com' : 'http://localhost:8080';
 
-export const gameUrl = (gameId: string, userId?: string) => {
+export const gameUrl = (gameId?: string, userId?: string) => {
+  if (!gameId) return baseUrl;
   const url = `${baseUrl}?gameId=${gameId}`;
   return userId ? `${url}&userId=${userId}` : url;
 }
 
-export const {connected, setUserId} = connectionSlice.actions;
+export const {connected, resetConnection, setUserId} = connectionSlice.actions;
 
 export default connectionSlice.reducer;

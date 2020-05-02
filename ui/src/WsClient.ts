@@ -14,24 +14,23 @@ const WS_READY_MSG = 'ready';
 const KEEP_ALIVE_CHECK_INTERVAL = 30000;
 // equals to akka connection timeout
 const KEEP_ALIVE_MAX_INTERVAL = 60000;
-const RETRY_DELAY = 1000;
 
 export class WsClient {
   private ws: WebSocket;
-  private tries: number = 0;
   private terminated: boolean = false;
   private _connected: boolean = false;
   private autoReconnect: boolean = true;
-
   private readonly initReconnectDelay = MIN_RECONNECT_DELAY + Math.floor(Math.random() * MIN_RECONNECT_DELAY);
+
   private nextReconnectDelay = this.initReconnectDelay;
   private connectDelayTimer: number | undefined;
-
   private connectTimeoutTimer: number | undefined;
 
   private lastMsgTime: number = Date.now();
+
   private keepAliveCheckTimer: number | undefined;
   private localDispatch: Dispatch<any>;
+  private queue: any[] = [];
 
   constructor(private readonly url: string) {
     window.addEventListener('unload', () => {
@@ -97,6 +96,10 @@ export class WsClient {
     this.lastMsgTime = Date.now();
     // this.keepAliveCheckTimer = window.setInterval(this.keepAliveCheck, KEEP_ALIVE_CHECK_INTERVAL);
     this.localDispatch(connected());
+
+    const queue = [...this.queue];
+    this.queue = [];
+    queue.filter(action => !this.dispatchToWs(action));
   }
 
   private setupReconnect = () => {
@@ -166,22 +169,15 @@ export class WsClient {
     }
   }
 
-  private dispatchToWs(action: any) {
+  private dispatchToWs(action: any): boolean {
     if (!this._connected) {
-      console.warn('ignoring action due to ws being disconnected', action)
-      if (action.retry >= 5) {
-        console.log(`Giving up trying to send ${action}`);
-        return;
-      } else {
-        const retry = (action.retry || 0) + 1;
-        setTimeout(
-          () => this.dispatchToWs({...action, retry: retry}),
-          retry * RETRY_DELAY
-        );
-        return;
-      }
+      console.warn('Adding action to a queue due to ws being disconnected', action);
+      this.queue.push(action);
+      return false;
     }
-    return this.ws.send(JSON.stringify(action));
+    this.ws.send(JSON.stringify(action));
+    console.info('sent', action);
+    return true;
   };
 
   private onOpen = () => {

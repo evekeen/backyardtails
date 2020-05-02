@@ -4,7 +4,7 @@ import {Reporter} from 'io-ts/lib/Reporter';
 import * as WebSocket from 'ws';
 import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
-import {getCardIndex, LoveLetterGameState, Player, PlayerId} from './game/loveletter';
+import {GameId, getCardIndex, LoveLetterGameState, Player, PlayerId} from './game/loveletter';
 import {CardType} from './game/commonTypes';
 import {PlayerHandle} from './game/PlayerHandle';
 import _ = require('lodash');
@@ -61,6 +61,11 @@ export interface UserJoinedMessage {
 export interface UserDisconnectedMessage {
   type: 'connection/userDisconnected',
   payload: PlayerId;
+}
+
+export interface GameNotFoundMessage {
+  type: 'connection/gameNotFound',
+  payload: GameId;
 }
 
 export interface SetTableMessage {
@@ -143,6 +148,13 @@ export function createUserDisconnectedMessage(userId: PlayerId): UserDisconnecte
   return {
     type: 'connection/userDisconnected',
     payload: userId
+  };
+}
+
+export function createGameNotFoundMessage(gameId: GameId): GameNotFoundMessage {
+  return {
+    type: 'connection/gameNotFound',
+    payload: gameId
   };
 }
 

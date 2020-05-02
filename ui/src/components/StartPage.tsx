@@ -53,8 +53,9 @@ const JoinGameComponent = (props: JoinGameProps) => {
   const disabledButton = joinStarted || !name;
   const loadingClass = joinStarted ? 'loading' : '';
 
-  useEffect(() => props.openGame({gameId, userId}), []);
-  useEffect(() => props.name && join(), [props.name]);
+  useEffect(() => {
+    if (!props.name) props.openGame({gameId, userId});
+  }, [props.name]);
 
   const onKeyDown = (e: KeyboardEvent) => e.key === 'Enter' && join();
 
