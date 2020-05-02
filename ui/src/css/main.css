@@ -1,11 +1,16 @@
+#app {
+  height: 100vh;
+  background-color: #e5e5e5;
+}
+
 .game-container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100vh;
+  height: 100%;
+  max-height: 1000px;
   padding: 1vh;
   margin: 0 auto;
-  background-color: #e5e5e5;
   font-family: 'Roboto', sans-serif;
 }
 

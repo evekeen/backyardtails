@@ -56,7 +56,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
         controller.gameId = gameId;
         controller.userId = userId;
         console.log(`Added spectator ${userId} to a game...`);
-        gamesController.addSpectator(controller, gameId)
+        gamesController.onOpenGame(controller, gameId)
       }));
   });
 

@@ -22,13 +22,22 @@ export class GamesController {
   private pendingGames = new Map<GameId, PlayerHandle[]>();
   private games = new Map<GameId, LoveLetterGame>();
 
-  addSpectator(controller: PlayerController, gameId: GameId): void {
+  onOpenGame(controller: PlayerController, gameId: GameId): void {
     const userId = controller.userId!!;
     if (this.playerControllers.get(userId)) {
       console.log(`Ignored repeated connection for user ${userId}`);
       return;
     }
     this.subscribe(userId, gameId, controller);
+
+    if (this.games.has(userId)) {
+      console.log(`Game already exists ${gameId}`);
+      const game = this.games.get(gameId)!!;
+      if (game.hasPlayer(userId)) {
+        this.joinActiveGame(game, userId, controller);
+      }
+      return;
+    }
 
     let pendingPlayers = this.pendingGames.get(gameId);
     const handle = {id: userId, ready: false};
@@ -58,17 +67,7 @@ export class GamesController {
     // TODO refactor: need to create a function to send whole game state to a particular user on reconnect
     // TODO keep a log of messages sent to users, so they can be send again
     if (game !== undefined && game.hasPlayer(userId)) {
-      game.state.players.find(p => p.id === userId)!!.ready = true;
-      const handles = game.state.players.filter(p => p.ready);
-      game.state.players.forEach(h => this.broadcast(handles, createJoinedMessage(h)));
-
-      controller.dispatch(createSetTableMessage(userId, game!!.state));
-      controller.dispatch(createLoadCardMessage(game!!.state.getPlayer(userId)));
-      const activePlayer = game!!.state.getActivePlayer();
-      if (activePlayer.id === userId) {
-        controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
-      }
-      controller.dispatch(createTextMessage(`It's ${activePlayer.id}'s turn`));
+      this.joinActiveGame(game, userId, controller);
       return;
     }
 
@@ -112,6 +111,19 @@ export class GamesController {
     }
   }
 
+  private joinActiveGame(game: LoveLetterGame, userId: string, controller: PlayerController) {
+    game.state.players.find(p => p.id === userId)!!.ready = true;
+    const handles = game.state.players.filter(p => p.ready);
+    game.state.players.forEach(h => this.broadcast(handles, createJoinedMessage(h)));
+
+    controller.dispatch(createSetTableMessage(userId, game!!.state));
+    controller.dispatch(createLoadCardMessage(game!!.state.getPlayer(userId)));
+    const activePlayer = game!!.state.getActivePlayer();
+    if (activePlayer.id === userId) {
+      controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
+    }
+    controller.dispatch(createTextMessage(`It's ${activePlayer.id}'s turn`));
+  }
   disconnect(userId: PlayerId | undefined, gameId: GameId | undefined): void {
     if (!userId) {
       return;
