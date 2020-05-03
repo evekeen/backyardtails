@@ -292,7 +292,9 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
 }
 
 function getActionResult(action: CardAction, me: Player, target: Player, state: LoveLetterGameState): ActionResult {
-  const card = me.hand.card === action.payload.card ? me.hand.pendingCard!! : me.hand.card!!;
+  const otherCard = me.hand.card === action.payload.card ? me.hand.pendingCard!! : me.hand.card!!;
+  state.discardPile.push(action.payload.card);
+
   switch (action.payload.card) {
   case CardType.Guard:
   {
@@ -307,10 +309,10 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
   case CardType.Baron:
   {
     const opponentCard = target.hand.card!;
-    const killed = card > opponentCard;
+    const killed = otherCard > opponentCard;
     if (killed) {
       state.killPlayer(target.id)
-    } else if (card < opponentCard) {
+    } else if (otherCard < opponentCard) {
       state.killPlayer(me.id);
     }
     return {killed, opponentCard};
@@ -334,7 +336,7 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
     me.hand.card = target.hand.card;
     me.hand.pendingCard = undefined;
     me.updatedCard = true;
-    target.hand.card = card;
+    target.hand.card = otherCard;
     target.updatedCard = true;
     return {opponentCard: me.hand.card};
   case CardType.Countess:
