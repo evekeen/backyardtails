@@ -32,12 +32,12 @@ jobs:
         npm ci
         npm run build-zip
 
-    - uses: einaregilsson/beanstalk-deploy@v9
-      with:
-        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: loveletter
-        environment_name: ${{ secrets.ENVIRONMENT_NAME }}
-        region: us-west-2
-        version_label: ${{ github.run_number }}
-        deployment_package: backend/backend.zip
+#    - uses: einaregilsson/beanstalk-deploy@v9
+#      with:
+#        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#        application_name: loveletter
+#        environment_name: ${{ secrets.ENVIRONMENT_NAME }}
+#        region: us-west-2
+#        version_label: ${{ github.run_number }}
+#        deployment_package: backend/backend.zip
