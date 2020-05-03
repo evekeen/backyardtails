@@ -53,7 +53,6 @@ const BaronFeedback = (props: CardActionFeedback) => {
   return (
     <>
       <p>You've {status} the duel</p>
-      <KillingStatus card={props.card} killed={props.killed} opponentName={props.opponentName}/>
       <div>{props.opponentName} had {<Card card={props.opponentCard} showDescription={false}/>}</div>
     </>
   );

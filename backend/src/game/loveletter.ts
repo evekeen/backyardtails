@@ -12,10 +12,10 @@ export interface Player {
   name: string;
   index: number;
   hand: Hand;
-  discardPile: CardType[];
   score: number;
   alive: boolean;
   ready: boolean;
+  updatedCard: boolean;
 }
 
 /*
@@ -114,6 +114,7 @@ export class LoveLetterGameState {
   public players: Player[] = [];
   public idlePlayersIds: PlayerHandle[] = [];
   public deck: Deck = new LoveLetterDeck();
+  public discardPile: CardType[] = [];
   public activePlayerIds: PlayerId[] = [];
   public deadPlayerIds: PlayerId[] = [];
   public activeTurnPlayerId: PlayerId | undefined;
@@ -134,10 +135,10 @@ export class LoveLetterGameState {
         pendingCard: undefined,
         immune: false
       },
-      discardPile: [],
       score: 0,
       alive: true,
-      ready: true
+      ready: true,
+      updatedCard: false
     };
     this.players.push(player);
     return player;
@@ -148,6 +149,7 @@ export class LoveLetterGameState {
     player.alive = false;
     this.deadPlayerIds.push(player.id);
     this.activePlayerIds = this.activePlayerIds.filter((id) => id !== playerId);
+    this.discardPile.push(player.hand.card!!);
   }
 
   public addPlayer(player: PlayerHandle) {
@@ -173,7 +175,6 @@ export class LoveLetterGameState {
       player.hand.card = this.deck.take();
       player.hand.immune = false;
       player.hand.pendingCard = undefined;
-      player.discardPile = [];
     });
 
     this.deadPlayerIds = [];
@@ -195,14 +196,8 @@ export class LoveLetterGameState {
       const playersLeft = this.activePlayerIds.map(id => this.getPlayer(id));
       const maxHeldCardStrength = playersLeft.map(p => p.hand.card).reduce((a, b) => Math.max(a || 0, b || 0)) || 0;
       const byHandStrength = _.groupBy(playersLeft, player => player.hand.card);
-
       const potentialWinners = byHandStrength[maxHeldCardStrength];
-      if (potentialWinners.length == 1) {
-        this.setWinner(potentialWinners[0].id);
-      } else {
-        const winnerId = _.maxBy(potentialWinners, p => p.discardPile.length)?.id
-        winnerId && this.setWinner(winnerId); // TODO What if tied even here?
-      }
+      this.setWinner(potentialWinners[0].id); // TODO support even hands
     } else {
       const currentPlayerId = this.activeTurnPlayerId!; // should be initialized on start
       let currentPlayerIndex = _.findIndex(this.players, p => p.id == currentPlayerId);
@@ -297,7 +292,7 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
 }
 
 function getActionResult(action: CardAction, me: Player, target: Player, state: LoveLetterGameState): ActionResult {
-  const playerCard = me.hand.card === action.payload.card ? me.hand.pendingCard!! : me.hand.card!!;
+  const card = me.hand.card === action.payload.card ? me.hand.pendingCard!! : me.hand.card!!;
   switch (action.payload.card) {
   case CardType.Guard:
   {
@@ -311,14 +306,14 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
     return {killed: true, opponentCard: target.hand.card};
   case CardType.Baron:
   {
-    const targetPlayerCard = target.hand.card!;
-    const killed = playerCard > targetPlayerCard;
+    const opponentCard = target.hand.card!;
+    const killed = card > opponentCard;
     if (killed) {
       state.killPlayer(target.id)
-    } else if (playerCard < targetPlayerCard) {
+    } else if (card < opponentCard) {
       state.killPlayer(me.id);
     }
-    return {killed};
+    return {killed, opponentCard};
   }
   case CardType.Handmaid:
     me.hand.immune = true;
@@ -329,13 +324,18 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
     if (killed) {
       state.killPlayer(target.id);
     } else {
+      state.discardPile.push(target.hand.card!!);
       target.hand.card = state.deck.take();
+      target.updatedCard = true;
     }
     return {killed};
   }
   case CardType.King:
     me.hand.card = target.hand.card;
-    target.hand.card = playerCard;
+    me.hand.pendingCard = undefined;
+    me.updatedCard = true;
+    target.hand.card = card;
+    target.updatedCard = true;
     return {opponentCard: me.hand.card};
   case CardType.Countess:
     return {};

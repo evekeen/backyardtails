@@ -173,11 +173,17 @@ export class GamesController {
           payload: {...res, card: action.payload.card}
         });
 
-        const playerSuffix = action.payload.playerIndex ? ` on ${game.state.players[action.payload.playerIndex].id}` : '';
+        const playerSuffix = action.payload.playerIndex ? ` on ${game.state.players[action.payload.playerIndex].name}` : '';
         const cardName = cardNameMapping[action.payload.card];
 
         this.sendToTheGame(gameId, () => createTextMessage(`${controller.name} played ${cardName}${playerSuffix}`));
         // TODO report if a player is dead
+        game.state.players.forEach(p => {
+          if (p.updatedCard) {
+            this.send(p.id, createLoadCardMessage(p));
+            p.updatedCard = false;
+          }
+        });
         this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
 
         const player = game.state.getActivePlayer();

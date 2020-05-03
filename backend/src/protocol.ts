@@ -4,7 +4,7 @@ import {Reporter} from 'io-ts/lib/Reporter';
 import * as WebSocket from 'ws';
 import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
-import {GameId, getCardIndex, LoveLetterGameState, Player, PlayerId} from './game/loveletter';
+import {GameId, LoveLetterGameState, Player, PlayerId} from './game/loveletter';
 import {CardType} from './game/commonTypes';
 import {PlayerHandle} from './game/PlayerHandle';
 import _ = require('lodash');
@@ -159,13 +159,11 @@ export function createGameNotFoundMessage(gameId: GameId): GameNotFoundMessage {
 }
 
 export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameState): SetTableMessage {
-  const player = state.getPlayer(playerId);
-  const discardPileTop = _.last(player.discardPile);
   return {
     type: 'board/setTable',
     payload: {
       deckLeft: state.deck.size(),
-      discardPileTop: discardPileTop && getCardIndex(discardPileTop) || undefined,
+      discardPileTop: _.last(state.discardPile),
       turnIndex: state.getPlayer(state.activeTurnPlayerId!).index,
       currentPlayerIndex: state.getPlayer(playerId).index,
       players: state.players.map((player, index) => {
