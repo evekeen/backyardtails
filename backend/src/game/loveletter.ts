@@ -1,20 +1,20 @@
 import * as _ from 'lodash';
 import {CardType} from './commonTypes';
 import {CardAction} from '../protocol';
-import {PlayerHandle} from './PlayerHandle';
 import {PLAYERS_NUMBER} from '../../../ui/src/model/commonTypes';
+import {ReadyPlayerController} from '../PlayerController';
 
 export type GameId = string;
 export type PlayerId = string
 
 export interface Player {
   id: string;
+  controller: ReadyPlayerController;
   name: string;
   index: number;
   hand: Hand;
   score: number;
   alive: boolean;
-  ready: boolean;
   updatedCard: boolean;
 }
 
@@ -106,13 +106,10 @@ export interface Game<State> {
 
   init(): void;
   applyAction(action: GameAction<State>): Promise<ActionResult>;
-  join(player: PlayerHandle): void;
-  leave(player: PlayerHandle): void;
 }
 
 export class LoveLetterGameState {
   public players: Player[] = [];
-  public idlePlayersIds: PlayerHandle[] = [];
   public deck: Deck = new LoveLetterDeck();
   public discardPile: CardType[] = [];
   public activePlayerIds: PlayerId[] = [];
@@ -120,15 +117,17 @@ export class LoveLetterGameState {
   public activeTurnPlayerId: PlayerId | undefined;
   public winnerId: PlayerId | undefined;
 
-  constructor(players: PlayerHandle[]) {
-    players.forEach((p) => this.newPlayer(p));
+  constructor(controllers: ReadyPlayerController[]) {
+    controllers.forEach(c => this.newPlayer(c));
   }
 
-  newPlayer(handle: PlayerHandle): Player {
+  newPlayer(controller: ReadyPlayerController): Player {
+    const info = controller.getInfo();
     const playerIndex = this.players.length;
     const player: Player = {
-      id: handle.id,
-      name: handle.name!!,
+      id: info.userId,
+      controller: controller,
+      name: info.name,
       index: playerIndex,
       hand: {
         card: undefined,
@@ -137,7 +136,6 @@ export class LoveLetterGameState {
       },
       score: 0,
       alive: true,
-      ready: true,
       updatedCard: false
     };
     this.players.push(player);
@@ -152,22 +150,8 @@ export class LoveLetterGameState {
     this.discardPile.push(player.hand.card!!);
   }
 
-  public addPlayer(player: PlayerHandle) {
-    this.idlePlayersIds.push(player);
-  }
-
-  public removePlayer(player: PlayerHandle) {
-    this.idlePlayersIds = _.remove(this.idlePlayersIds, id => id === player);
-    this.players = _.remove(this.players, p => p.id === player.id);
-    this.activePlayerIds = _.remove(this.activePlayerIds, id => id === player.id);
-  }
-
-  start(playerHandle: PlayerHandle) {
-    for (const idleId of this.idlePlayersIds) {
-      this.newPlayer(idleId);
-    }
-
-    this.idlePlayersIds = [];
+  start(controller: ReadyPlayerController) {
+    const userId = controller.getInfo().userId;
     this.deck.init();
     this.activePlayerIds = this.players.map(p => p.id);
 
@@ -178,15 +162,15 @@ export class LoveLetterGameState {
     });
 
     this.deadPlayerIds = [];
-    this.activeTurnPlayerId = playerHandle.id;
-    const firstPlayer = this.getPlayer(playerHandle.id);
+    this.activeTurnPlayerId = userId;
+    const firstPlayer = this.getPlayer(userId);
     firstPlayer.hand.pendingCard = this.deck.take();
     this.winnerId = undefined;
   }
 
   nextTurn() {
     console.info('next turn');
-    if (this.players.filter(p => p.ready).length < PLAYERS_NUMBER) {
+    if (this.players.filter(p => p.controller.isReady()).length < PLAYERS_NUMBER) {
       console.log('Not enough players connected');
     }
 
@@ -242,12 +226,11 @@ export class LoveLetterGameState {
 }
 
 export class LoveLetterGame implements Game<LoveLetterGameState> {
-  public state = new LoveLetterGameState(this.players);
+  public state = new LoveLetterGameState(this.controllers);
   private actions: GameAction<LoveLetterGameState>[] = [];
   private firstPlayerIdx = -1;
 
-  constructor(private players: PlayerHandle[]) {
-  }
+  constructor(private controllers: ReadyPlayerController[]) {}
 
   applyAction(action: GameAction<LoveLetterGameState>): Promise<ActionResult> {
     if (action.playerId !== this.state.activeTurnPlayerId) {
@@ -260,21 +243,13 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
     });
   }
 
-  join(player: PlayerHandle) {
-    this.state.addPlayer(player)
-  }
-
-  leave(player: PlayerHandle) {
-    this.state.removePlayer(player);
-  }
-
   hasPlayer(id: PlayerId): boolean {
-    return !!this.players.find(p => p.id === id);
+    return !!this.controllers.find(c => c.getInfo().userId === id);
   }
 
   init() {
-    this.firstPlayerIdx = (this.firstPlayerIdx + 1) % this.players.length;
-    const firstPlayer = this.players[this.firstPlayerIdx];
+    this.firstPlayerIdx = (this.firstPlayerIdx + 1) % this.controllers.length;
+    const firstPlayer = this.controllers[this.firstPlayerIdx];
     this.state.start(firstPlayer);
     console.log(JSON.stringify(this.state, null, '  '));
   }

@@ -3,12 +3,12 @@ import * as http from 'http';
 import * as WebSocket from 'ws';
 import {AddressInfo} from 'net';
 import * as session from 'express-session';
-import {error, ErrorCode, JoinMessage, Message, OpenGameMessage} from './protocol';
+import {CreateGameMessage, error, ErrorCode, ForceGame, InitSession, JoinMessage, Message} from './protocol';
 import {ThrowReporter} from 'io-ts/lib/ThrowReporter';
 import * as Either from 'fp-ts/lib/Either';
 import {fold} from 'fp-ts/lib/Either';
 import {pipe} from 'fp-ts/lib/pipeable';
-import {PlayerController} from './PlayerController';
+import {PlayerControllerImpl} from './PlayerController';
 import {GamesController} from './game/GameController';
 
 const app = express();
@@ -45,33 +45,40 @@ function authenticate(req: any, callback: (userId: string) => any) {
 wss.on('connection', (ws: WebSocket, request: any) => {
   console.log('connection');
   // authenticate(request, sessionUserId => {
-  const controller = new PlayerController();
+  const controller = new PlayerControllerImpl();
 
-  controller.on('connection/openGame', msg => {
-    console.log('openGame', msg);
-    pipe(OpenGameMessage.decode(msg), fold(() => console.log('Failed to parse: ' + msg),
-      joinMessage => {
-        const gameId = joinMessage.payload.gameId;
-        const userId = joinMessage.payload.userId;
-        controller.gameId = gameId;
-        controller.userId = userId;
-        console.log(`Added spectator ${userId} to a game...`);
-        gamesController.onOpenGame(controller, gameId)
+  controller.on('connection/initSession', msg => {
+    pipe(InitSession.decode(msg), fold(() => console.log('Failed to parse: ' + msg),
+      request => {
+        console.log(`Init session for ${request.payload}`);
+        gamesController.subscribe(controller, request.payload);
+      }));
+  });
+
+  controller.on('connection/createGame', msg => {
+    console.log('create game', msg);
+    pipe(CreateGameMessage.decode(msg), fold(() => console.log('Failed to parse: ' + msg),
+      request => {
+        const {gameId, userId} = request.payload;
+        console.log(`Creating a game ${gameId} by user ${userId}...`);
+        gamesController.onCreateGame(controller, gameId, userId);
       }));
   });
 
   controller.on('connection/join', msg => {
     console.log('join', msg);
     pipe(JoinMessage.decode(msg), fold(() => console.log('Failed to parse: ' + msg),
-      joinMessage => {
-        const gameId = joinMessage.payload.gameId;
-        const userId = joinMessage.payload.userId;
-        const name = joinMessage.payload.name;
-        controller.gameId = gameId;
-        controller.userId = userId;
-        controller.name = name;
-        console.log(`Joining user ${controller.userId} to a game...`);
-        gamesController.onJoin(controller, name, gameId);
+      request => {
+        console.log(`Joining user ${request.payload.userId} to a game...`);
+        gamesController.onJoin(controller, request.payload);
+      }));
+  });
+
+  controller.on('connection/forceGame', msg => {
+    console.log('forceGame', msg);
+    pipe(ForceGame.decode(msg), fold(() => console.log('Failed to parse: ' + msg),
+      request => {
+        gamesController.forceGame(controller, request.payload);
       }));
   });
 
@@ -94,14 +101,15 @@ wss.on('connection', (ws: WebSocket, request: any) => {
   });
 
   controller.on('stateReady', state => {
-    console.log(`Sending ${state.type} to ${controller.userId}`)
+    const userId = state.payload?.userId ? ` about ${state.payload.userId}` : '';
+    console.log(`Sending ${state.type}${userId} to ${controller.userId}`)
     ws.send(JSON.stringify(state));
   });
 
   ws.on('error', (error) => console.log('Error: ' + error));
   ws.on('close', () => {
     console.log(`Disconnected ${controller.userId}`);
-    gamesController.disconnect(controller.userId, controller.gameId)
+    gamesController.disconnect(controller)
   });
   ws.send(JSON.stringify({type: 'ready'}));
   // });

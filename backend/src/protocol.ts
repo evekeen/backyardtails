@@ -6,30 +6,50 @@ import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
 import {GameId, LoveLetterGameState, Player, PlayerId} from './game/loveletter';
 import {CardType} from './game/commonTypes';
-import {PlayerHandle} from './game/PlayerHandle';
+import {InGamePlayerController} from './PlayerController';
 import _ = require('lodash');
 
-export const MessageType = t.union([t.literal('connection/openGame'), t.literal('connection/join'), t.literal('cardAction'), t.literal('state')])
+export const MessageType = t.union([
+  t.literal('connection/initSession'),
+  t.literal('connection/startGame'),
+  t.literal('connection/join'),
+  t.literal('connection/forceGame'),
+  t.literal('cardAction'),
+  t.literal('state')
+])
 
 export const Message = t.interface({
   type: MessageType
 })
-
-export const OpenGameMessage = t.interface({
-  type: t.literal('connection/openGame'),
-  payload: t.interface({
-    gameId: t.string,
-    userId: t.string
-  }),
-});
 
 export const JoinMessage = t.interface({
   type: t.literal('connection/join'),
   payload: t.interface({
     gameId: t.string,
     userId: t.string,
-    name: t.string
+    name: t.union([t.string, t.undefined])
   }),
+});
+
+export const CreateGameMessage = t.interface({
+  type: t.literal('connection/createGame'),
+  payload: t.interface({
+    gameId: t.string,
+    userId: t.string
+  })
+});
+
+export const InitSession = t.interface({
+  type: t.literal('connection/initSession'),
+  payload: t.string
+});
+
+export const ForceGame = t.interface({
+  type: t.literal('connection/forceGame'),
+  payload: t.interface({
+    gameId: t.string,
+    userId: t.string
+  })
 });
 
 export const BoardStateMessage = t.interface({
@@ -65,7 +85,7 @@ export interface UserDisconnectedMessage {
 
 export interface GameNotFoundMessage {
   type: 'connection/gameNotFound',
-  payload: GameId;
+  payload: GameId | undefined;
 }
 
 export interface SetTableMessage {
@@ -137,10 +157,14 @@ export function error(code: ErrorCode, message: any): ErrorResponse {
   }
 }
 
-export function createJoinedMessage(description: PlayerHandle): UserJoinedMessage {
+export function createJoinedMessage(controller: InGamePlayerController): UserJoinedMessage {
   return {
     type: 'connection/userJoined',
-    payload: _.pick(description, 'id', 'name', 'ready')
+    payload: {
+      id: controller.getInfo().userId,
+      name: controller.getInfo().name,
+      ready: controller.isReady()
+    }
   };
 }
 
@@ -151,7 +175,7 @@ export function createUserDisconnectedMessage(userId: PlayerId): UserDisconnecte
   };
 }
 
-export function createGameNotFoundMessage(gameId: GameId): GameNotFoundMessage {
+export function createGameNotFoundMessage(gameId?: GameId): GameNotFoundMessage {
   return {
     type: 'connection/gameNotFound',
     payload: gameId

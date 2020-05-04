@@ -1,5 +1,5 @@
 import {ActionResult, GameAction, GameId, LoveLetterGame, LoveLetterGameState, Player, PlayerId} from './loveletter';
-import {PlayerController} from '../PlayerController';
+import {InGamePlayerController, InGamePlayerControllerInfo, PlayerController, PlayerControllerInfo, ReadyPlayerController} from '../PlayerController';
 import {
   CardAction,
   createGameNotFoundMessage,
@@ -13,118 +13,71 @@ import {
   RemoteAction
 } from '../protocol';
 import {cardNameMapping} from './commonTypes';
-import {PlayerHandle} from './PlayerHandle';
+import _ = require('lodash');
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
 export class GamesController {
   private playerControllers = new Map<PlayerId, PlayerController>();
-  private pendingGames = new Map<GameId, PlayerHandle[]>();
+  private pendingGames = new Map<GameId, InGamePlayerController[]>();
   private games = new Map<GameId, LoveLetterGame>();
 
-  onOpenGame(controller: PlayerController, gameId: GameId): void {
-    const userId = controller.userId!!;
-    if (this.playerControllers.get(userId)) {
-      console.log(`Repeated openGame for user ${userId}`);
-      return;
-    }
-    this.subscribe(userId, gameId, controller);
-
-    if (this.games.has(gameId)) {
+  onCreateGame(controller: PlayerController, gameId: GameId, userId: PlayerId): void {
+    if (this.games.has(gameId) || this.pendingGames.has(gameId)) {
       console.log(`Game already exists ${gameId}`);
-      const game = this.games.get(gameId)!!;
-      if (game.hasPlayer(userId)) {
-        this.joinActiveGame(game, userId, controller);
-      }
-      return;
+      // controller.dispatch({}); // TODO
+      return
     }
-
-    let pendingPlayers = this.pendingGames.get(gameId);
-    const handle = {id: userId, ready: false};
-    if (pendingPlayers) {
-      pendingPlayers.push(handle);
-    } else {
-      pendingPlayers = [handle];
-      this.pendingGames.set(gameId, pendingPlayers);
-      console.log(`Pending game ${gameId} created!`);
-    }
-    console.log(`User ${userId} has joined ${gameId} as spectator`);
-    pendingPlayers.forEach(h => this.broadcast(pendingPlayers!!, createJoinedMessage(h)));
+    controller.setInfo({gameId, userId});
+    this.addToPending(controller as InGamePlayerController);
   }
 
-  onJoin(controller: PlayerController, name: string, gameId: GameId): void {
-    const userId = controller.userId!!;
-    if (!this.playerControllers.get(userId)) {
-      this.subscribe(userId, gameId, controller);
-    }
-    const pendingPlayers = this.pendingGames.get(gameId);
+  onJoin(c: PlayerController, info: InGamePlayerControllerInfo): void {
+    // this.resubscribe(controller, oldInfo);
+    c.setInfo(info);
+    const controller = c as InGamePlayerController;
+    const {gameId, userId, name} = info;
+    const pending = this.pendingGames.get(gameId);
     const game = this.games.get(gameId);
-    if (pendingPlayers === undefined && game === undefined) {
+    if (pending === undefined && game === undefined) {
       console.log(`Game ${gameId} was not found`);
       controller.dispatch(createGameNotFoundMessage(gameId));
       return;
     }
     // TODO refactor: need to create a function to send whole game state to a particular user on reconnect
     // TODO keep a log of messages sent to users, so they can be send again
-    if (game !== undefined && game.hasPlayer(userId)) {
-      this.joinActiveGame(game, userId, controller);
-      return;
-    }
+    if (game !== undefined) {
+      this.tryJoinExistingGame(game, userId, controller);
+    } else if (pending !== undefined) {
+      const readyControllers = getReady(pending);
 
-    if (pendingPlayers === undefined) {
-      console.log('WTF', game);
-      return;
-    }
+      if (getReady(readyControllers).length >= PLAYERS_COUNT) {
+        controller.dispatch(MO_MORE_SEATS);
+        return;
+      }
+      this.addToPending(controller);
+      console.log(`User ${userId} has joined ${gameId} as ${name}`);
+      console.log('Pending', pending);
 
-    if (getReady(pendingPlayers).length >= PLAYERS_COUNT) {
-      controller.dispatch(MO_MORE_SEATS);
-      return;
-    }
-    console.log(`User ${userId} has joined ${gameId} as ${name}`);
-    const index = pendingPlayers.findIndex(p => p.id === userId);
-    const handle = {id: userId, name, ready: true};
-    if (index !== -1) {
-      pendingPlayers[index] = handle;
-      this.pendingGames.set(gameId, pendingPlayers);
-    } else {
-      pendingPlayers.push(handle);
-      this.pendingGames.set(gameId, pendingPlayers);
-    }
-    console.log(pendingPlayers);
-    pendingPlayers.forEach(h => this.broadcast(pendingPlayers!!, createJoinedMessage(h)));
+      if (readyControllers.length === PLAYERS_COUNT) {
+        this.pendingGames.delete(gameId);
+        const game = new LoveLetterGame(readyControllers);
+        this.games.set(gameId, game);
+        console.log(`Created game ${gameId} with players ${readyControllers}`)
+        game.init()
 
-    const readyPlayers = getReady(pendingPlayers);
+        this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
+        this.sendToTheGame(gameId, (player) => createLoadCardMessage(player));
+        this.sendToTheGame(gameId, (player, game) => createTextMessage(`It's ${game.state.activeTurnPlayerId}'s turn`));
 
-    if (readyPlayers.length === PLAYERS_COUNT) {
-      this.pendingGames.delete(gameId);
-      const game = new LoveLetterGame(readyPlayers);
-      this.games.set(gameId, game);
-      console.log(`Created game ${gameId} with players ${readyPlayers}`)
-      game.init()
-
-      this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
-      this.sendToTheGame(gameId, (player) => createLoadCardMessage(player));
-      this.sendToTheGame(gameId, (player, game) => createTextMessage(`It's ${game.state.activeTurnPlayerId}'s turn`));
-
-      const player = game.state.getActivePlayer();
-      this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
+        const player = game.state.getActivePlayer();
+        this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
+      }
     }
   }
 
-  private joinActiveGame(game: LoveLetterGame, userId: string, controller: PlayerController) {
-    game.state.players.find(p => p.id === userId)!!.ready = true;
-    const handles = game.state.players.filter(p => p.ready);
-    game.state.players.forEach(h => this.broadcast(handles, createJoinedMessage(h)));
-
-    controller.dispatch(createSetTableMessage(userId, game!!.state));
-    controller.dispatch(createLoadCardMessage(game!!.state.getPlayer(userId)));
-    const activePlayer = game!!.state.getActivePlayer();
-    if (activePlayer.id === userId) {
-      controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
-    }
-    controller.dispatch(createTextMessage(`It's ${activePlayer.id}'s turn`));
-  }
-  disconnect(userId: PlayerId | undefined, gameId: GameId | undefined): void {
+  disconnect(controller: PlayerController): void {
+    const {gameId, userId} = controller.getInfo();
     if (!userId) {
       return;
     }
@@ -138,11 +91,12 @@ export class GamesController {
     let otherPlayers: PlayerId[];
     if (game && game.hasPlayer(userId)) {
       otherPlayers = game.state.players.filter(p => p.id !== userId).map(p => p.id);
-      game.state.players.find(p => p.id === userId)!!.ready = false;
+      const info = _.pick(controller, 'gameId', 'userId') as PlayerControllerInfo; // Clear name
+      controller.setInfo(info);
     } else if (pending) {
-      const other = pending.filter(h => h.id !== userId);
+      const other = pending.filter(h => h.getInfo().userId !== userId);
       this.pendingGames.set(gameId, other);
-      otherPlayers = other.map(h => h.id);
+      otherPlayers = other.map(h => h.getInfo().userId);
     } else {
       return;
     }
@@ -150,24 +104,82 @@ export class GamesController {
     this.broadcast(otherPlayers, createUserDisconnectedMessage(userId));
   }
 
-  private subscribe(userId: PlayerId, gameId: GameId, controller: PlayerController) {
-    controller.removeAllListeners('cardAction');
-    this.playerControllers.set(userId, controller);
+  forceGame(controller: PlayerController, info: InGamePlayerControllerInfo) {
+    this.onCreateGame(controller, info.gameId, info.userId);
+    const names = ['Поручик Ржевский', 'Наташа Ростова', 'Андрей Болконский', 'Пьер Безухов'];
+    const controllers = Array.from(this.playerControllers.values());
+    console.log('keys', Array.from(this.playerControllers.keys()));
+    // console.log('controllers', controllers);
+    const size = Math.min(names.length, controllers.length);
+    for (let i = 0; i < size; i++) {
+      const c = controllers[i];
+      console.log('forcing', c, names[i]);
+      const oldInfo = c.getInfo();
+      const info = {...oldInfo, userId: oldInfo.userId || `forced-${i}`, name: names[i]} as InGamePlayerControllerInfo;
+      this.onJoin(c, info);
+    }
+  }
 
-    controller.on('cardAction', (action: CardAction) => {
+  private addToPending(controller: InGamePlayerController) {
+    const {gameId, userId, name} = controller.getInfo();
+    const joinedAs = name ? name : 'spectator';
+    const pending = this.pendingGames.get(gameId) || [];
+    const index = pending.findIndex(p => p.getInfo().userId === userId);
+    if (index === -1) {
+      pending.push(controller);
+    }
+    this.pendingGames.set(gameId, pending);
+    console.log(`User ${userId} has joined ${gameId} as ${joinedAs}`);
+    pending.filter(c => c.getInfo().userId !== userId).forEach(c => c.dispatch(createJoinedMessage(controller)));
+    pending.forEach(c => controller.dispatch(createJoinedMessage(c)));
+  }
+
+  private tryJoinExistingGame(game: LoveLetterGame, userId: string, controller: InGamePlayerController) {
+    if (game.hasPlayer(userId)) {
+      this.joinActiveGame(game, controller);
+    } else {
+      controller.setInfo({userId}); // Clear gameId and name
+      controller.dispatch(MO_MORE_SEATS);
+    }
+  }
+
+  private joinActiveGame(game: LoveLetterGame, controller: InGamePlayerController) {
+    const {userId} = controller.getInfo();
+    console.log(`Joining user ${userId} back`);
+    const controllers = game.state.players.filter(p => p.controller.isReady()).map(p => p.controller);
+    controllers.forEach(c => c.dispatch(createJoinedMessage(controller)));
+
+    controller.dispatch(createSetTableMessage(userId, game!!.state));
+    controller.dispatch(createLoadCardMessage(game!!.state.getPlayer(userId)));
+    const activePlayer = game!!.state.getActivePlayer();
+    if (activePlayer.id === userId) {
+      controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
+    }
+    controller.dispatch(createTextMessage(`It's ${activePlayer.id}'s turn`));
+  }
+
+  subscribe(c: PlayerController, userId: PlayerId) {
+    c.removeAllListeners('cardAction');
+    c.setInfo({...c.getInfo(), userId});
+    this.playerControllers.set(userId, c);
+
+    c.on('cardAction', (action: CardAction) => {
+      const {gameId} = c.getInfo();
+      if (!gameId) {
+        console.error(`game-id was not set for ${userId}`);
+        c.dispatch(createGameNotFoundMessage(gameId));
+        return;
+      }
+      const controller = c as InGamePlayerController;
       const game = this.games.get(gameId);
       if (!game) {
         console.log(`Game ${gameId} was not found`);
+        controller.setInfo({userId}); // Clear game id and name
         controller.dispatch(createGameNotFoundMessage(gameId));
         return;
       }
-      const gameAction = this.createAction(game, controller.userId!!, action);
+      const gameAction = this.createAction(game, userId, action);
       game.applyAction(gameAction).then(res => {
-        const controller = this.playerControllers.get(userId);
-        if (!controller) {
-          console.log(`Cannot find player controller ${userId}`);
-          return;
-        }
         controller.dispatch({
           type: 'feedback/showFeedback',
           payload: {...res, card: action.payload.card}
@@ -175,9 +187,10 @@ export class GamesController {
 
         const playerSuffix = action.payload.playerIndex ? ` on ${game.state.players[action.payload.playerIndex].name}` : '';
         const cardName = cardNameMapping[action.payload.card];
-
-        this.sendToTheGame(gameId, () => createTextMessage(`${controller.name} played ${cardName}${playerSuffix}`));
+        const name = controller.getInfo().name;
+        this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}`));
         // TODO report if a player is dead
+
         game.state.players.forEach(p => {
           if (p.updatedCard) {
             this.send(p.id, createLoadCardMessage(p));
@@ -207,11 +220,8 @@ export class GamesController {
     });
   }
 
-  private broadcast(handles: Array<PlayerHandle | PlayerId>, message: RemoteAction): void {
-    handles.forEach(h => {
-      const id = typeof h === 'string' ? h : h.id;
-      this.send(id, message)
-    });
+  private broadcast(ids: Array<PlayerId>, message: RemoteAction): void {
+    ids.forEach(id => this.send(id, message));
   }
 
   private send(playerId: PlayerId, message: RemoteAction): void {
@@ -252,6 +262,6 @@ export class GamesController {
   }
 }
 
-function getReady(handles: PlayerHandle[]): PlayerHandle[] {
-  return handles.filter(p => p.ready);
+function getReady(controllers: PlayerController[]): ReadyPlayerController[] {
+  return controllers.filter(c => c.isReady()) as ReadyPlayerController[];
 }
