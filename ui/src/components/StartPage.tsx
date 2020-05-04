@@ -1,14 +1,18 @@
 import React = require('react');
-import {KeyboardEvent, useEffect, useState} from 'react';
+import {KeyboardEvent, useState} from 'react';
 import {connect} from 'react-redux';
 import {v4 as uuid4} from 'uuid';
 // @ts-ignore
 import {CopyToClipboard} from 'react-copy-to-clipboard';
-import {GameParams, gameUrl, joinGame, JoinParams, MaybeJoinedUser, openGame, OpenGameParams, openJoinScreen} from '../reducers/connection';
+import {createGame, GameParams, gameUrl, joinGame, JoinParams, MaybeJoinedUser,} from '../reducers/connection';
 import {PLAYERS_NUMBER} from '../model/commonTypes';
 import {AppState} from './App';
 
-const CreateGameComponent = (props: { openJoinScreen: (gameId: string) => void }) => {
+interface CreateGameProps {
+  createGame: (gameId: string) => void;
+}
+
+const CreateGameComponent = (props: CreateGameProps) => {
   const [gameId, setGameId] = useState<string>(undefined);
   const url = gameId ? gameUrl(gameId) : undefined;
   const [cpUrl, setCpUrl] = useState<string>(undefined);
@@ -27,7 +31,7 @@ const CreateGameComponent = (props: { openJoinScreen: (gameId: string) => void }
         </CopyToClipboard>
         <div className="clipboard-message">{copied && 'Copied'}</div>
       </div>
-      <button className="start-page-element start-page-button" style={{visibility}} onClick={() => props.openJoinScreen(gameId)}>
+      <button className="start-page-element start-page-button" style={{visibility}} onClick={() => props.createGame(gameId)}>
         Join
       </button>
     </div>
@@ -37,7 +41,6 @@ const CreateGameComponent = (props: { openJoinScreen: (gameId: string) => void }
 interface JoinGameProps extends GameParams {
   joining: boolean;
   joined: boolean;
-  openGame: (params: OpenGameParams) => void;
   joinGame: (params: JoinParams) => void;
   users: MaybeJoinedUser[];
   name: string | undefined;
@@ -52,10 +55,6 @@ const JoinGameComponent = (props: JoinGameProps) => {
   const joinStarted = props.joining || props.joined;
   const disabledButton = joinStarted || !name;
   const loadingClass = joinStarted ? 'loading' : '';
-
-  useEffect(() => {
-    if (!props.name) props.openGame({gameId, userId});
-  }, [props.name]);
 
   const onKeyDown = (e: KeyboardEvent) => e.key === 'Enter' && join();
 
@@ -82,5 +81,5 @@ const JoinedUser = (props: { name: string }) => {
 
 const mapStateToProps = (state: AppState) => state.connection
 
-export const CreateGame = connect(mapStateToProps, {openJoinScreen})(CreateGameComponent);
-export const JoinGame = connect(mapStateToProps, {openGame, joinGame})(JoinGameComponent);
+export const CreateGame = connect(mapStateToProps, {createGame: createGame})(CreateGameComponent);
+export const JoinGame = connect(mapStateToProps, {joinGame})(JoinGameComponent);

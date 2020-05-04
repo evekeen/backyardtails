@@ -2,7 +2,9 @@ import {ActionResult, GameAction, GameId, LoveLetterGame, LoveLetterGameState, P
 import {InGamePlayerController, InGamePlayerControllerInfo, PlayerController, PlayerControllerInfo, ReadyPlayerController} from '../PlayerController';
 import {
   CardAction,
+  createGameCreatedMessage,
   createGameNotFoundMessage,
+  createGamePreexistedMessage,
   createJoinedMessage,
   createLoadCardMessage,
   createSetTableMessage,
@@ -25,11 +27,12 @@ export class GamesController {
   onCreateGame(controller: PlayerController, gameId: GameId, userId: PlayerId): void {
     if (this.games.has(gameId) || this.pendingGames.has(gameId)) {
       console.log(`Game already exists ${gameId}`);
-      // controller.dispatch({}); // TODO
-      return
+      controller.dispatch(createGamePreexistedMessage(gameId));
+      return;
     }
     controller.setInfo({gameId, userId});
     this.addToPending(controller as InGamePlayerController);
+    controller.dispatch(createGameCreatedMessage(gameId));
   }
 
   onJoin(c: PlayerController, info: InGamePlayerControllerInfo): void {
@@ -50,20 +53,22 @@ export class GamesController {
       this.tryJoinExistingGame(game, userId, controller);
     } else if (pending !== undefined) {
       const readyControllers = getReady(pending);
+      console.log('ready', readyControllers);
 
       if (getReady(readyControllers).length >= PLAYERS_COUNT) {
+        console.log('game is full');
         controller.dispatch(MO_MORE_SEATS);
         return;
       }
       this.addToPending(controller);
-      console.log(`User ${userId} has joined ${gameId} as ${name}`);
       console.log('Pending', pending);
 
-      if (readyControllers.length === PLAYERS_COUNT) {
+      const newReady = getReady(pending);
+      if (newReady.length === PLAYERS_COUNT) {
         this.pendingGames.delete(gameId);
-        const game = new LoveLetterGame(readyControllers);
+        const game = new LoveLetterGame(newReady);
         this.games.set(gameId, game);
-        console.log(`Created game ${gameId} with players ${readyControllers}`)
+        console.log(`Created game ${gameId} with players ${newReady}`)
         game.init()
 
         this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
@@ -105,7 +110,10 @@ export class GamesController {
   }
 
   forceGame(controller: PlayerController, info: InGamePlayerControllerInfo) {
-    this.onCreateGame(controller, info.gameId, info.userId);
+    const gameId = info.gameId;
+    this.games.delete(gameId);
+    this.pendingGames.delete(gameId);
+    this.onCreateGame(controller, gameId, info.userId);
     const names = ['Поручик Ржевский', 'Наташа Ростова', 'Андрей Болконский', 'Пьер Безухов'];
     const controllers = Array.from(this.playerControllers.values());
     console.log('keys', Array.from(this.playerControllers.keys()));
@@ -115,7 +123,7 @@ export class GamesController {
       const c = controllers[i];
       console.log('forcing', c, names[i]);
       const oldInfo = c.getInfo();
-      const info = {...oldInfo, userId: oldInfo.userId || `forced-${i}`, name: names[i]} as InGamePlayerControllerInfo;
+      const info = {gameId, userId: oldInfo.userId || `forced-${i}`, name: names[i]} as InGamePlayerControllerInfo;
       this.onJoin(c, info);
     }
   }
@@ -138,6 +146,8 @@ export class GamesController {
     if (game.hasPlayer(userId)) {
       this.joinActiveGame(game, controller);
     } else {
+      console.log(game.state.players);
+      console.log('game is already started without you');
       controller.setInfo({userId}); // Clear gameId and name
       controller.dispatch(MO_MORE_SEATS);
     }

@@ -1,12 +1,12 @@
 import React = require('react');
 import {useEffect} from 'react';
-import {gameUrl, resetConnection} from '../reducers/connection';
+import {gameUrl, resetGameId} from '../reducers/connection';
 import {connect} from 'react-redux';
 
-const GameNotFound = (props: { resetConnection: () => void }) => {
+const GameNotFound = (props: { resetGameId: () => void }) => {
   useEffect(() => {
     window.history.pushState(undefined, `Love Letter`, gameUrl());
-    setTimeout(props.resetConnection, 1000);
+    setTimeout(props.resetGameId, 1000);
   }, []);
 
   return (
@@ -16,4 +16,4 @@ const GameNotFound = (props: { resetConnection: () => void }) => {
   );
 }
 
-export default connect(() => ({}), {resetConnection})(GameNotFound);
+export default connect(() => ({}), {resetGameId})(GameNotFound);

@@ -11,7 +11,7 @@ import _ = require('lodash');
 
 export const MessageType = t.union([
   t.literal('connection/initSession'),
-  t.literal('connection/startGame'),
+  t.literal('connection/createGame'),
   t.literal('connection/join'),
   t.literal('connection/forceGame'),
   t.literal('cardAction'),
@@ -72,7 +72,8 @@ export interface RemoteAction {
 export interface UserJoinedMessage {
   type: 'connection/userJoined',
   payload: {
-    id: string;
+    gameId: string;
+    userId: string;
     name?: string;
     ready: boolean;
   };
@@ -86,6 +87,16 @@ export interface UserDisconnectedMessage {
 export interface GameNotFoundMessage {
   type: 'connection/gameNotFound',
   payload: GameId | undefined;
+}
+
+export interface GameCreatedMessage {
+  type: 'connection/gameCreated',
+  payload: GameId;
+}
+
+export interface GamePreexistedMessage {
+  type: 'connection/gamePreexisted',
+  payload: GameId;
 }
 
 export interface SetTableMessage {
@@ -161,8 +172,7 @@ export function createJoinedMessage(controller: InGamePlayerController): UserJoi
   return {
     type: 'connection/userJoined',
     payload: {
-      id: controller.getInfo().userId,
-      name: controller.getInfo().name,
+      ...controller.getInfo(),
       ready: controller.isReady()
     }
   };
@@ -178,6 +188,20 @@ export function createUserDisconnectedMessage(userId: PlayerId): UserDisconnecte
 export function createGameNotFoundMessage(gameId?: GameId): GameNotFoundMessage {
   return {
     type: 'connection/gameNotFound',
+    payload: gameId
+  };
+}
+
+export function createGameCreatedMessage(gameId: GameId): GameCreatedMessage {
+  return {
+    type: 'connection/gameCreated',
+    payload: gameId
+  };
+}
+
+export function createGamePreexistedMessage(gameId: GameId): GamePreexistedMessage {
+  return {
+    type: 'connection/gamePreexisted',
     payload: gameId
   };
 }

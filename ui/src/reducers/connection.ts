@@ -12,6 +12,7 @@ export interface ConnectionState extends MaybeGameParams {
   joining: boolean;
   name: string | undefined;
   gameNotFound: boolean;
+  gamePreexisted: boolean;
 }
 
 export interface User {
@@ -21,6 +22,13 @@ export interface User {
 
 export interface MaybeJoinedUser {
   id: string;
+  name: string | undefined;
+  ready: boolean;
+}
+
+export interface UserJoined {
+  gameId: string;
+  userId: string;
   name: string | undefined;
   ready: boolean;
 }
@@ -48,58 +56,60 @@ function generateUserId(): string {
   return 'client-' + Math.ceil(Math.random() * 100);
 }
 
-export const loadUrl = () => (dispatch: Dispatch<any>, getState: () => AppState) => {
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  const gameId = urlParams.get('gameId');
-  const userId = urlParams.get('userId') || generateUserId();
-  rejoin(dispatch, getState, gameId, userId);
-};
-
 export const joinGame = createAction('connection/join', (params: JoinParams) => {
   return {meta: 'remote', payload: params};
 });
 
-export const openGame = createAction('connection/openGame', (params: OpenGameParams) => {
-  window.history.pushState(undefined, `Love Letter ${params.gameId}`, gameUrl(params.gameId, params.userId));
-  return {meta: 'remote', payload: params};
+export const initSession = createAction('connection/initSession', (userId: string) => {
+  return {meta: 'remote', payload: userId};
 });
 
 export const forceGame = createAction('connection/forceGame', (params: OpenGameParams) => {
   return {meta: 'remote', payload: params};
 });
 
+export const loadUrl = () => (dispatch: Dispatch<any>, getState: () => AppState) => {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  const gameId = urlParams.get('gameId');
+  const userId = urlParams.get('userId') || generateUserId();
+  dispatch(setGameParams({gameId, userId}));
+  dispatch(rejoin({gameId, userId}));
+};
+
+export const createGame = (gameId: string) => (dispatch: Dispatch<any>, getState: () => AppState) => {
+  const userId = getState().connection.userId!!;
+  window.history.pushState(undefined, `Love Letter ${gameId}`, gameUrl(gameId, userId));
+  dispatch({type: 'connection/createGame', meta: 'remote', payload: {gameId, userId}});
+};
+
 export const iddqd = () => (dispatch: Dispatch<any>, getState: () => AppState) => {
   const gameId = 'warandpeace';
-  dispatch(resetConnection());
-  // @ts-ignore
-  dispatch(openNewGame(gameId));
+  dispatch(resetGameId());
   dispatch(forceGame({gameId, userId: getState().connection.userId}));
 };
 
 export const wsConnected = () => (dispatch: Dispatch<any>, getState: () => AppState) => {
-  const state = getState();
+  const {gameId, userId} = getState().connection;
   dispatch(connectionSlice.actions.connected());
-  rejoin(dispatch, getState, state.connection.gameId, state.connection.userId);
+  dispatch(initSession(userId));
+  dispatch(connectionSlice.actions.setGameParams({gameId, userId}));
+  dispatch(rejoin({gameId, userId}));
 };
 
-export const openNewGame = (gameId: string) => (dispatch: Dispatch<any>, getState: () => AppState) => {
-  const existingGameId = getState().connection.gameId;
-  if (existingGameId !== gameId) {
-    openGame({gameId});
+const rejoin = (params: MaybeGameParams) => (dispatch: (value: any) => void, getState: () => AppState) => {
+  if (!params.gameId) {
+    console.log('no gameId');
+    return;
   }
-  dispatch(connectionSlice.actions.openJoinScreen(gameId));
-};
-
-function rejoin(dispatch: (value: any) => void, getState: () => AppState, gameId: string | undefined, userId: string | undefined) {
+  if (!params.userId) {
+    console.log('no userId');
+    return;
+  }
   const name = getState().connection.name;
-  console.log('try to rejoin', gameId, userId, name);
-  if (gameId && userId && name) {
-    dispatch(joinGame({gameId, userId, name}));
-  } else if (gameId && userId) {
-    dispatch(openGame({gameId, userId}));
-  }
-}
+  console.log('try to rejoin', params, name);
+  dispatch(joinGame({...params, name}));
+};
 
 const INITIAL_STATE = {
   connecting: true,
@@ -107,7 +117,8 @@ const INITIAL_STATE = {
   joining: false,
   joined: false,
   users: [],
-  gameNotFound: false
+  gameNotFound: false,
+  gamePreexisted: false
 } as ConnectionState;
 
 const connectionSlice = createSlice({
@@ -118,43 +129,45 @@ const connectionSlice = createSlice({
       state.connecting = false;
       state.connected = true;
     },
-    userJoined(state: ConnectionState, action: PayloadAction<MaybeJoinedUser>) {
-      if (action.payload.id === state.userId) {
-        state.joined = action.payload.ready;
-        state.name = state.name || action.payload.name;
-        if (action.payload.ready) {
+    userJoined(state: ConnectionState, action: PayloadAction<UserJoined>) {
+      const {userId, gameId, name, ready} = action.payload;
+      if (userId === state.userId) {
+        state.gameId = gameId;
+        state.joined = ready;
+        state.name = state.name || name;
+        if (ready) {
           state.joining = false;
         }
       }
-      const users = (state.users ?? []).filter(u => u.id !== action.payload.id).concat(action.payload);
+      const users = (state.users ?? []).filter(u => u.id !== userId)
+        .concat({id: userId, name, ready});
       state.users = _.uniqBy(users, u => u.id);
     },
     userDisconnected(state: ConnectionState, action: PayloadAction<string>) {
       state.users = state.users.filter(user => user.id !== action.payload);
     },
-    openGame(state: ConnectionState, action: PayloadAction<OpenGameParams>) {
+    setGameParams(state: ConnectionState, action: PayloadAction<GameParams>) {
       state.gameId = action.payload.gameId;
       state.userId = action.payload.userId;
-      state.name = undefined;
     },
-    setUserId(state: ConnectionState, action: PayloadAction<string>) {
-      state.userId = action.payload;
+    gameNotFound(state: ConnectionState) {
+      state.gameId = undefined;
+      state.gameNotFound = true;
     },
-    gameNotFound() {
-      return {...INITIAL_STATE, gameNotFound: true};
+    gamePreexisted(state: ConnectionState) {
+      state.gameId = undefined;
+      state.gamePreexisted = true;
     },
-    resetConnection() {
-      return {...INITIAL_STATE};
+    resetGameId(state: ConnectionState) {
+      state.gameId = undefined;
     },
-    openJoinScreen(state: ConnectionState, action: PayloadAction<string>) {
+    gameCreated(state: ConnectionState, action: PayloadAction<string>) {
       state.gameId = action.payload;
-      state.userId = state.userId || generateUserId();
     }
   },
   extraReducers: builder => {
     builder.addCase(joinGame, (state: ConnectionState, action: PayloadAction<JoinParams>) => {
-      state.joining = true;
-      state.name = action.payload.name;
+      state.joining = !!action.payload.name;
       Object.assign(state, action.payload);
     }).addCase(setTable, (state: ConnectionState) => {
       state.joining = false;
@@ -172,6 +185,6 @@ export const gameUrl = (gameId?: string, userId?: string) => {
   return userId ? `${url}&userId=${userId}` : url;
 }
 
-export const {resetConnection} = connectionSlice.actions;
+export const {resetGameId, setGameParams} = connectionSlice.actions;
 
 export default connectionSlice.reducer;

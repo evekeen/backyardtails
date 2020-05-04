@@ -6,6 +6,7 @@ import {WsClient} from './WsClient';
 import {loadState, saveState} from './localStorage';
 import {AppState} from './components/App';
 import {loadUrl} from './reducers/connection';
+import thunk from 'redux-thunk';
 
 const prod = process.env.NODE_ENV === 'production';
 const wsUrl = prod ? 'wss://ll-backend.us-east-1.elasticbeanstalk.com:8443' : 'ws://localhost:8081';
@@ -17,7 +18,7 @@ export const store = configureAppStore(loadState());
 function configureAppStore(preloadedState: any) {
   const store = configureStore({
     reducer: reducers,
-    middleware: [loggerMiddleware, wsClient.remoteMiddleware, ...getDefaultMiddleware()],
+    middleware: [loggerMiddleware, wsClient.remoteMiddleware, thunk, ...getDefaultMiddleware()],
     preloadedState,
     enhancers: []
   });
@@ -26,7 +27,8 @@ function configureAppStore(preloadedState: any) {
     module.hot.accept('./reducers', () => store.replaceReducer(reducers));
   }
 
-  loadUrl(store.dispatch, store.getState);
+  // @ts-ignore
+  store.dispatch(loadUrl());
 
   store.subscribe(_.throttle(() => {
     saveState(store.getState() as AppState);

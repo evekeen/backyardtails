@@ -1,5 +1,5 @@
 import {Dispatch, Store} from 'redux';
-import {connected} from './reducers/connection';
+import {wsConnected} from './reducers/connection';
 
 const CONNECT_TIMEOUT = 60000;
 
@@ -95,11 +95,7 @@ export class WsClient {
     this.nextReconnectDelay = this.initReconnectDelay;
     this.lastMsgTime = Date.now();
     // this.keepAliveCheckTimer = window.setInterval(this.keepAliveCheck, KEEP_ALIVE_CHECK_INTERVAL);
-    this.localDispatch(connected());
-
-    const queue = [...this.queue];
-    this.queue = [];
-    queue.filter(action => !this.dispatchToWs(action));
+    this.localDispatch(wsConnected());
   }
 
   private setupReconnect = () => {
@@ -133,6 +129,7 @@ export class WsClient {
       const data = JSON.parse(msg.data);
       if (data.type === WS_READY_MSG) {
         this.reportConnected();
+        this.sendPending();
         return;
       }
       this.localDispatch(data);
@@ -141,6 +138,12 @@ export class WsClient {
       console.error(`Cannot parse message ${msg.data}`)
     }
   };
+
+  private sendPending() {
+    const queue = [...this.queue];
+    this.queue = [];
+    queue.filter(action => !this.dispatchToWs(action));
+  }
 
   private deleteWs(): void {
     if (this.ws === undefined) return;

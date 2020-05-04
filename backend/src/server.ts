@@ -48,7 +48,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
   const controller = new PlayerControllerImpl();
 
   controller.on('connection/initSession', msg => {
-    pipe(InitSession.decode(msg), fold(() => console.log('Failed to parse: ' + msg),
+    pipe(InitSession.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
       request => {
         console.log(`Init session for ${request.payload}`);
         gamesController.subscribe(controller, request.payload);
@@ -56,8 +56,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
   });
 
   controller.on('connection/createGame', msg => {
-    console.log('create game', msg);
-    pipe(CreateGameMessage.decode(msg), fold(() => console.log('Failed to parse: ' + msg),
+    pipe(CreateGameMessage.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
       request => {
         const {gameId, userId} = request.payload;
         console.log(`Creating a game ${gameId} by user ${userId}...`);
@@ -66,8 +65,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
   });
 
   controller.on('connection/join', msg => {
-    console.log('join', msg);
-    pipe(JoinMessage.decode(msg), fold(() => console.log('Failed to parse: ' + msg),
+    pipe(JoinMessage.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
       request => {
         console.log(`Joining user ${request.payload.userId} to a game...`);
         gamesController.onJoin(controller, request.payload);
@@ -75,8 +73,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
   });
 
   controller.on('connection/forceGame', msg => {
-    console.log('forceGame', msg);
-    pipe(ForceGame.decode(msg), fold(() => console.log('Failed to parse: ' + msg),
+    pipe(ForceGame.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
       request => {
         gamesController.forceGame(controller, request.payload);
       }));
