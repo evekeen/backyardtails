@@ -1,5 +1,5 @@
 import {Dispatch, Store} from 'redux';
-import {wsConnected} from './reducers/connection';
+import {ActionRouter} from './actionRouter';
 
 const CONNECT_TIMEOUT = 60000;
 
@@ -29,7 +29,7 @@ export class WsClient {
   private lastMsgTime: number = Date.now();
 
   private keepAliveCheckTimer: number | undefined;
-  private localDispatch: Dispatch<any>;
+  private router: ActionRouter;
   private queue: any[] = [];
 
   constructor(private readonly url: string) {
@@ -57,8 +57,10 @@ export class WsClient {
     this.stopTimers();
   }
 
-  private init(localDispatch: Dispatch<any>): void {
-    this.localDispatch = localDispatch;
+  private init(localDispatch?: Dispatch<any>): void {
+    if (localDispatch) {
+      this.router = new ActionRouter(localDispatch);
+    }
     if (this.terminated) return;
 
     console.debug('Init');
@@ -95,7 +97,7 @@ export class WsClient {
     this.nextReconnectDelay = this.initReconnectDelay;
     this.lastMsgTime = Date.now();
     // this.keepAliveCheckTimer = window.setInterval(this.keepAliveCheck, KEEP_ALIVE_CHECK_INTERVAL);
-    this.localDispatch(wsConnected());
+    this.router.reportConnected();
   }
 
   private setupReconnect = () => {
@@ -106,7 +108,7 @@ export class WsClient {
     }
 
     console.warn(`Reconnect after ${this.nextReconnectDelay} ms`);
-    this.connectDelayTimer = window.setTimeout(() => this.init(this.localDispatch), this.nextReconnectDelay);
+    this.connectDelayTimer = window.setTimeout(() => this.init(), this.nextReconnectDelay);
 
     this.nextReconnectDelay = Math.min(this.nextReconnectDelay * RECONNECT_DELAY_GROWTH, MAX_RECONNECT_DELAY);
   };
@@ -132,7 +134,7 @@ export class WsClient {
         this.sendPending();
         return;
       }
-      this.localDispatch(data);
+      this.router.onServerAction(data);
     } catch (err) {
       console.error(err);
       console.error(`Cannot parse message ${msg.data}`)

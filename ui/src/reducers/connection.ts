@@ -3,6 +3,7 @@ import {createAction, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {setTable} from './board';
 import {Dispatch} from 'react';
 import {AppState} from '../components/App';
+import {updateUrl} from '../middleware/urlController';
 
 export interface ConnectionState extends MaybeGameParams {
   connecting: boolean;
@@ -68,30 +69,36 @@ export const forceGame = createAction('connection/forceGame', (params: OpenGameP
   return {meta: 'remote', payload: params};
 });
 
-function updateUrl(gameId: string | undefined, userId: string) {
-  window.history.pushState(undefined, `Love Letter ${gameId}`, gameUrl(gameId, userId));
-}
+export const setGameParams = createAction('connection/setGameParams', (params: MaybeGameParams) => {
+  return {meta: 'url', payload: params};
+});
 
 export const loadUrl = () => (dispatch: Dispatch<any>, getState: () => AppState) => {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const gameId = urlParams.get('gameId');
   const userId = urlParams.get('userId') || generateUserId();
-  updateUrl(gameId, userId);
   dispatch(setGameParams({gameId, userId}));
   dispatch(rejoin({gameId, userId}));
 };
 
 export const createGame = (gameId: string) => (dispatch: Dispatch<any>, getState: () => AppState) => {
   const userId = getState().connection.userId!!;
-  updateUrl(gameId, userId);
+  dispatch(setGameParams({gameId, userId}));
   dispatch({type: 'connection/createGame', meta: 'remote', payload: {gameId, userId}});
 };
 
 export const resetGame = () => (dispatch: Dispatch<any>, getState: () => AppState) => {
   const userId = getState().connection.userId!!;
-  updateUrl(undefined, userId);
+  dispatch(setGameParams({gameId: undefined, userId}));
   dispatch(connectionSlice.actions.resetGameId());
+};
+
+export const maybeSetUrl = (params: MaybeGameParams) => (dispatch: Dispatch<any>, getState: () => AppState) => {
+  const {gameId, userId} = getState().connection;
+  if (params.userId && params.userId === userId) {
+    updateUrl(params.gameId || gameId, params.userId || userId);
+  }
 };
 
 export const iddqd = () => (dispatch: Dispatch<any>, getState: () => AppState) => {
@@ -104,7 +111,7 @@ export const wsConnected = () => (dispatch: Dispatch<any>, getState: () => AppSt
   const {gameId, userId} = getState().connection;
   dispatch(connectionSlice.actions.connected());
   dispatch(initSession(userId));
-  dispatch(connectionSlice.actions.setGameParams({gameId, userId}));
+  dispatch(setGameParams({gameId, userId}));
   dispatch(rejoin({gameId, userId}));
 };
 
@@ -157,10 +164,6 @@ const connectionSlice = createSlice({
     userDisconnected(state: ConnectionState, action: PayloadAction<string>) {
       state.users = state.users.filter(user => user.id !== action.payload);
     },
-    setGameParams(state: ConnectionState, action: PayloadAction<GameParams>) {
-      state.gameId = action.payload.gameId;
-      state.userId = action.payload.userId;
-    },
     gameNotFound(state: ConnectionState) {
       state.gameId = undefined;
       state.gameNotFound = true;
@@ -185,6 +188,9 @@ const connectionSlice = createSlice({
     }).addCase(setTable, (state: ConnectionState) => {
       state.joining = false;
       state.joined = true;
+    }).addCase(setGameParams, (state: ConnectionState, action: PayloadAction<MaybeGameParams>) => {
+      state.gameId = action.payload.gameId;
+      state.userId = action.payload.userId;
     });
   }
 });
@@ -197,7 +203,5 @@ export const gameUrl = (gameId?: string, userId?: string) => {
   const url = `${baseUrl}?gameId=${gameId}`;
   return userId ? `${url}&userId=${userId}` : url;
 }
-
-export const {setGameParams} = connectionSlice.actions;
 
 export default connectionSlice.reducer;

@@ -31,8 +31,8 @@ export class GamesController {
       return;
     }
     controller.setInfo({gameId, userId});
-    this.addToPending(controller as InGamePlayerController);
     controller.dispatch(createGameCreatedMessage(gameId));
+    this.addToPending(controller as InGamePlayerController);
   }
 
   onJoin(c: PlayerController, info: InGamePlayerControllerInfo): void {

@@ -2,11 +2,12 @@ import _ = require('lodash');
 import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit'
 import loggerMiddleware from './middleware/logger'
 import reducers from './reducers'
-import {WsClient} from './WsClient';
+import {WsClient} from './ws/WsClient';
 import {loadState, saveState} from './localStorage';
 import {AppState} from './components/App';
 import {loadUrl} from './reducers/connection';
 import thunk from 'redux-thunk';
+import urlController from './middleware/urlController';
 
 const prod = process.env.NODE_ENV === 'production';
 const wsUrl = prod ? 'wss://ll-backend.us-east-1.elasticbeanstalk.com:8443' : 'ws://localhost:8081';
@@ -18,7 +19,7 @@ export const store = configureAppStore(loadState());
 function configureAppStore(preloadedState: any) {
   const store = configureStore({
     reducer: reducers,
-    middleware: [loggerMiddleware, wsClient.remoteMiddleware, thunk, ...getDefaultMiddleware()],
+    middleware: [loggerMiddleware, wsClient.remoteMiddleware, urlController, thunk, ...getDefaultMiddleware()],
     preloadedState,
     enhancers: []
   });
