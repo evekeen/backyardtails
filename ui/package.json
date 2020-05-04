@@ -7,7 +7,9 @@
     "build": "webpack",
     "watch": "webpack-dev-server --open --mode development",
     "watch-prod": "webpack-dev-server --open --mode production",
-    "copy": "cp package.json dist"
+    "copy": "cp package.json dist",
+    "storybook": "start-storybook -s ./src -p 9009",
+    "build-storybook": "build-storybook"
   },
   "repository": {
     "type": "git",
@@ -21,7 +23,12 @@
   },
   "homepage": "https://github.com/junglefunkyman/loveletter#readme",
   "devDependencies": {
+    "@babel/core": "^7.9.6",
     "@reduxjs/toolkit": "1.3.4",
+    "@storybook/addon-actions": "^5.3.18",
+    "@storybook/addon-links": "^5.3.18",
+    "@storybook/addons": "^5.3.18",
+    "@storybook/react": "^5.3.18",
     "@types/lodash": "4.14.150",
     "@types/node": "13.13.0",
     "@types/react": "16.9.34",
@@ -31,7 +38,9 @@
     "@types/uuid": "^7.0.3",
     "@types/webpack-env": "1.15.1",
     "@types/ws": "7.2.4",
+    "babel-loader": "^8.1.0",
     "babel-plugin-transform-react-jsx-source": "^6.22.0",
+    "babel-preset-react-app": "9.1.2",
     "clean-webpack-plugin": "3.0.0",
     "css-loader": "3.5.2",
     "file-loader": "6.0.0",

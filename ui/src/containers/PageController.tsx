@@ -9,8 +9,8 @@ import ManagedBoard from '../containers/ManagedBoard';
 import {AppState} from '../components/App';
 import {connect} from 'react-redux';
 import {PLAYERS_NUMBER} from '../model/commonTypes';
-import GameNotFound from '../components/GameNotFound';
 import {store} from '../store';
+import {GameNotFound, GamePreexisted} from '../components/GameErrors';
 
 const PageController = (props: PageControllerProps) => {
   const readyUsers = props.users?.filter(u => u.ready)?.length || 0;
@@ -21,6 +21,8 @@ const PageController = (props: PageControllerProps) => {
 
   if (props.gameNotFound) {
     return (<GameNotFound/>);
+  } else if (props.gamePreexisted) {
+    return (<GamePreexisted/>);
   } else if (!props.gameId) {
     return (<CreateGame/>);
   } else if (!props.name || readyUsers < PLAYERS_NUMBER || !props.joined) {
@@ -53,6 +55,7 @@ interface PageControllerProps {
   joined: boolean;
   users: MaybeJoinedUser[];
   gameNotFound: boolean;
+  gamePreexisted: boolean;
   loadUrl: () => void;
 }
 

@@ -1,9 +1,8 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
-import {startTurn, loadCard, TurnData} from '../reducers/yourTurn';
-import {setPlayerInTurn, setTable, BoardState} from '../reducers/board';
+import {loadCard, startTurn, TurnData} from '../reducers/yourTurn';
+import {BoardState, setPlayerInTurn, setTable} from '../reducers/board';
 import {CardType, PlayerIndex} from '../model/commonTypes';
-import {useEffect} from 'react';
 import {addMessage} from '../reducers/status';
 
 interface DebugPanelProps {

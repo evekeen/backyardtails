@@ -1,12 +1,12 @@
 import React = require('react');
-import {KeyboardEvent, useState} from 'react';
+import {useState} from 'react';
 import {connect} from 'react-redux';
 import {v4 as uuid4} from 'uuid';
 // @ts-ignore
 import {CopyToClipboard} from 'react-copy-to-clipboard';
-import {createGame, GameParams, gameUrl, joinGame, JoinParams, MaybeJoinedUser,} from '../reducers/connection';
-import {PLAYERS_NUMBER} from '../model/commonTypes';
+import {createGame, gameUrl, joinGame, resetGameId} from '../reducers/connection';
 import {AppState} from './App';
+import {JoinGameComponent} from './JoinGameComponent';
 
 interface CreateGameProps {
   createGame: (gameId: string) => void;
@@ -38,48 +38,7 @@ const CreateGameComponent = (props: CreateGameProps) => {
   );
 }
 
-interface JoinGameProps extends GameParams {
-  joining: boolean;
-  joined: boolean;
-  joinGame: (params: JoinParams) => void;
-  users: MaybeJoinedUser[];
-  name: string | undefined;
-}
-
-const JoinGameComponent = (props: JoinGameProps) => {
-  const {gameId, userId} = props;
-  const readyUsers = props.users?.filter(u => u.ready) || [];
-  const waiting = PLAYERS_NUMBER - readyUsers.length;
-  const [name, setName] = useState(props.name || '');
-  const join = () => props.joinGame({gameId, userId, name});
-  const joinStarted = props.joining || props.joined;
-  const disabledButton = joinStarted || !name;
-  const loadingClass = joinStarted ? 'loading' : '';
-
-  const onKeyDown = (e: KeyboardEvent) => e.key === 'Enter' && join();
-
-  return (
-    <div className={`login-wrapper ${loadingClass}`}>
-      {readyUsers.map(user => <JoinedUser key={user.id} name={user.name}/>)}
-      <p className="pending-users">Waiting for <b>{waiting}</b> more players.</p>
-      <div className="form">
-        <div className={`input-name start-page-element`}>
-          <input value={name} disabled={joinStarted} placeholder="Your Name" onChange={e => setName(e.target.value)} onKeyDown={onKeyDown} autoFocus={true}/>
-        </div>
-        <img src="img/jigsaw.svg" alt=""/>
-        <button disabled={disabledButton} className="start-page-element start-page-button" onClick={join}>Join game</button>
-      </div>
-    </div>
-  );
-}
-
-const JoinedUser = (props: { name: string }) => {
-  return (
-    <p className="joined-user"><b>{props.name}</b> joined</p>
-  );
-}
-
 const mapStateToProps = (state: AppState) => state.connection
 
 export const CreateGame = connect(mapStateToProps, {createGame: createGame})(CreateGameComponent);
-export const JoinGame = connect(mapStateToProps, {joinGame})(JoinGameComponent);
+export const JoinGame = connect(mapStateToProps, {joinGame, resetGameId})(JoinGameComponent);

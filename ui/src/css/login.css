@@ -57,6 +57,11 @@
   background: linear-gradient(165.78deg, #d6def0 24.65%, #a5b0c5 67.59%);
 }
 
+.back-button {
+  margin-right: 20px;
+  width: 200px;
+}
+
 .game-link {
   margin-left: 50px;
   width: 700px;
