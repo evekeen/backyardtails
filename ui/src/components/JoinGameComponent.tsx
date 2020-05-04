@@ -8,7 +8,7 @@ interface JoinGameProps extends GameParams {
   joining: boolean;
   joined: boolean;
   joinGame: (params: JoinParams) => void;
-  resetGameId: () => void;
+  resetGame: () => void;
   users: MaybeJoinedUser[];
   name: string | undefined;
 }
@@ -36,7 +36,7 @@ export const JoinGameComponent = (props: JoinGameProps) => {
         </div>
         <img src="img/jigsaw.svg" alt="" onClick={() => joinStarted && join('')}/>
         <div>
-          <Button variant="link" onClick={props.resetGameId}>
+          <Button variant="link" onClick={props.resetGame}>
             Back
           </Button>
           <button disabled={disabledButton} className="start-page-element start-page-button" onClick={() => join(name)}>Join game</button>

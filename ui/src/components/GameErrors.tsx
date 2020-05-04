@@ -1,12 +1,12 @@
 import React = require('react');
 import {useEffect} from 'react';
-import {gameUrl, resetGameId} from '../reducers/connection';
+import {gameUrl, resetGame} from '../reducers/connection';
 import {connect} from 'react-redux';
 
-const GameNotFoundComponent = (props: { resetGameId: () => void }) => {
+const GameNotFoundComponent = (props: { resetGame: () => void }) => {
   useEffect(() => {
     window.history.pushState(undefined, `Love Letter`, gameUrl());
-    setTimeout(props.resetGameId, 1000);
+    setTimeout(props.resetGame, 1000);
   }, []);
 
   return (
@@ -16,10 +16,10 @@ const GameNotFoundComponent = (props: { resetGameId: () => void }) => {
   );
 }
 
-const GamePreexistedComponent = (props: { resetGameId: () => void }) => {
+const GamePreexistedComponent = (props: { resetGame: () => void }) => {
   useEffect(() => {
     window.history.pushState(undefined, `Love Letter`, gameUrl());
-    setTimeout(props.resetGameId, 1000);
+    setTimeout(props.resetGame, 1000);
   }, []);
 
   return (
@@ -29,5 +29,5 @@ const GamePreexistedComponent = (props: { resetGameId: () => void }) => {
   );
 }
 
-export const GameNotFound = connect(() => ({}), {resetGameId})(GameNotFoundComponent);
-export const GamePreexisted = connect(() => ({}), {resetGameId})(GamePreexistedComponent);
+export const GameNotFound = connect(() => ({}), {resetGame})(GameNotFoundComponent);
+export const GamePreexisted = connect(() => ({}), {resetGame})(GamePreexistedComponent);

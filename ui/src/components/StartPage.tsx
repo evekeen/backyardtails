@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {v4 as uuid4} from 'uuid';
 // @ts-ignore
 import {CopyToClipboard} from 'react-copy-to-clipboard';
-import {createGame, gameUrl, joinGame, resetGameId} from '../reducers/connection';
+import {createGame, gameUrl, joinGame, resetGame} from '../reducers/connection';
 import {AppState} from './App';
 import {JoinGameComponent} from './JoinGameComponent';
 
@@ -40,5 +40,5 @@ const CreateGameComponent = (props: CreateGameProps) => {
 
 const mapStateToProps = (state: AppState) => state.connection
 
-export const CreateGame = connect(mapStateToProps, {createGame: createGame})(CreateGameComponent);
-export const JoinGame = connect(mapStateToProps, {joinGame, resetGameId})(JoinGameComponent);
+export const CreateGame = connect(mapStateToProps, {createGame})(CreateGameComponent);
+export const JoinGame = connect(mapStateToProps, {joinGame, resetGame})(JoinGameComponent);

@@ -68,7 +68,7 @@ export const forceGame = createAction('connection/forceGame', (params: OpenGameP
   return {meta: 'remote', payload: params};
 });
 
-function updateUrl(gameId: string, userId: string) {
+function updateUrl(gameId: string | undefined, userId: string) {
   window.history.pushState(undefined, `Love Letter ${gameId}`, gameUrl(gameId, userId));
 }
 
@@ -88,9 +88,15 @@ export const createGame = (gameId: string) => (dispatch: Dispatch<any>, getState
   dispatch({type: 'connection/createGame', meta: 'remote', payload: {gameId, userId}});
 };
 
+export const resetGame = () => (dispatch: Dispatch<any>, getState: () => AppState) => {
+  const userId = getState().connection.userId!!;
+  updateUrl(undefined, userId);
+  dispatch(connectionSlice.actions.resetGameId());
+};
+
 export const iddqd = () => (dispatch: Dispatch<any>, getState: () => AppState) => {
   const gameId = 'warandpeace';
-  dispatch(resetGameId());
+  dispatch(resetGame());
   dispatch(forceGame({gameId, userId: getState().connection.userId}));
 };
 
@@ -192,6 +198,6 @@ export const gameUrl = (gameId?: string, userId?: string) => {
   return userId ? `${url}&userId=${userId}` : url;
 }
 
-export const {resetGameId, setGameParams} = connectionSlice.actions;
+export const {setGameParams} = connectionSlice.actions;
 
 export default connectionSlice.reducer;
