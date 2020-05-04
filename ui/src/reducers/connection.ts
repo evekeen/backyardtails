@@ -68,18 +68,23 @@ export const forceGame = createAction('connection/forceGame', (params: OpenGameP
   return {meta: 'remote', payload: params};
 });
 
+function updateUrl(gameId: string, userId: string) {
+  window.history.pushState(undefined, `Love Letter ${gameId}`, gameUrl(gameId, userId));
+}
+
 export const loadUrl = () => (dispatch: Dispatch<any>, getState: () => AppState) => {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const gameId = urlParams.get('gameId');
   const userId = urlParams.get('userId') || generateUserId();
+  updateUrl(gameId, userId);
   dispatch(setGameParams({gameId, userId}));
   dispatch(rejoin({gameId, userId}));
 };
 
 export const createGame = (gameId: string) => (dispatch: Dispatch<any>, getState: () => AppState) => {
   const userId = getState().connection.userId!!;
-  window.history.pushState(undefined, `Love Letter ${gameId}`, gameUrl(gameId, userId));
+  updateUrl(gameId, userId);
   dispatch({type: 'connection/createGame', meta: 'remote', payload: {gameId, userId}});
 };
 
