@@ -38,19 +38,23 @@
 .player:hover:not(.main-player):not(.disabled) h3, .player-selected h3 {
   font-weight: 500;
   color: #bc5952;
+  transition: color 0.2s ease;
 }
 
 .player:hover:not(.main-player):not(.disabled):not(.player-selected) .ll-card__box {
   background-color: #ccc;
+  transition: background-color 0.2s ease;
 }
 
 .main-player:not(.disabled) .ll-card__box:hover:not(.ll-card-selected) {
   background-color: #ccc;
+  transition: background-color 0.2s ease;
   cursor: grab;
 }
 
 .player-selected:hover .ll-card__box, .player-selected .ll-card__box {
   background-color: #bc5952;
+  transition: background-color 0.2s ease;
 }
 
 .player h3 {
@@ -73,7 +77,8 @@
 }
 
 .player-active .ll-card__box {
-  box-shadow: 17px 17px 43px rgba(212, 206, 146, 0.6), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(210, 151, 0, 0.1), -17px 17px 34px rgba(201, 181, 0, 0.1), inset -1px -1px 2px rgba(217, 212, 98, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+  box-shadow: 17px 17px 43px rgba(83, 104, 84, 0.19), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(51, 191, 57, 0.15), -17px 17px 34px rgba(51, 191, 57, 0.15), inset -1px -1px 2px rgba(196, 191, 191, 0.7), inset 1px 1px 2px rgba(255, 255, 255, 0.4);
+  transition: box-shadow 0.5s ease;
 }
 
 .ll-card__cover {
@@ -117,6 +122,7 @@
 
 .ll-card-selected {
   background-color: #bc5952;
+  transition: background-color 0.5s ease;
 }
 
 .status-log {
