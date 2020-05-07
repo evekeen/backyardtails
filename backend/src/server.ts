@@ -16,7 +16,7 @@ const app = express();
 const sessionParser = session({
   saveUninitialized: false,
   secret: 'Нарба',
-  resave: false
+  resave: false,
 });
 
 app.use(sessionParser);
@@ -83,7 +83,7 @@ wss.on('connection', (ws: WebSocket, request: any) => {
   ws.on('message', (m: string) => {
     const parsedMessage = Either.parseJSON(m, reason => {
       ws.send(error(ErrorCode.INVALID_MESSAGE, 'Invalid JSON received: ' + reason));
-    })
+    });
 
     pipe(parsedMessage, Either.map(message => {
       const typedMessage = Message.decode(message);
@@ -91,22 +91,22 @@ wss.on('connection', (ws: WebSocket, request: any) => {
       // websocketReporter(ws).report(typedMessage)
       pipe(typedMessage, fold(_ => ThrowReporter.report(typedMessage), m => {
         console.log('received: %s', JSON.stringify(m));
-        const type = m.type
+        const type = m.type;
         controller.onMessage(type, message);
-      }))
+      }));
     }));
   });
 
   controller.on('stateReady', state => {
     const userId = state.payload?.userId ? ` about ${state.payload.userId}` : '';
-    console.log(`Sending ${state.type}${userId} to ${controller.userId}`)
+    console.log(`Sending ${state.type}${userId} to ${controller.userId}`);
     ws.send(JSON.stringify(state));
   });
 
   ws.on('error', (error) => console.log('Error: ' + error));
   ws.on('close', () => {
     console.log(`Disconnected ${controller.userId}`);
-    gamesController.disconnect(controller)
+    gamesController.disconnect(controller);
   });
   ws.send(JSON.stringify({type: 'ready'}));
   // });

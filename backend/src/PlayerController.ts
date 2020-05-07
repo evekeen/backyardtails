@@ -33,9 +33,13 @@ export class PlayerControllerImpl extends EventEmitter implements PlayerControll
 
 export interface PlayerController extends EventEmitter {
   getInfo(): PlayerControllerInfo;
+
   setInfo(info: PlayerControllerInfo): void;
+
   onMessage(type: string, message: any): void;
+
   dispatch<T extends RemoteAction>(state: T): void;
+
   isReady(): boolean;
 }
 

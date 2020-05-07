@@ -15,19 +15,19 @@ export const MessageType = t.union([
   t.literal('connection/join'),
   t.literal('connection/forceGame'),
   t.literal('cardAction'),
-  t.literal('state')
-])
+  t.literal('state'),
+]);
 
 export const Message = t.interface({
-  type: MessageType
-})
+  type: MessageType,
+});
 
 export const JoinMessage = t.interface({
   type: t.literal('connection/join'),
   payload: t.interface({
     gameId: t.string,
     userId: t.string,
-    name: t.union([t.string, t.undefined])
+    name: t.union([t.string, t.undefined]),
   }),
 });
 
@@ -35,25 +35,25 @@ export const CreateGameMessage = t.interface({
   type: t.literal('connection/createGame'),
   payload: t.interface({
     gameId: t.string,
-    userId: t.string
-  })
+    userId: t.string,
+  }),
 });
 
 export const InitSession = t.interface({
   type: t.literal('connection/initSession'),
-  payload: t.string
+  payload: t.string,
 });
 
 export const ForceGame = t.interface({
   type: t.literal('connection/forceGame'),
   payload: t.interface({
     gameId: t.string,
-    userId: t.string
-  })
+    userId: t.string,
+  }),
 });
 
 export const BoardStateMessage = t.interface({
-  type: t.literal('state')
+  type: t.literal('state'),
 });
 
 interface PlayerDescription {
@@ -157,15 +157,15 @@ export function websocketReporter(ws: WebSocket): Reporter<void> {
       if (Either.isLeft(validation)) {
         ws.send(JSON.stringify(error(ErrorCode.INVALID_MESSAGE, PathReporter.report(validation))));
       }
-    }
-  }
+    },
+  };
 }
 
 export function error(code: ErrorCode, message: any): ErrorResponse {
   return {
     code: code,
-    message: JSON.stringify(message)
-  }
+    message: JSON.stringify(message),
+  };
 }
 
 export function createJoinedMessage(controller: InGamePlayerController): UserJoinedMessage {
@@ -173,36 +173,36 @@ export function createJoinedMessage(controller: InGamePlayerController): UserJoi
     type: 'connection/userJoined',
     payload: {
       ...controller.getInfo(),
-      ready: controller.isReady()
-    }
+      ready: controller.isReady(),
+    },
   };
 }
 
 export function createUserDisconnectedMessage(userId: PlayerId): UserDisconnectedMessage {
   return {
     type: 'connection/userDisconnected',
-    payload: userId
+    payload: userId,
   };
 }
 
 export function createGameNotFoundMessage(gameId?: GameId): GameNotFoundMessage {
   return {
     type: 'connection/gameNotFound',
-    payload: gameId
+    payload: gameId,
   };
 }
 
 export function createGameCreatedMessage(gameId: GameId): GameCreatedMessage {
   return {
     type: 'connection/gameCreated',
-    payload: gameId
+    payload: gameId,
   };
 }
 
 export function createGamePreexistedMessage(gameId: GameId): GamePreexistedMessage {
   return {
     type: 'connection/gamePreexisted',
-    payload: gameId
+    payload: gameId,
   };
 }
 
@@ -222,17 +222,17 @@ export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameS
           alive: player.alive,
           shield: player.hand.immune,
         });
-      })
-    }
-  }
+      }),
+    },
+  };
 }
 
 export function createLoadCardMessage(player: Player): LoadCardMessage {
   return {
     type: 'yourTurn/loadCard',
     payload: {
-      card: player.hand.card!!
-    }
+      card: player.hand.card!!,
+    },
   };
 }
 
@@ -240,19 +240,19 @@ export function createStartTurnMessage(card: CardType): StartTurnMessage {
   return {
     type: 'yourTurn/startTurn',
     payload: {
-      card: card
-    }
+      card: card,
+    },
   };
 }
 
 export function createTextMessage(text: string): RemoteAction {
   return {
     type: 'status/addMessage',
-    payload: text
+    payload: text,
   };
 }
 
 export const MO_MORE_SEATS: RemoteAction = {
   type: 'connection/noMoreSeats',
-  payload: 'Game has already started'
-}
+  payload: 'Game has already started',
+};

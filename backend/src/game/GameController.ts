@@ -1,5 +1,10 @@
 import {ActionResult, GameAction, GameId, LoveLetterGame, LoveLetterGameState, Player, PlayerId} from './loveletter';
-import {InGamePlayerController, InGamePlayerControllerInfo, PlayerController, ReadyPlayerController} from '../PlayerController';
+import {
+  InGamePlayerController,
+  InGamePlayerControllerInfo,
+  PlayerController,
+  ReadyPlayerController,
+} from '../PlayerController';
 import {
   CardAction,
   createGameCreatedMessage,
@@ -12,7 +17,7 @@ import {
   createTextMessage,
   createUserDisconnectedMessage,
   MO_MORE_SEATS,
-  RemoteAction
+  RemoteAction,
 } from '../protocol';
 import {cardNameMapping} from './commonTypes';
 
@@ -67,8 +72,8 @@ export class GamesController {
         this.pendingGames.delete(gameId);
         const game = new LoveLetterGame(newReady);
         this.games.set(gameId, game);
-        console.log(`Created game ${gameId} with players ${newReady}`)
-        game.init()
+        console.log(`Created game ${gameId} with players ${newReady}`);
+        game.init();
 
         this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
         this.sendToTheGame(gameId, (player) => createLoadCardMessage(player));
@@ -194,7 +199,7 @@ export class GamesController {
       game.applyAction(gameAction).then(res => {
         controller.dispatch({
           type: 'feedback/showFeedback',
-          payload: {...res, card: action.payload.card}
+          payload: {...res, card: action.payload.card},
         });
 
         const playerSuffix = action.payload.playerIndex ? ` on ${game.state.players[action.payload.playerIndex].name}` : '';
@@ -251,12 +256,12 @@ export class GamesController {
   }
 
   private createAction(game: LoveLetterGame, player: PlayerId, action: CardAction): GameAction<LoveLetterGameState> {
-    const gameAction = game.getActionForCard(action)
+    const gameAction = game.getActionForCard(action);
     return this.action(action, player, gameAction);
   }
 
   private action(cardAction: CardAction, playerId: PlayerId,
-    action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): GameAction<LoveLetterGameState> {
+                 action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): GameAction<LoveLetterGameState> {
     const playerIndex = cardAction.payload.playerIndex;
     const playedCard = cardAction.payload.card;
     return {
@@ -274,7 +279,7 @@ export class GamesController {
         }
 
         return Promise.resolve(action(me, targetPlayer, s));
-      }
+      },
     };
   }
 }

@@ -19,5 +19,5 @@ export const cardNameMapping = {
   [CardType.Prince]: 'Prince',
   [CardType.King]: 'King',
   [CardType.Countess]: 'Countess',
-  [CardType.Princess]: 'Princess'
-}
+  [CardType.Princess]: 'Princess',
+};

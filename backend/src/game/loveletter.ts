@@ -37,7 +37,7 @@ const cards = [
   CardType.Prince, CardType.Prince,
   CardType.King,
   CardType.Countess,
-  CardType.Princess
+  CardType.Princess,
 ];
 
 export function getCardIndex(card: CardType): number {
@@ -52,7 +52,9 @@ export interface Hand {
 
 export interface Deck {
   size(): number;
+
   take(): CardType
+
   init(): void;
 }
 
@@ -71,7 +73,7 @@ class LoveLetterDeck implements Deck {
   }
 
   init(): void {
-    const shuffled = _.shuffle(cards)
+    const shuffled = _.shuffle(cards);
     if (shuffled.length > 0)
       shuffled.pop();
     this.deck = shuffled;
@@ -105,6 +107,7 @@ export interface Game<State> {
   state: State
 
   init(): void;
+
   applyAction(action: GameAction<State>): Promise<ActionResult>;
 }
 
@@ -132,11 +135,11 @@ export class LoveLetterGameState {
       hand: {
         card: undefined,
         pendingCard: undefined,
-        immune: false
+        immune: false,
       },
       score: 0,
       alive: true,
-      updatedCard: false
+      updatedCard: false,
     };
     this.players.push(player);
     return player;
@@ -230,7 +233,8 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
   private actions: GameAction<LoveLetterGameState>[] = [];
   private firstPlayerIdx = -1;
 
-  constructor(private controllers: ReadyPlayerController[]) {}
+  constructor(private controllers: ReadyPlayerController[]) {
+  }
 
   applyAction(action: GameAction<LoveLetterGameState>): Promise<ActionResult> {
     if (action.playerId !== this.state.activeTurnPlayerId) {
@@ -261,7 +265,7 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
   private createResult(res: ActionResult, player: Player): ActionResult {
     return {
       ...res,
-      opponentIndex: this.state.players.findIndex(p => p.id === player.id)
+      opponentIndex: this.state.players.findIndex(p => p.id === player.id),
     };
   }
 }
@@ -271,53 +275,50 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
   state.discardPile.push(action.payload.card);
 
   switch (action.payload.card) {
-  case CardType.Guard:
-  {
-    const killed = target.hand.card === action.payload.guess;
-    if (killed) {
-      state.killPlayer(target.id);
+    case CardType.Guard: {
+      const killed = target.hand.card === action.payload.guess;
+      if (killed) {
+        state.killPlayer(target.id);
+      }
+      return {killed};
     }
-    return {killed};
-  }
-  case CardType.Priest:
-    return {killed: true, opponentCard: target.hand.card};
-  case CardType.Baron:
-  {
-    const opponentCard = target.hand.card!;
-    const killed = otherCard > opponentCard;
-    if (killed) {
-      state.killPlayer(target.id)
-    } else if (otherCard < opponentCard) {
-      state.killPlayer(me.id);
+    case CardType.Priest:
+      return {killed: true, opponentCard: target.hand.card};
+    case CardType.Baron: {
+      const opponentCard = target.hand.card!;
+      const killed = otherCard > opponentCard;
+      if (killed) {
+        state.killPlayer(target.id);
+      } else if (otherCard < opponentCard) {
+        state.killPlayer(me.id);
+      }
+      return {killed, opponentCard};
     }
-    return {killed, opponentCard};
-  }
-  case CardType.Handmaid:
-    me.hand.immune = true;
-    return {};
-  case CardType.Prince:
-  {
-    const killed = target.hand.card == CardType.Princess;
-    if (killed) {
-      state.killPlayer(target.id);
-    } else {
-      state.discardPile.push(target.hand.card!!);
-      target.hand.card = state.deck.take();
+    case CardType.Handmaid:
+      me.hand.immune = true;
+      return {};
+    case CardType.Prince: {
+      const killed = target.hand.card == CardType.Princess;
+      if (killed) {
+        state.killPlayer(target.id);
+      } else {
+        state.discardPile.push(target.hand.card!!);
+        target.hand.card = state.deck.take();
+        target.updatedCard = true;
+      }
+      return {killed};
+    }
+    case CardType.King:
+      me.hand.card = target.hand.card;
+      me.hand.pendingCard = undefined;
+      me.updatedCard = true;
+      target.hand.card = otherCard;
       target.updatedCard = true;
-    }
-    return {killed};
-  }
-  case CardType.King:
-    me.hand.card = target.hand.card;
-    me.hand.pendingCard = undefined;
-    me.updatedCard = true;
-    target.hand.card = otherCard;
-    target.updatedCard = true;
-    return {opponentCard: me.hand.card};
-  case CardType.Countess:
-    return {};
-  case CardType.Princess:
-    state.killPlayer(me.id);
-    return {killed: true};
+      return {opponentCard: me.hand.card};
+    case CardType.Countess:
+      return {};
+    case CardType.Princess:
+      state.killPlayer(me.id);
+      return {killed: true};
   }
 }
