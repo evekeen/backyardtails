@@ -39,11 +39,11 @@ export interface PlayerController extends EventEmitter {
   isReady(): boolean;
 }
 
-export interface InGamePlayerController extends  PlayerController{
+export interface InGamePlayerController extends PlayerController {
   getInfo(): InGamePlayerControllerInfo;
 }
 
-export interface ReadyPlayerController extends  PlayerController{
+export interface ReadyPlayerController extends InGamePlayerController {
   getInfo(): ReadyPlayerControllerInfo;
 }
 

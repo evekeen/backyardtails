@@ -1,5 +1,5 @@
 import {ActionResult, GameAction, GameId, LoveLetterGame, LoveLetterGameState, Player, PlayerId} from './loveletter';
-import {InGamePlayerController, InGamePlayerControllerInfo, PlayerController, PlayerControllerInfo, ReadyPlayerController} from '../PlayerController';
+import {InGamePlayerController, InGamePlayerControllerInfo, PlayerController, ReadyPlayerController} from '../PlayerController';
 import {
   CardAction,
   createGameCreatedMessage,
@@ -15,7 +15,6 @@ import {
   RemoteAction
 } from '../protocol';
 import {cardNameMapping} from './commonTypes';
-import _ = require('lodash');
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
@@ -49,8 +48,8 @@ export class GamesController {
     }
     // TODO refactor: need to create a function to send whole game state to a particular user on reconnect
     // TODO keep a log of messages sent to users, so they can be send again
-    if (game !== undefined) {
-      this.tryJoinExistingGame(game, userId, controller);
+    if (game !== undefined && name) {
+      this.tryJoinExistingGame(game, userId, controller as ReadyPlayerController);
     } else if (pending !== undefined) {
       const readyControllers = getReady(pending);
       console.log('ready', readyControllers);
@@ -96,8 +95,7 @@ export class GamesController {
     let otherPlayers: PlayerId[];
     if (game && game.hasPlayer(userId)) {
       otherPlayers = game.state.players.filter(p => p.id !== userId).map(p => p.id);
-      const info = _.pick(controller, 'gameId', 'userId') as PlayerControllerInfo; // Clear name
-      controller.setInfo(info);
+      controller.setInfo({gameId, userId});
     } else if (pending) {
       const other = pending.filter(h => h.getInfo().userId !== userId);
       this.pendingGames.set(gameId, other);
@@ -138,11 +136,10 @@ export class GamesController {
     }
     this.pendingGames.set(gameId, pending);
     console.log(`User ${userId} has joined ${gameId} as ${joinedAs}`);
-    pending.filter(c => c.getInfo().userId !== userId).forEach(c => c.dispatch(createJoinedMessage(controller)));
-    pending.forEach(c => controller.dispatch(createJoinedMessage(c)));
+    this.sendJoined(controller, pending);
   }
 
-  private tryJoinExistingGame(game: LoveLetterGame, userId: string, controller: InGamePlayerController) {
+  private tryJoinExistingGame(game: LoveLetterGame, userId: string, controller: ReadyPlayerController) {
     if (game.hasPlayer(userId)) {
       this.joinActiveGame(game, controller);
     } else {
@@ -153,11 +150,16 @@ export class GamesController {
     }
   }
 
-  private joinActiveGame(game: LoveLetterGame, controller: InGamePlayerController) {
+  private joinActiveGame(game: LoveLetterGame, controller: ReadyPlayerController) {
     const {userId} = controller.getInfo();
     console.log(`Joining user ${userId} back`);
-    const controllers = game.state.players.filter(p => p.controller.isReady()).map(p => p.controller);
-    controllers.forEach(c => c.dispatch(createJoinedMessage(controller)));
+    const player = game.state.players.find(p => p.id === userId);
+    if (!player) {
+      console.log(`Could not find player ${userId} to re-join`);
+      return;
+    }
+    player.controller = controller;
+    this.sendJoined(controller, game.state.players.map(p => p.controller));
 
     controller.dispatch(createSetTableMessage(userId, game!!.state));
     controller.dispatch(createLoadCardMessage(game!!.state.getPlayer(userId)));
@@ -213,6 +215,11 @@ export class GamesController {
         this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
       }).catch(err => console.log(err));
     });
+  }
+
+  private sendJoined(controller: InGamePlayerController, controllers: InGamePlayerController[]) {
+    controllers.filter(c => c.getInfo().userId !== controller.getInfo().userId).forEach(c => c.dispatch(createJoinedMessage(controller)));
+    controllers.forEach(c => controller.dispatch(createJoinedMessage(c)));
   }
 
   private sendToTheGame(gameId: GameId, messageCreator: (player: Player, game: LoveLetterGame) => RemoteAction): void {
