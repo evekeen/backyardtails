@@ -1,10 +1,5 @@
 import {ActionResult, GameAction, GameId, LoveLetterGame, LoveLetterGameState, Player, PlayerId} from './loveletter';
-import {
-  InGamePlayerController,
-  InGamePlayerControllerInfo,
-  PlayerController,
-  ReadyPlayerController,
-} from '../PlayerController';
+import {InGamePlayerController, InGamePlayerControllerInfo, PlayerController, ReadyPlayerController,} from '../PlayerController';
 import {
   CardAction,
   createGameCreatedMessage,
@@ -74,13 +69,7 @@ export class GamesController {
         this.games.set(gameId, game);
         console.log(`Created game ${gameId} with players ${newReady}`);
         game.init();
-
-        this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
-        this.sendToTheGame(gameId, (player) => createLoadCardMessage(player));
-        this.sendToTheGame(gameId, (player, game) => createTextMessage(`It's ${game.state.activeTurnPlayerId}'s turn`));
-
-        const player = game.state.getActivePlayer();
-        this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
+        newReady.forEach(c => GamesController.initGameForPlayer(c, game));
       }
     }
   }
@@ -165,14 +154,7 @@ export class GamesController {
     }
     player.controller = controller;
     this.sendJoined(controller, game.state.players.map(p => p.controller));
-
-    controller.dispatch(createSetTableMessage(userId, game!!.state));
-    controller.dispatch(createLoadCardMessage(game!!.state.getPlayer(userId)));
-    const activePlayer = game!!.state.getActivePlayer();
-    if (activePlayer.id === userId) {
-      controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
-    }
-    controller.dispatch(createTextMessage(`It's ${activePlayer.id}'s turn`));
+    GamesController.initGameForPlayer(controller, game);
   }
 
   subscribe(c: PlayerController, userId: PlayerId) {
@@ -281,6 +263,17 @@ export class GamesController {
         return Promise.resolve(action(me, targetPlayer, s));
       },
     };
+  }
+
+  private static initGameForPlayer(controller: ReadyPlayerController, game: LoveLetterGame) {
+    const {userId} = controller.getInfo();
+    controller.dispatch(createSetTableMessage(userId, game.state));
+    controller.dispatch(createLoadCardMessage(game.state.getPlayer(userId)));
+    const activePlayer = game.state.getActivePlayer();
+    if (activePlayer.id === userId) {
+      controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
+    }
+    controller.dispatch(createTextMessage(`It's ${activePlayer.name}'s turn`));
   }
 }
 
