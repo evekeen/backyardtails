@@ -49,10 +49,17 @@ const PriestFeedback = (props: CardActionFeedback) => {
 }
 
 const BaronFeedback = (props: CardActionFeedback) => {
-  const status = props.killed ? 'won' : 'lost';
+  function getMessage() {
+    if (props.killed) {
+      return 'You\'ve won the duel';
+    } else if (props.killed === undefined) {
+      return 'Nobody died';
+    }
+    return 'You\'ve lost the duel';
+  }
   return (
     <>
-      <p>You've {status} the duel</p>
+      <p>{getMessage()}</p>
       <div>{props.opponentName} had {<Card card={props.opponentCard} showDescription={false}/>}</div>
     </>
   );

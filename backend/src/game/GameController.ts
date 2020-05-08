@@ -183,7 +183,7 @@ export class GamesController {
           payload: {...res, card: action.payload.card},
         });
 
-        const playerSuffix = action.payload.playerIndex ? ` on ${game.state.players[action.payload.playerIndex].name}` : '';
+        const playerSuffix = action.payload.playerIndex !== undefined ? ` on ${game.state.players[action.payload.playerIndex].name}` : '';
         const cardName = cardNameMapping[action.payload.card];
         const name = controller.getInfo().name;
         this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}`));
@@ -250,12 +250,12 @@ export class GamesController {
       apply: (s: LoveLetterGameState): Promise<ActionResult> => {
         const me = s.getPlayer(playerId);
         const hand = me.hand;
-        if (playedCard == hand.card) {
+        if (playedCard === hand.card) {
           hand.card = hand.pendingCard;
         }
 
-        const targetPlayer = playerIndex ? s.players[playerIndex] : me;
-        if (targetPlayer.id != me.id && targetPlayer.hand.immune) {
+        const targetPlayer = playerIndex !== undefined ? s.players[playerIndex] : me;
+        if (targetPlayer.id !== me.id && targetPlayer.hand.immune) {
           return Promise.reject();
         }
 

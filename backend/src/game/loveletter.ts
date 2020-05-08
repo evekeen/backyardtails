@@ -279,6 +279,8 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
   console.log('me', me.name, otherCard);
   console.log('target', target.name, opponentCard);
   state.discardPile.push(action.payload.card);
+  me.hand.card = otherCard;
+  me.hand.pendingCard = undefined;
 
   switch (action.payload.card) {
     case CardType.Guard: {
@@ -289,8 +291,12 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
       return {killed};
     }
     case CardType.Priest:
-      return {killed: true, opponentCard};
+      return {opponentCard};
     case CardType.Baron: {
+      if (otherCard === opponentCard) {
+        // Nobody died, even duel
+        return {killed: undefined, opponentCard};
+      }
       const killed = otherCard > opponentCard!;
       if (killed) {
         state.killPlayer(target.id);
