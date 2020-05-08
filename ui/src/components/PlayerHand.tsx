@@ -44,7 +44,7 @@ export const PlayerHand = (props: PlayerHandProps) => {
 
   return (
     <div className="main-wrapper">
-      <div className='player-wrapper main-player'>
+      <div className={`player-wrapper main-player ${disabledClass} ${activeClass} ${deadClass}`}>
         <h3>{props.player?.name || ''}</h3>
         <div className={`player main-player ${disabledClass} ${activeClass} ${deadClass}`}>
           <div className="main-player__cards">

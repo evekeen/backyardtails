@@ -39,7 +39,7 @@ function player(player: Player, props: BoardProps) {
   return (
     <OtherPlayer player={player}
                  selected={player && props.selectedPlayerIndex === player?.index}
-                 selectable={props.currentPlayerInTurn}
+                 selectable={props.currentPlayerInTurn && !player.shield && player.alive}
                  active={props.turnIndex !== undefined && props.turnIndex === player?.index}
                  onClick={props.selectPlayer}/>
   )
