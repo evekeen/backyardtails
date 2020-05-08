@@ -44,15 +44,15 @@ export const PlayerHand = (props: PlayerHandProps) => {
 
   return (
     <div className="main-wrapper">
-      <div className='player-wrapper'>
+      <div className='player-wrapper main-player'>
+        <h3>{props.player?.name || ''}</h3>
         <div className={`player main-player ${disabledClass} ${activeClass} ${deadClass}`}>
-          <h3>{props.player?.name || ''}</h3>
           <div className="main-player__cards">
             <Card card={props.cards[0]} onClick={() => selectCard(props.cards[0])} selected={selectedCard === props.cards[0]}/>
             {secondCard()}
           </div>
+          <Score score={props.player?.score || 0}/>
         </div>
-        <Score score={props.player?.score || 0}/>
       </div>
       <ActionDialog card={selectedCard} player={props.selectedPlayer} show={showDialog(selectedCard, props)}
                     onHide={() => props.cancelSelection()} onSubmit={submit}/>

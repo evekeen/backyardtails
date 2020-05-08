@@ -19,12 +19,12 @@ export const OtherPlayer = (props: PlayerProps) => {
   const deadClass = !props.player?.alive ? 'player-dead' : '';
   const select = props.selectable ? props.onClick : _.noop;
   return (
-    <div className='player-wrapper'>
+    <div className={`player-wrapper ${selectedClass} ${disabledClass} ${activeClass} ${deadClass}`}>
+      <h3>{props.player?.name || 'Unknown'}</h3>
       <div className={`player ${selectedClass} ${disabledClass} ${activeClass} ${deadClass}`} onClick={() => select(props.player)}>
-        <h3>{props.player?.name || 'Unknown'}</h3>
         <Card/>
+        <Score score={props.player?.score || 0}/>
       </div>
-      <Score score={props.player?.score || 0}/>
     </div>
   );
 };

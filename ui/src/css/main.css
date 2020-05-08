@@ -27,6 +27,12 @@
 
 .player-wrapper {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.player {
+  display: flex;
   flex-direction: row;
   align-items: flex-end;
 }
@@ -35,8 +41,7 @@
   cursor: grab;
 }
 
-.player:hover:not(.main-player):not(.disabled) h3, .player-selected h3 {
-  font-weight: 500;
+.player-wrapper:hover:not(.main-player):not(.disabled) h3, .player-selected h3 {
   color: #bc5952;
   transition: color 0.2s ease;
 }
@@ -57,13 +62,13 @@
   transition: background-color 0.2s ease;
 }
 
-.player h3 {
+.player-wrapper h3 {
   font-weight: 300;
   text-transform: uppercase;
   text-align: center;
 }
 
-.player h3 .your-name {
+.player-wrapper h3 .your-name {
   font-size: 14px;
   font-weight: lighter;
   vertical-align: middle;
