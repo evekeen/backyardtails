@@ -162,6 +162,7 @@ export class LoveLetterGameState {
     this.activePlayerIds = this.players.map(p => p.id);
 
     this.players.forEach(player => {
+      player.alive = true;
       player.hand.card = this.deck.take();
       player.hand.immune = false;
       player.hand.pendingCard = undefined;

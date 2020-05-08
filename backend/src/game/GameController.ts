@@ -51,7 +51,6 @@ export class GamesController {
       this.tryJoinExistingGame(game, userId, controller as ReadyPlayerController);
     } else if (pending !== undefined) {
       const readyControllers = getReady(pending);
-      console.log('ready', readyControllers);
 
       if (getReady(readyControllers).length >= PLAYERS_COUNT) {
         console.log('game is full');
@@ -59,7 +58,6 @@ export class GamesController {
         return;
       }
       this.addToPending(controller);
-      console.log('Pending', pending);
 
       const newReady = getReady(pending);
       if (newReady.length === PLAYERS_COUNT) {
@@ -136,7 +134,6 @@ export class GamesController {
     if (game.hasPlayer(userId)) {
       this.joinActiveGame(game, controller);
     } else {
-      console.log(game.state.players);
       console.log('game is already started without you');
       controller.setInfo({userId}); // Clear gameId and name
       controller.dispatch(MO_MORE_SEATS);
@@ -188,6 +185,11 @@ export class GamesController {
         const name = controller.getInfo().name;
         this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}`));
         // TODO report if a player is dead
+
+        if (game.state.winnerId) {
+          this.onRoundEnd(gameId, game);
+          return;
+        }
 
         game.state.players.forEach(p => {
           if (p.updatedCard) {
@@ -262,6 +264,19 @@ export class GamesController {
         return Promise.resolve(action(me, targetPlayer, s));
       },
     };
+  }
+
+  private onRoundEnd(gameId: GameId, game: LoveLetterGame) {
+    const winnerController = this.playerControllers.get(game.state.winnerId!!)!!;
+    const winnerName = winnerController.getInfo().name;
+    if (!winnerController.isReady()) {
+      console.log("Winner is not ready. Cannot start next round");
+      this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} is not ready. Cannot start next round`));
+      return;
+    }
+    this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} won the round! Starting next one`));
+    game.state.start(winnerController as ReadyPlayerController);
+    game.state.players.forEach(c => GamesController.initGameForPlayer(c.controller, game));
   }
 
   private static initGameForPlayer(controller: ReadyPlayerController, game: LoveLetterGame) {
