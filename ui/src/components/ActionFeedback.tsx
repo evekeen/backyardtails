@@ -65,7 +65,7 @@ const HandmaidFeedback = () => {
 const PrinceFeedback = (props: CardActionFeedback) => {
   return (
     <>
-      <p>You've made {props.opponentName} discard a card</p>
+      <p>You've made {props.opponentName} discard a {<Card card={props.opponentCard} showDescription={false}/>}</p>
       {props.killed && (<KillingStatus card={props.card} killed={props.killed} opponentName={props.opponentName}/>)}
     </>
   );

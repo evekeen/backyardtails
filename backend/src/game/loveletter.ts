@@ -272,24 +272,24 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
 
 function getActionResult(action: CardAction, me: Player, target: Player, state: LoveLetterGameState): ActionResult {
   const otherCard = me.hand.card === action.payload.card ? me.hand.pendingCard!! : me.hand.card!!;
+  const opponentCard = target.hand.card;
   state.discardPile.push(action.payload.card);
 
   switch (action.payload.card) {
     case CardType.Guard: {
-      const killed = target.hand.card === action.payload.guess;
+      const killed = opponentCard === action.payload.guess;
       if (killed) {
         state.killPlayer(target.id);
       }
       return {killed};
     }
     case CardType.Priest:
-      return {killed: true, opponentCard: target.hand.card};
+      return {killed: true, opponentCard: opponentCard};
     case CardType.Baron: {
-      const opponentCard = target.hand.card!;
-      const killed = otherCard > opponentCard;
+      const killed = otherCard > opponentCard!;
       if (killed) {
         state.killPlayer(target.id);
-      } else if (otherCard < opponentCard) {
+      } else if (otherCard < opponentCard!) {
         state.killPlayer(me.id);
       }
       return {killed, opponentCard};
@@ -298,18 +298,18 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
       me.hand.immune = true;
       return {};
     case CardType.Prince: {
-      const killed = target.hand.card == CardType.Princess;
+      const killed = opponentCard === CardType.Princess;
       if (killed) {
         state.killPlayer(target.id);
       } else {
-        state.discardPile.push(target.hand.card!!);
+        state.discardPile.push(opponentCard!!);
         target.hand.card = state.deck.take();
         target.updatedCard = true;
       }
-      return {killed};
+      return {killed, opponentCard};
     }
     case CardType.King:
-      me.hand.card = target.hand.card;
+      me.hand.card = opponentCard;
       me.hand.pendingCard = undefined;
       me.updatedCard = true;
       target.hand.card = otherCard;
