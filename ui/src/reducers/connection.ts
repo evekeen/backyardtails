@@ -14,6 +14,8 @@ export interface ConnectionState extends MaybeGameParams {
   name: string | undefined;
   gameNotFound: boolean;
   gamePreexisted: boolean;
+  noMoreSeats: boolean;
+  createdGameId: string | undefined;
 }
 
 export interface User {
@@ -84,7 +86,6 @@ export const loadUrl = () => (dispatch: Dispatch<any>, getState: () => AppState)
 
 export const createGame = (gameId: string) => (dispatch: Dispatch<any>, getState: () => AppState) => {
   const userId = getState().connection.userId!!;
-  dispatch(setGameParams({gameId, userId}));
   dispatch({type: 'connection/createGame', meta: 'remote', payload: {gameId, userId}});
 };
 
@@ -136,7 +137,8 @@ const INITIAL_STATE = {
   joined: false,
   users: [],
   gameNotFound: false,
-  gamePreexisted: false
+  gamePreexisted: false,
+  noMoreSeats: false
 } as ConnectionState;
 
 const connectionSlice = createSlice({
@@ -172,13 +174,17 @@ const connectionSlice = createSlice({
       state.gameId = undefined;
       state.gamePreexisted = true;
     },
+    noMoreSeats(state: ConnectionState) {
+      state.gameId = undefined;
+      state.noMoreSeats = true;
+    },
     resetGameId(state: ConnectionState) {
       state.gameId = undefined;
       state.gameNotFound = false;
       state.gamePreexisted = false;
     },
     gameCreated(state: ConnectionState, action: PayloadAction<string>) {
-      state.gameId = action.payload;
+      state.createdGameId = action.payload;
     }
   },
   extraReducers: builder => {

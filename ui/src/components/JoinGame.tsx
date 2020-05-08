@@ -1,8 +1,10 @@
 import React = require('react');
-import {GameParams, JoinParams, MaybeJoinedUser} from '../reducers/connection';
+import {GameParams, joinGame, JoinParams, MaybeJoinedUser, resetGame} from '../reducers/connection';
 import {PLAYERS_NUMBER} from '../model/commonTypes';
 import {KeyboardEvent, useState} from 'react';
 import {Button} from 'react-bootstrap';
+import {connect} from 'react-redux';
+import {AppState} from './App';
 
 interface JoinGameProps extends GameParams {
   joining: boolean;
@@ -51,3 +53,7 @@ const JoinedUser = (props: { name: string }) => {
     <p className="joined-user"><b>{props.name}</b> joined</p>
   );
 }
+
+const mapStateToProps = (state: AppState) => state.connection
+
+export const JoinGame = connect(mapStateToProps, {joinGame, resetGame})(JoinGameComponent);

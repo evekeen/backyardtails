@@ -29,13 +29,12 @@ export class GamesController {
       controller.dispatch(createGamePreexistedMessage(gameId));
       return;
     }
-    controller.setInfo({gameId, userId});
+    controller.setInfo({userId});
+    this.pendingGames.set(gameId, []);
     controller.dispatch(createGameCreatedMessage(gameId));
-    this.addToPending(controller as InGamePlayerController);
   }
 
   onJoin(c: PlayerController, info: InGamePlayerControllerInfo): void {
-    // this.resubscribe(controller, oldInfo);
     c.setInfo(info);
     const controller = c as InGamePlayerController;
     const {gameId, userId, name} = info;

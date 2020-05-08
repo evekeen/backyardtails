@@ -1,7 +1,8 @@
 import * as React from 'react';
 import {useEffect} from 'react';
 import {iddqd, loadUrl, MaybeJoinedUser} from '../reducers/connection';
-import {CreateGame, JoinGame} from '../components/StartPage';
+import {CreateGame} from '../components/CreateGame';
+import {JoinGame} from '../components/JoinGame';
 import ManagedStatusPanel from '../containers/ManagedStatusPanel';
 import PlayerHandContainer from '../containers/PlayerHandContainer';
 import ManagedFeedback from '../containers/ManagedFeedback';
@@ -10,7 +11,7 @@ import {AppState} from '../components/App';
 import {connect} from 'react-redux';
 import {PLAYERS_NUMBER} from '../model/commonTypes';
 import {store} from '../store';
-import {GameNotFound, GamePreexisted} from '../components/GameErrors';
+import {GameNotFound, GamePreexisted, NoMoreSeats} from '../components/GameErrors';
 
 const PageController = (props: PageControllerProps) => {
   const readyUsers = props.users?.filter(u => u.ready)?.length || 0;
@@ -23,6 +24,8 @@ const PageController = (props: PageControllerProps) => {
     return (<GameNotFound/>);
   } else if (props.gamePreexisted) {
     return (<GamePreexisted/>);
+  } else if (props.noMoreSeats) {
+    return (<NoMoreSeats/>);
   } else if (!props.gameId) {
     return (<CreateGame/>);
   } else if (!props.name || readyUsers < PLAYERS_NUMBER || !props.joined) {
@@ -56,6 +59,7 @@ interface PageControllerProps {
   users: MaybeJoinedUser[];
   gameNotFound: boolean;
   gamePreexisted: boolean;
+  noMoreSeats: boolean;
   loadUrl: () => void;
 }
 

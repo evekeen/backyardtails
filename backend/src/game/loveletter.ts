@@ -151,6 +151,9 @@ export class LoveLetterGameState {
     this.deadPlayerIds.push(player.id);
     this.activePlayerIds = this.activePlayerIds.filter((id) => id !== playerId);
     this.discardPile.push(player.hand.card!!);
+    if (player.hand.pendingCard) {
+      this.discardPile.push(player.hand.pendingCard);
+    }
   }
 
   start(controller: ReadyPlayerController) {
@@ -273,6 +276,8 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
 function getActionResult(action: CardAction, me: Player, target: Player, state: LoveLetterGameState): ActionResult {
   const otherCard = me.hand.card === action.payload.card ? me.hand.pendingCard!! : me.hand.card!!;
   const opponentCard = target.hand.card;
+  console.log('me', me.name, otherCard);
+  console.log('target', me.name, opponentCard);
   state.discardPile.push(action.payload.card);
 
   switch (action.payload.card) {
@@ -284,7 +289,7 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
       return {killed};
     }
     case CardType.Priest:
-      return {killed: true, opponentCard: opponentCard};
+      return {killed: true, opponentCard};
     case CardType.Baron: {
       const killed = otherCard > opponentCard!;
       if (killed) {
@@ -314,7 +319,7 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
       me.updatedCard = true;
       target.hand.card = otherCard;
       target.updatedCard = true;
-      return {opponentCard: me.hand.card};
+      return {opponentCard};
     case CardType.Countess:
       return {};
     case CardType.Princess:
