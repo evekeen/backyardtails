@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {Score} from './Score';
 import {Player} from '../model/Player';
 import {Card} from './Card';
+import {Markers} from './Markers';
 import _ = require('lodash');
 
 export interface PlayerProps {
@@ -23,7 +23,7 @@ export const OtherPlayer = (props: PlayerProps) => {
       <h3>{props.player?.name || 'Unknown'}</h3>
       <div className={`player ${selectedClass} ${disabledClass} ${activeClass} ${deadClass}`} onClick={() => select(props.player)}>
         <Card/>
-        <Score score={props.player?.score || 0}/>
+        <Markers player={props.player}/>
       </div>
     </div>
   );

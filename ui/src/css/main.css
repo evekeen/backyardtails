@@ -74,6 +74,18 @@
   vertical-align: middle;
 }
 
+.markers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.markers svg {
+  color: #aab78f;
+  height: 60px;
+  width: 40px;
+}
+
 .ll-card__box {
   background: #fff8f8;
   box-shadow: 17px 17px 43px rgba(196, 191, 191, 0.9), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(196, 191, 191, 0.2), -17px 17px 34px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);

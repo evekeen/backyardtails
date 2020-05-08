@@ -4,7 +4,7 @@ import {CardType, needPlayerSelected} from '../model/commonTypes';
 import {ActionDialog} from './ActionDialog';
 import {CardAction} from '../model/CardAction';
 import {Player} from '../model/Player';
-import {Score} from './Score';
+import {Markers} from './Markers';
 import _ = require('lodash');
 
 interface PlayerHandProps {
@@ -51,7 +51,7 @@ export const PlayerHand = (props: PlayerHandProps) => {
             <Card card={props.cards[0]} onClick={() => selectCard(props.cards[0])} selected={selectedCard === props.cards[0]}/>
             {secondCard()}
           </div>
-          <Score score={props.player?.score || 0}/>
+          <Markers player={props.player}/>
         </div>
       </div>
       <ActionDialog card={selectedCard} player={props.selectedPlayer} show={showDialog(selectedCard, props)}
