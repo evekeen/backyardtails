@@ -1,5 +1,5 @@
 import {submitAction} from '../reducers/cardActions';
-import {selectCard, cancelSelection} from '../reducers/yourTurn';
+import {cancelSelection, selectCard} from '../reducers/yourTurn';
 import {connect} from 'react-redux';
 import {PlayerHand} from '../components/PlayerHand';
 import {AppState} from '../components/App';
@@ -12,7 +12,8 @@ const mapStateToProps = (state: AppState) => {
     player: state.board.players[state.board.currentPlayerIndex],
     cards: [state.yourTurn.oldCard, state.yourTurn.newCard],
     selectedPlayer: state.yourTurn.selectedPlayer,
-    selectedCard: state.yourTurn.selectedCard
+    selectedCard: state.yourTurn.selectedCard,
+    hasAvailablePlayers: state.board.players.filter(p => p.alive && !p.shield).length > 1
   };
 }
 

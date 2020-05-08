@@ -7,7 +7,8 @@ import {Player} from '../model/Player';
 
 interface ActionDialogProps {
   card: CardType | undefined;
-  player: Player | undefined,
+  player: Player | undefined;
+  hasAvailablePlayers: boolean;
   show: boolean;
   onHide: () => void;
   onSubmit: (guess?: CardType) => void;
@@ -26,7 +27,7 @@ export const ActionDialog = (props: ActionDialogProps) => {
       </Modal.Header>
 
       <Modal.Body>
-        <MoveDescription card={props.card} player={props.player}/>
+        <MoveDescription card={props.card} player={props.player} hasAvailablePlayers={props.hasAvailablePlayers}/>
         {guard && (<GuardGuess guess={guess} setGuess={setGuess}/>)}
       </Modal.Body>
 
@@ -40,12 +41,13 @@ export const ActionDialog = (props: ActionDialogProps) => {
 
 interface MoveDescriptionProps {
   card: CardType | undefined;
-  player: Player | undefined,
+  player: Player | undefined;
+  hasAvailablePlayers: boolean;
 }
 
 const MoveDescription = (props: MoveDescriptionProps) => {
   const description = renderDescription(props);
-  if (!needPlayerSelected(props.card)) return (
+  if (!needPlayerSelected(props.card) || !props.hasAvailablePlayers) return (
     <>
       <div className="move-description">
         <Card card={props.card} showDescription={false}/>

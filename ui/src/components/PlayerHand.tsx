@@ -13,6 +13,7 @@ interface PlayerHandProps {
   cards: CardType[];
   selectedCard: CardType | undefined;
   selectedPlayer: Player | undefined;
+  hasAvailablePlayers: boolean;
   selectCard: (card: CardType) => void;
   submitAction: (action: CardAction) => void;
   cancelSelection: () => void;
@@ -55,6 +56,7 @@ export const PlayerHand = (props: PlayerHandProps) => {
         </div>
       </div>
       <ActionDialog card={selectedCard} player={props.selectedPlayer} show={showDialog(selectedCard, props)}
+                    hasAvailablePlayers={props.hasAvailablePlayers}
                     onHide={() => props.cancelSelection()} onSubmit={submit}/>
     </div>
   );
@@ -62,6 +64,6 @@ export const PlayerHand = (props: PlayerHandProps) => {
 
 function showDialog(selectedCard: CardType, props: PlayerHandProps): boolean {
   if (!selectedCard) return false;
-  if (!needPlayerSelected(selectedCard)) return true;
+  if (!needPlayerSelected(selectedCard) || !props.hasAvailablePlayers) return true;
   return !!selectedCard && !!props.selectedPlayer;
 }
