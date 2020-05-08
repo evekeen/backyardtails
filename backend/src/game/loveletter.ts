@@ -277,7 +277,7 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
   const otherCard = me.hand.card === action.payload.card ? me.hand.pendingCard!! : me.hand.card!!;
   const opponentCard = target.hand.card;
   console.log('me', me.name, otherCard);
-  console.log('target', me.name, opponentCard);
+  console.log('target', target.name, opponentCard);
   state.discardPile.push(action.payload.card);
 
   switch (action.payload.card) {

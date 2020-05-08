@@ -1,5 +1,5 @@
 import {Dispatch} from 'redux';
-import {maybeSetUrl, wsConnected} from '../reducers/connection';
+import {maybeResetHand, maybeSetUrl, wsConnected} from '../reducers/connection';
 
 export class ActionRouter {
   constructor(private readonly dispatch: Dispatch<any>) {}
@@ -7,6 +7,7 @@ export class ActionRouter {
   onServerAction(data: any) {
     if (data.type === 'connection/userJoined') {
       this.dispatch(maybeSetUrl(data.payload));
+      this.dispatch(maybeResetHand(data.payload));
     }
     this.dispatch(data);
   }

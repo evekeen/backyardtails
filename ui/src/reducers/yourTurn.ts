@@ -40,6 +40,10 @@ const yourTurnSlice = createSlice({
       state.selectedCard = undefined;
       state.selectedPlayer = undefined;
     },
+    resetTurn(state: YourTurnState) {
+      state.oldCard = undefined;
+      state.newCard = undefined;
+    }
   },
   extraReducers: builder => {
     builder.addCase(submitAction, (state: YourTurnState, action: PayloadAction<CardAction>) => {
@@ -50,6 +54,6 @@ const yourTurnSlice = createSlice({
   }
 });
 
-export const {startTurn, loadCard, selectCard, selectPlayer, cancelSelection} = yourTurnSlice.actions;
+export const {startTurn, loadCard, resetTurn, selectCard, selectPlayer, cancelSelection} = yourTurnSlice.actions;
 
 export default yourTurnSlice.reducer;

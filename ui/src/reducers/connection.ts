@@ -4,6 +4,7 @@ import {setTable} from './board';
 import {Dispatch} from 'react';
 import {AppState} from '../components/App';
 import {updateUrl} from '../middleware/urlController';
+import {resetTurn} from './yourTurn';
 
 export interface ConnectionState extends MaybeGameParams {
   connecting: boolean;
@@ -102,6 +103,13 @@ export const maybeSetUrl = (params: MaybeGameParams) => (dispatch: Dispatch<any>
   }
 };
 
+export const maybeResetHand = (params: MaybeGameParams) => (dispatch: Dispatch<any>, getState: () => AppState) => {
+  const {userId} = getState().connection;
+  if (params.userId && params.userId === userId) {
+    dispatch(resetTurn());
+  }
+};
+
 export const iddqd = () => (dispatch: Dispatch<any>, getState: () => AppState) => {
   const gameId = 'warandpeace';
   dispatch(resetGame());
@@ -154,7 +162,7 @@ const connectionSlice = createSlice({
       if (userId === state.userId) {
         state.gameId = gameId;
         state.joined = ready;
-        state.name = state.name || name;
+        state.name = name || state.name;
         if (ready) {
           state.joining = false;
         }
@@ -209,5 +217,7 @@ export const gameUrl = (gameId?: string, userId?: string) => {
   const url = `${baseUrl}?gameId=${gameId}`;
   return userId ? `${url}&userId=${userId}` : url;
 }
+
+export const {userJoined} = connectionSlice.actions;
 
 export default connectionSlice.reducer;
