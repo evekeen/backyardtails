@@ -60,6 +60,8 @@ export class GamesController {
           return;
         }
         this.addToPending(controller);
+      } else {
+        this.sendJoined(controller, pending);
       }
 
       const newReady = getReady(pending);
@@ -85,11 +87,10 @@ export class GamesController {
     }
     const game = this.games.get(gameId);
     const pending = this.pendingGames.get(gameId);
-
+    controller.setInfo({});
     let otherPlayers: PlayerId[];
     if (game && game.hasPlayer(userId)) {
       otherPlayers = game.state.players.filter(p => p.id !== userId).map(p => p.id);
-      controller.setInfo({gameId, userId});
     } else if (pending) {
       const other = pending.filter(h => h.getInfo().userId !== userId);
       this.pendingGames.set(gameId, other);

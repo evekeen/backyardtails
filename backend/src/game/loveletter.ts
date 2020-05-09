@@ -260,7 +260,6 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
     this.firstPlayerIdx = (this.firstPlayerIdx + 1) % this.controllers.length;
     const firstPlayer = this.controllers[this.firstPlayerIdx];
     this.state.start(firstPlayer);
-    console.log(JSON.stringify(this.state, null, '  '));
   }
 
   getActionForCard(action: CardAction): (me: Player, target: Player, s: LoveLetterGameState) => ActionResult {

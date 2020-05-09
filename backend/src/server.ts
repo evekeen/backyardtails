@@ -47,6 +47,13 @@ wss.on('connection', (ws: WebSocket, request: any) => {
   // authenticate(request, sessionUserId => {
   const controller = new PlayerControllerImpl();
 
+  const scheduleKa = (ws: WebSocket) => setTimeout(() => {
+    controller.kaTimer = scheduleKa(ws);
+    ws.send('ka');
+  }, KA_INTERVAL);
+
+  scheduleKa(ws);
+
   controller.on('connection/initSession', msg => {
     pipe(InitSession.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
       request => {
@@ -107,6 +114,8 @@ wss.on('connection', (ws: WebSocket, request: any) => {
   ws.on('close', () => {
     console.log(`Disconnected ${controller.userId}`);
     gamesController.disconnect(controller);
+    clearTimeout(controller.kaTimer);
+    controller.kaTimer = undefined;
   });
   ws.send(JSON.stringify({type: 'ready'}));
   // });
@@ -130,3 +139,5 @@ server.listen(process.env.WS_PORT || 8081, () => {
   const address = server.address() as AddressInfo;
   console.log(`Server started on port ${address.port} :)`);
 });
+
+const KA_INTERVAL = 30000;

@@ -83,6 +83,7 @@ export class WsClient {
       this._connected = false;
     }
     this.terminateWs();
+    this.router.reportDisconnected();
 
     if (this.autoReconnect) {
       this.setupReconnect();
@@ -123,7 +124,7 @@ export class WsClient {
   private onMessage = (msg: any) => {
     console.info('received', msg);
     this.lastMsgTime = Date.now();
-    if (msg === KEEP_ALIVE_MSG) return;
+    if (msg === KEEP_ALIVE_MSG || msg?.data === KEEP_ALIVE_MSG) return;
     if (!msg || !msg.data) {
       return
     }

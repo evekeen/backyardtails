@@ -1,5 +1,5 @@
 import {Dispatch} from 'redux';
-import {maybeResetHand, maybeSetUrl, wsConnected} from '../reducers/connection';
+import {maybeResetHand, maybeSetUrl, resetGame, wsConnected} from '../reducers/connection';
 
 export class ActionRouter {
   constructor(private readonly dispatch: Dispatch<any>) {}
@@ -13,4 +13,6 @@ export class ActionRouter {
   }
 
   reportConnected = () => this.dispatch(wsConnected());
+
+  reportDisconnected = () => this.dispatch(resetGame());
 }

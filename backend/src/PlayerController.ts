@@ -4,6 +4,7 @@ import {GameId, PlayerId} from './game/loveletter';
 import _ = require('lodash');
 
 export class PlayerControllerImpl extends EventEmitter implements PlayerController {
+  public kaTimer?: any = undefined;
   constructor(public userId?: string, public gameId?: string, public name?: string) {
     super();
   }

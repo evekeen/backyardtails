@@ -190,6 +190,7 @@ const connectionSlice = createSlice({
       state.gameId = undefined;
       state.gameNotFound = false;
       state.gamePreexisted = false;
+      state.users = [];
     },
     gameCreated(state: ConnectionState, action: PayloadAction<string>) {
       state.createdGameId = action.payload;
