@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useEffect} from 'react';
-import {iddqd, loadUrl, MaybeJoinedUser} from '../reducers/connection';
+import {iddqd, MaybeJoinedUser} from '../reducers/connection';
 import {CreateGame} from '../components/CreateGame';
 import {JoinGame} from '../components/JoinGame';
 import ManagedStatusPanel from '../containers/ManagedStatusPanel';
@@ -64,9 +64,8 @@ interface PageControllerProps {
   gameNotFound: boolean;
   gamePreexisted: boolean;
   noMoreSeats: boolean;
-  loadUrl: () => void;
 }
 
 const mapStateToProps = (state: AppState) => state.connection;
 
-export default connect(mapStateToProps, {loadUrl})(PageController);
+export default connect(mapStateToProps)(PageController);

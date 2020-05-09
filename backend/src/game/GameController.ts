@@ -53,13 +53,14 @@ export class GamesController {
       this.tryJoinExistingGame(game, userId, controller as ReadyPlayerController);
     } else if (pending !== undefined) {
       const readyControllers = getReady(pending);
-
-      if (getReady(readyControllers).length >= PLAYERS_COUNT) {
-        console.log('game is full');
-        controller.dispatch(MO_MORE_SEATS);
-        return;
+      if (!readyControllers.find(c => c.getInfo().userId === userId)) {
+        if (getReady(readyControllers).length >= PLAYERS_COUNT) {
+          console.log('game is full');
+          controller.dispatch(MO_MORE_SEATS);
+          return;
+        }
+        this.addToPending(controller);
       }
-      this.addToPending(controller);
 
       const newReady = getReady(pending);
       if (newReady.length === PLAYERS_COUNT) {
