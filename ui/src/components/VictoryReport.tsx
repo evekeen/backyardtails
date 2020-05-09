@@ -14,14 +14,14 @@ interface VictoryReportProps {
 const VictoryReport = (props: VictoryReportProps) => {
   const show = props.roundWinnerName && !props.feedback;
   return (
-    <Modal show={show} onHide={() => props.discardVictoryReport()}>
+    <Modal size="lg" show={show} onHide={() => props.discardVictoryReport()}>
       <Modal.Header closeButton>
         <Modal.Title>Winner of the round</Modal.Title>
       </Modal.Header>
 
-      <Modal.Body>
-        <img src="img/princess.png"/>
-        <p>{props.roundWinnerName} has won the round!</p>
+      <Modal.Body className="ll-winner">
+        <img src="img/winner.svg" alt=""/>
+        <p><b>{props.roundWinnerName}</b> has won the round!</p>
       </Modal.Body>
 
       <Modal.Footer>

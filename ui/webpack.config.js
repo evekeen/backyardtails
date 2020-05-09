@@ -35,6 +35,7 @@ module.exports = {
       './src/img/mish-active.svg',
       './src/img/cover.jpg',
       './src/img/jigsaw.svg',
+      './src/img/winner.svg',
     ]
   },
 
