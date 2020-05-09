@@ -12,6 +12,7 @@ import {connect} from 'react-redux';
 import {PLAYERS_NUMBER} from '../model/commonTypes';
 import {store} from '../store';
 import {GameNotFound, GamePreexisted, NoMoreSeats} from '../components/GameErrors';
+import {Rules} from '../components/Rules';
 
 const PageController = (props: PageControllerProps) => {
   const readyUsers = props.users?.filter(u => u.ready)?.length || 0;
@@ -36,6 +37,7 @@ const PageController = (props: PageControllerProps) => {
       <ManagedStatusPanel/>
       <ManagedBoard/>
       <PlayerHandContainer/>
+      <Rules/>
       <ManagedFeedback/>
     </>
   );

@@ -28,6 +28,17 @@ export const cardNameMapping = {
   [CardType.Princess]: 'Princess'
 }
 
+export const cardCounts = {
+  [CardType.Guard]: 5,
+  [CardType.Priest]: 2,
+  [CardType.Baron]: 2,
+  [CardType.Handmaid]: 2,
+  [CardType.Prince]: 5,
+  [CardType.King]: 1,
+  [CardType.Countess]: 1,
+  [CardType.Princess]: 1
+}
+
 export const cardDescriptionMapping = {
   [CardType.Guard]: 'Player designates another player and names a type of card. If the guess is right, that player is eliminated from the round.',
   [CardType.Priest]: 'Player is allowed to see another player\'s hand.',
