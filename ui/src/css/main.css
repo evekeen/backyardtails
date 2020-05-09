@@ -74,18 +74,6 @@
   vertical-align: middle;
 }
 
-.markers {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.markers svg {
-  color: #aab78f;
-  height: 60px;
-  width: 40px;
-}
-
 .ll-card__box {
   background: #fff8f8;
   box-shadow: 17px 17px 43px rgba(196, 191, 191, 0.9), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(196, 191, 191, 0.2), -17px 17px 34px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
@@ -94,8 +82,12 @@
 }
 
 .player-active .ll-card__box {
-  box-shadow: 17px 17px 43px rgba(83, 104, 84, 0.19), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(51, 191, 57, 0.15), -17px 17px 34px rgba(51, 191, 57, 0.15), inset -1px -1px 2px rgba(196, 191, 191, 0.7), inset 1px 1px 2px rgba(255, 255, 255, 0.4);
-  transition: box-shadow 0.5s ease;
+  background-color: #acb49c;
+  transition: background-color 0.5s ease;
+}
+
+.player-active h3 {
+  color: #495337;
 }
 
 .ll-card__cover {
@@ -210,12 +202,26 @@ ol li span {
   margin-right: 30px;
 }
 
-.score {
-  margin: 0;
+.markers {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 40px;
 }
 
-.main-wrapper .score {
-  padding-left: 10px;
+.main-player .markers {
+  margin-left: 30px;
+}
+
+.markers svg {
+  color: #aab78f;
+  height: 50px;
+  width: 40px;
+}
+
+.score {
+  margin: 0;
+  padding: 0;
 }
 
 .score li {
@@ -225,6 +231,7 @@ ol li span {
 
 .score li img {
   height: 30px;
+  padding: 0;
 }
 
 .move-description {
