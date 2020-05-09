@@ -71,6 +71,7 @@
   text-decoration: none;
   color: rgba(62, 62, 62, 0.9);
   cursor: pointer;
+  overflow: hidden;
 }
 
 .game-link.disabled {
