@@ -5,7 +5,7 @@ export interface ScoreProps {
 }
 
 export const Score = (props: ScoreProps) => {
-  const tokens: number[] = Array.apply(null, Array(MAX_SCORE)).map((x: any, i: number) => i);
+  const tokens: number[] = Array.apply(null, Array(MAX_SCORE)).map((x: any, i: number) => MAX_SCORE - i - 1);
   return (
     <ul className="score">
       {tokens.map(i => <li key={`token-${i}`}><LoveToken active={i < props.score}/></li>)}
