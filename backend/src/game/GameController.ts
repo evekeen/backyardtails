@@ -15,6 +15,7 @@ import {
   RemoteAction,
 } from '../protocol';
 import {cardNameMapping} from './commonTypes';
+import {nextKilledText, nextSuicideText} from './Texts';
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
@@ -180,11 +181,16 @@ export class GamesController {
           payload: {...res, card: action.payload.card},
         });
 
-        const playerSuffix = action.payload.playerIndex !== undefined ? ` on ${game.state.players[action.payload.playerIndex].name}` : '';
+        const opponentName = action.payload.playerIndex !== undefined ? game.state.players[action.payload.playerIndex].name : undefined;
+        const playerSuffix = opponentName ? ` on ${opponentName}` : '';
         const cardName = cardNameMapping[action.payload.card];
         const name = controller.getInfo().name;
-        this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}`));
-        // TODO report if a player is dead
+        this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}`, 'info'));
+        if (res.killed) {
+          this.sendToTheGame(gameId, () => createTextMessage(`${opponentName} ${nextKilledText()}`, 'death'));
+        } else if (res.suicide) {
+          this.sendToTheGame(gameId, () => createTextMessage(`${name} ${nextSuicideText()}`, 'death'));
+        }
 
         if (game.state.winnerId) {
           this.onRoundEnd(gameId, game);
@@ -244,7 +250,7 @@ export class GamesController {
   }
 
   private action(cardAction: CardAction, playerId: PlayerId,
-                 action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): GameAction<LoveLetterGameState> {
+    action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): GameAction<LoveLetterGameState> {
     const playerIndex = cardAction.payload.playerIndex;
     const playedCard = cardAction.payload.card;
     return {
@@ -270,11 +276,11 @@ export class GamesController {
     const winnerController = this.playerControllers.get(game.state.winnerId!!)!!;
     const winnerName = winnerController.getInfo().name;
     if (!winnerController.isReady()) {
-      console.log("Winner is not ready. Cannot start next round");
-      this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} is not ready. Cannot start next round`, 'danger'));
+      console.log('Winner is not ready. Cannot start next round');
+      this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} is not ready. Cannot start next round`, 'error'));
       return;
     }
-    this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} won the round! Starting next one`, 'success'));
+    this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} won the round! Starting next one`, 'victory'));
     game.state.start(winnerController as ReadyPlayerController);
     game.state.players.forEach(c => GamesController.initGameForPlayer(c.controller, game));
   }

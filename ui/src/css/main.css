@@ -81,7 +81,7 @@
   width: 166px;
 }
 
-.player-active .ll-card__box {
+.player-active .ll-card__box:not(.ll-card-selected) {
   background-color: #acb49c;
   transition: background-color 0.5s ease;
 }
@@ -280,8 +280,13 @@ ol li span {
   margin: 0;
 }
 
-.status-success {
+.status-victory {
   font-weight: bold;
+}
+
+.status-death {
+  font-style: italic;
+  color: #bc5952;
 }
 
 .ll-feedback .modal-body > div {

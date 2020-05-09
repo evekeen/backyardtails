@@ -22,4 +22,4 @@ export const cardNameMapping = {
   [CardType.Princess]: 'Princess',
 };
 
-export type StatusMessageType = 'primary' | 'secondary' | 'success' | 'info' | 'danger' | undefined;
+export type StatusMessageType = 'info' | 'victory' | 'death' | 'error' | undefined;

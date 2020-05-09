@@ -7,7 +7,7 @@ export interface StatusState {
 
 export interface StatusMessage {
   text: string;
-  type: 'primary' | 'secondary' | 'info' | 'danger' | undefined;
+  type: 'info' | 'victory' | 'death' | 'error' | undefined;
 }
 
 const statusSlice = createSlice({

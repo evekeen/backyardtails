@@ -99,6 +99,7 @@ export interface GameAction<State> {
 // TODO Field for each card type? Union type?
 export interface ActionResult {
   killed?: boolean;
+  suicide?: boolean;
   opponentCard?: CardType;
   opponentIndex?: number;
 }
@@ -331,6 +332,6 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
       return {};
     case CardType.Princess:
       state.killPlayer(me.id);
-      return {killed: true};
+      return {};
   }
 }
