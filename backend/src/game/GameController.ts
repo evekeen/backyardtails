@@ -7,6 +7,7 @@ import {
   createGamePreexistedMessage,
   createJoinedMessage,
   createLoadCardMessage,
+  createRoundVictoryMessage,
   createSetTableMessage,
   createStartTurnMessage,
   createTextMessage,
@@ -274,13 +275,14 @@ export class GamesController {
 
   private onRoundEnd(gameId: GameId, game: LoveLetterGame) {
     const winnerController = this.playerControllers.get(game.state.winnerId!!)!!;
-    const winnerName = winnerController.getInfo().name;
+    const winnerName = winnerController.getInfo().name!!;
+    this.sendToTheGame(gameId, () => createRoundVictoryMessage(winnerName));
+    this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} won the round! Starting next one`, 'victory'));
     if (!winnerController.isReady()) {
       console.log('Winner is not ready. Cannot start next round');
       this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} is not ready. Cannot start next round`, 'error'));
       return;
     }
-    this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} won the round! Starting next one`, 'victory'));
     game.state.start(winnerController as ReadyPlayerController);
     game.state.players.forEach(c => GamesController.initGameForPlayer(c.controller, game));
   }

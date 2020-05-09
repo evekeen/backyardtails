@@ -252,6 +252,13 @@ export function createTextMessage(text: string, type?: StatusMessageType): Remot
   };
 }
 
+export function createRoundVictoryMessage(winnerName: string): RemoteAction {
+  return {
+    type: 'status/reportRoundVictory',
+    payload: winnerName,
+  };
+}
+
 export const MO_MORE_SEATS: RemoteAction = {
   type: 'connection/noMoreSeats',
   payload: 'Game has already started',

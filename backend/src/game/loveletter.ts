@@ -311,15 +311,17 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
       me.hand.immune = true;
       return {};
     case CardType.Prince: {
-      const killed = opponentCard === CardType.Princess;
-      if (killed) {
+      const death = opponentCard === CardType.Princess;
+      if (death) {
         state.killPlayer(target.id);
       } else {
         state.discardPile.push(opponentCard!!);
         target.hand.card = state.deck.take();
         target.updatedCard = true;
       }
-      return {killed, opponentCard};
+      const suicide = death && me === target;
+      const killed = death && !suicide;
+      return {killed, suicide, opponentCard};
     }
     case CardType.King:
       me.hand.card = opponentCard;
@@ -332,6 +334,6 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
       return {};
     case CardType.Princess:
       state.killPlayer(me.id);
-      return {};
+      return {suicide: true};
   }
 }
