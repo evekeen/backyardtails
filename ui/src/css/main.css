@@ -258,6 +258,9 @@ ol li span {
   top: 0;
   right: 0;
   z-index: 100;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
 }
 
 .status-messages > .toast {

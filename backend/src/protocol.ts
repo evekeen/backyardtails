@@ -5,7 +5,7 @@ import * as WebSocket from 'ws';
 import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
 import {GameId, LoveLetterGameState, Player, PlayerId} from './game/loveletter';
-import {CardType} from './game/commonTypes';
+import {CardType, StatusMessageType} from './game/commonTypes';
 import {InGamePlayerController} from './PlayerController';
 import _ = require('lodash');
 
@@ -245,10 +245,10 @@ export function createStartTurnMessage(card: CardType): StartTurnMessage {
   };
 }
 
-export function createTextMessage(text: string): RemoteAction {
+export function createTextMessage(text: string, type?: StatusMessageType): RemoteAction {
   return {
     type: 'status/addMessage',
-    payload: text,
+    payload: {text, type},
   };
 }
 

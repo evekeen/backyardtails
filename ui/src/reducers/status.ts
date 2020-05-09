@@ -1,5 +1,5 @@
-import { now } from 'lodash';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import _ = require('lodash');
 
 export interface StatusState {
   log: StatusMessage[];
@@ -7,8 +7,7 @@ export interface StatusState {
 
 export interface StatusMessage {
   text: string;
-  time: number;
-  closed?: boolean;
+  type: 'primary' | 'secondary' | 'info' | 'danger' | undefined;
 }
 
 const statusSlice = createSlice({
@@ -17,15 +16,12 @@ const statusSlice = createSlice({
     log: []
   } as StatusState,
   reducers: {
-    addMessage(state: StatusState, action: PayloadAction<string>) {
-      state.log.unshift({text: action.payload, time: now()});
-    },
-    closeMessage(state: StatusState, action: PayloadAction<number>) {
-      state.log.splice(action.payload, 1);
+    addMessage(state: StatusState, action: PayloadAction<StatusMessage>) {
+      state.log = _.take([action.payload].concat(state.log), 3);
     }
   }
 });
 
-export const {addMessage, closeMessage} = statusSlice.actions;
+export const {addMessage} = statusSlice.actions;
 
 export default statusSlice.reducer;

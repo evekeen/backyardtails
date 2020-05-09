@@ -1,15 +1,11 @@
-import _ = require('lodash');
 import React = require('react');
-import {Toast} from 'react-bootstrap';
-import {now} from 'lodash';
+import {Alert} from 'react-bootstrap';
 import {StatusMessage} from '../reducers/status';
 
 export const StatusPanel = (props: StatusProps) => {
   return (
     <div className="status-messages">
-      {_.take(props.log, 3)
-        .map((msg, i) => <MessageToast key={i} text={msg.text} time={msg.time} onClose={() => props.closeMessage(i)}/>)
-      }
+      {props.log.map((msg, i) => <StatusMessageComponent key={i} type={msg.type} text={msg.text}/>)}
     </div>
   );
 }
@@ -19,19 +15,10 @@ interface StatusProps {
   closeMessage: (index: number) => void;
 }
 
-interface MessageToastProps extends StatusMessage {
-  onClose: () => void;
-}
-
-const MessageToast = (props: MessageToastProps) => {
-  const ago = Math.round((now() - props.time) / 1000);
+const StatusMessageComponent = (props: StatusMessage) => {
   return (
-    <Toast show={!props.closed} onClose={props.onClose}>
-      <Toast.Header>
-        <strong className="mr-auto">Love Letter</strong>
-        <small>{ago} seconds ago</small>
-      </Toast.Header>
-      <Toast.Body>{props.text}</Toast.Body>
-    </Toast>
+    <Alert variant={props.type || 'primary'}>
+      {props.text}
+    </Alert>
   );
 }
