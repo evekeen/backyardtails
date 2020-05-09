@@ -274,7 +274,7 @@ export class GamesController {
       this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} is not ready. Cannot start next round`, 'danger'));
       return;
     }
-    this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} won the round! Starting next one`, 'info'));
+    this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} won the round! Starting next one`, 'success'));
     game.state.start(winnerController as ReadyPlayerController);
     game.state.players.forEach(c => GamesController.initGameForPlayer(c.controller, game));
   }
@@ -287,7 +287,7 @@ export class GamesController {
     if (activePlayer.id === userId) {
       controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
     }
-    controller.dispatch(createTextMessage(`It's ${activePlayer.name}'s turn`, 'secondary'));
+    controller.dispatch(createTextMessage(`It's ${activePlayer.name}'s turn`, 'info'));
   }
 }
 

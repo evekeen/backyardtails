@@ -1,5 +1,4 @@
 import React = require('react');
-import {Alert} from 'react-bootstrap';
 import {StatusMessage} from '../reducers/status';
 
 export const StatusPanel = (props: StatusProps) => {
@@ -16,8 +15,6 @@ interface StatusProps {
 
 const StatusMessageComponent = (props: StatusMessage) => {
   return (
-    <Alert variant={props.type || 'primary'}>
-      {props.text}
-    </Alert>
+    <p className={`status-${props.type}`}>{props.text}</p>
   );
 }

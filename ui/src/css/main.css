@@ -142,17 +142,6 @@
   transition: background-color 0.5s ease;
 }
 
-.status-log {
-  margin-top: 30px;
-  margin-right: 50px;
-  font-weight: 300;
-  font-size: 32px;
-  line-height: 37px;
-  text-transform: uppercase;
-
-  color: #acbc8a;
-}
-
 .decks {
   display: flex;
   justify-content: space-between;
@@ -258,14 +247,24 @@ ol li span {
   top: 0;
   right: 0;
   z-index: 100;
+  margin: 10px;
   padding: 10px;
-  background-color: #f5f5f5;
+  color: #004085;
+  background-color: #cce5ff;
+  border-color: #b8daff;
   border-radius: 5px;
-}
-
-.status-messages > .toast {
+  line-height: 28px;
   min-width: 300px;
   max-width: 600px;
+  text-align: right;
+}
+
+.status-messages > p {
+  margin: 0;
+}
+
+.status-success {
+  font-weight: bold;
 }
 
 .ll-feedback .modal-body > div {
