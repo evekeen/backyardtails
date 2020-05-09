@@ -17,7 +17,7 @@ const statusSlice = createSlice({
   } as StatusState,
   reducers: {
     addMessage(state: StatusState, action: PayloadAction<StatusMessage>) {
-      state.log = _.take([action.payload].concat(state.log), 3);
+      state.log = _.takeRight(state.log.concat([action.payload]), 3);
     }
   }
 });
