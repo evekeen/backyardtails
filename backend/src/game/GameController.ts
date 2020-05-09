@@ -87,7 +87,7 @@ export class GamesController {
     }
     const game = this.games.get(gameId);
     const pending = this.pendingGames.get(gameId);
-    controller.setInfo({});
+    controller.setInfo({gameId, userId});
     let otherPlayers: PlayerId[];
     if (game && game.hasPlayer(userId)) {
       otherPlayers = game.state.players.filter(p => p.id !== userId).map(p => p.id);
