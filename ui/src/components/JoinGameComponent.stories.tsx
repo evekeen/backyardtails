@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {storiesOf} from '@storybook/react';
-import {JoinGameComponent} from './JoinGameComponent';
+import {JoinGameComponent} from './JoinGame';
 import '../css/main.css';
 import '../css/login.css';
 

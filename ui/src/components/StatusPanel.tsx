@@ -12,7 +12,6 @@ export const StatusPanel = (props: StatusProps) => {
 
 interface StatusProps {
   log: StatusMessage[];
-  closeMessage: (index: number) => void;
 }
 
 const StatusMessageComponent = (props: StatusMessage) => {
