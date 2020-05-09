@@ -10,7 +10,7 @@ import thunk from 'redux-thunk';
 import urlController from './middleware/urlController';
 
 const prod = process.env.NODE_ENV === 'production';
-const wsUrl = prod ? 'wss://ll-backend.us-east-1.elasticbeanstalk.com:8443' : 'ws://localhost:8081';
+const wsUrl = prod ? 'ws://ll-backend.us-east-1.elasticbeanstalk.com:8081' : 'ws://localhost:8081';
 
 const wsClient = new WsClient(wsUrl);
 
