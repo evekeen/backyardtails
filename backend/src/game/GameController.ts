@@ -17,6 +17,7 @@ import {
 } from '../protocol';
 import {cardNameMapping} from './commonTypes';
 import {nextKilledText, nextSuicideText} from './Texts';
+import {InvalidGameStateError} from "../error/InvalidGameStateError";
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
@@ -178,39 +179,45 @@ export class GamesController {
         return;
       }
       const gameAction = this.createAction(game, userId, action);
-      game.applyAction(gameAction).then(res => {
-        controller.dispatch({
-          type: 'feedback/showFeedback',
-          payload: {...res, card: action.payload.card},
-        });
+      let actionResult: ActionResult;
+      try{
+        actionResult = game.applyAction(gameAction);
+      } catch (e) {
+        console.log(e);
+        return;
+      }
 
-        const opponentName = action.payload.playerIndex !== undefined ? game.state.players[action.payload.playerIndex].name : undefined;
-        const playerSuffix = opponentName ? ` on ${opponentName}` : '';
-        const cardName = cardNameMapping[action.payload.card];
-        const name = controller.getInfo().name;
-        this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}`, 'info'));
-        if (res.killed) {
-          this.sendToTheGame(gameId, () => createTextMessage(`${opponentName} ${nextKilledText()}`, 'death'));
-        } else if (res.suicide) {
-          this.sendToTheGame(gameId, () => createTextMessage(`${name} ${nextSuicideText()}`, 'death'));
+      controller.dispatch({
+        type: 'feedback/showFeedback',
+        payload: {...actionResult, card: action.payload.card},
+      });
+
+      const opponentName = action.payload.playerIndex !== undefined ? game.state.players[action.payload.playerIndex].name : undefined;
+      const playerSuffix = opponentName ? ` on ${opponentName}` : '';
+      const cardName = cardNameMapping[action.payload.card];
+      const name = controller.getInfo().name;
+      this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}`, 'info'));
+      if (actionResult.killed) {
+        this.sendToTheGame(gameId, () => createTextMessage(`${opponentName} ${nextKilledText()}`, 'death'));
+      } else if (actionResult.suicide) {
+        this.sendToTheGame(gameId, () => createTextMessage(`${name} ${nextSuicideText()}`, 'death'));
+      }
+
+      if (game.state.winnerId) {
+        this.onRoundEnd(gameId, game);
+        return;
+      }
+
+      game.state.players.forEach(p => {
+        if (p.updatedCard) {
+          this.send(p.id, createLoadCardMessage(p));
+          p.updatedCard = false;
         }
+      });
+      this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
 
-        if (game.state.winnerId) {
-          this.onRoundEnd(gameId, game);
-          return;
-        }
-
-        game.state.players.forEach(p => {
-          if (p.updatedCard) {
-            this.send(p.id, createLoadCardMessage(p));
-            p.updatedCard = false;
-          }
-        });
-        this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
-
-        const player = game.state.getActivePlayer();
-        this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
-      }).catch(err => console.log(err));
+      const player = game.state.getActivePlayer();
+      this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
     });
   }
 
@@ -258,7 +265,7 @@ export class GamesController {
     const playedCard = cardAction.payload.card;
     return {
       playerId: playerId,
-      apply: (s: LoveLetterGameState): Promise<ActionResult> => {
+      apply: (s: LoveLetterGameState): ActionResult => {
         const me = s.getPlayer(playerId);
         const hand = me.hand;
         if (playedCard === hand.card) {
@@ -267,10 +274,11 @@ export class GamesController {
 
         const targetPlayer = playerIndex !== undefined ? s.players[playerIndex] : me;
         if (targetPlayer.id !== me.id && targetPlayer.hand.immune) {
-          return Promise.reject();
+          //Should be blocked on fe side.
+          throw new InvalidGameStateError('applying card to immune player');
         }
 
-        return Promise.resolve(action(me, targetPlayer, s));
+        return action(me, targetPlayer, s);
       },
     };
   }

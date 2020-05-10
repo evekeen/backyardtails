@@ -3,6 +3,7 @@ import {CardType} from './commonTypes';
 import {CardAction} from '../protocol';
 import {PLAYERS_NUMBER} from '../../../ui/src/model/commonTypes';
 import {ReadyPlayerController} from '../PlayerController';
+import {InvalidGameStateError} from "../error/InvalidGameStateError";
 
 export type GameId = string;
 export type PlayerId = string
@@ -92,7 +93,7 @@ interface GameState {
 export interface GameAction<State> {
   playerId: PlayerId
 
-  apply(gameState: State): Promise<ActionResult>;
+  apply(gameState: State): ActionResult;
 }
 
 
@@ -109,7 +110,7 @@ export interface Game<State> {
 
   init(): void;
 
-  applyAction(action: GameAction<State>): Promise<ActionResult>;
+  applyAction(action: GameAction<State>): ActionResult;
 }
 
 export class LoveLetterGameState {
@@ -241,15 +242,19 @@ export class LoveLetterGame implements Game<LoveLetterGameState> {
   constructor(private controllers: ReadyPlayerController[]) {
   }
 
-  applyAction(action: GameAction<LoveLetterGameState>): Promise<ActionResult> {
+  applyAction(action: GameAction<LoveLetterGameState>): ActionResult {
     if (action.playerId !== this.state.activeTurnPlayerId) {
-      return Promise.reject();
+      throw new InvalidGameStateError()
     }
-    return action.apply(this.state).then(res => {
+    try{
+      const actionResult =  action.apply(this.state);
       this.actions.push(action);
       this.state.nextTurn();
-      return res;
-    });
+      return actionResult;
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
   }
 
   hasPlayer(id: PlayerId): boolean {
