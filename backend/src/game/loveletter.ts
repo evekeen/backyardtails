@@ -81,19 +81,10 @@ class LoveLetterDeck implements Deck {
   }
 }
 
-
-interface GameState {
-  activePlayerIds: PlayerId[];
-  deadPlayerIds: PlayerId[];
-  activeTurnPlayerId: PlayerId | undefined;
-  discarded: CardType[];
-  deck: Deck;
-}
-
-export interface GameAction<State> {
+export interface LoveLetterGameAction {
   playerId: PlayerId
 
-  apply(gameState: State): ActionResult;
+  apply(gameState: LoveLetterGameState): ActionResult;
 }
 
 
@@ -103,14 +94,6 @@ export interface ActionResult {
   suicide?: boolean;
   opponentCard?: CardType;
   opponentIndex?: number;
-}
-
-export interface Game<State> {
-  state: State
-
-  init(): void;
-
-  applyAction(action: GameAction<State>): ActionResult;
 }
 
 export class LoveLetterGameState {
@@ -234,15 +217,15 @@ export class LoveLetterGameState {
   }
 }
 
-export class LoveLetterGame implements Game<LoveLetterGameState> {
+export class LoveLetterGame {
   public state = new LoveLetterGameState(this.controllers);
-  private actions: GameAction<LoveLetterGameState>[] = [];
+  private actions: LoveLetterGameAction[] = [];
   private firstPlayerIdx = -1;
 
   constructor(private controllers: ReadyPlayerController[]) {
   }
 
-  applyAction(action: GameAction<LoveLetterGameState>): ActionResult {
+  applyAction(action: LoveLetterGameAction): ActionResult {
     if (action.playerId !== this.state.activeTurnPlayerId) {
       throw new InvalidGameStateError()
     }

@@ -9,7 +9,7 @@ import * as Either from 'fp-ts/lib/Either';
 import {fold} from 'fp-ts/lib/Either';
 import {pipe} from 'fp-ts/lib/pipeable';
 import {PlayerControllerImpl} from './PlayerController';
-import {GamesController} from './game/GameController';
+import {GamesController} from './game/GamesController';
 
 const app = express();
 

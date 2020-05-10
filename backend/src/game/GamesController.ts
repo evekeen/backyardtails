@@ -1,4 +1,4 @@
-import {ActionResult, GameAction, GameId, LoveLetterGame, LoveLetterGameState, Player, PlayerId} from './loveletter';
+import {ActionResult, LoveLetterGameAction, GameId, LoveLetterGame, LoveLetterGameState, Player, PlayerId} from './loveletter';
 import {InGamePlayerController, InGamePlayerControllerInfo, PlayerController, ReadyPlayerController,} from '../PlayerController';
 import {
   CardAction,
@@ -122,42 +122,6 @@ export class GamesController {
     }
   }
 
-  private addToPending(controller: InGamePlayerController) {
-    const {gameId, userId, name} = controller.getInfo();
-    const joinedAs = name ? name : 'spectator';
-    const pending = this.pendingGames.get(gameId) || [];
-    const index = pending.findIndex(p => p.getInfo().userId === userId);
-    if (index === -1) {
-      pending.push(controller);
-    }
-    this.pendingGames.set(gameId, pending);
-    console.log(`User ${userId} has joined ${gameId} as ${joinedAs}`);
-    this.sendJoined(controller, pending);
-  }
-
-  private tryJoinExistingGame(game: LoveLetterGame, userId: string, controller: ReadyPlayerController) {
-    if (game.hasPlayer(userId)) {
-      this.joinActiveGame(game, controller);
-    } else {
-      console.log('game is already started without you');
-      controller.setInfo({userId}); // Clear gameId and name
-      controller.dispatch(MO_MORE_SEATS);
-    }
-  }
-
-  private joinActiveGame(game: LoveLetterGame, controller: ReadyPlayerController) {
-    const {userId} = controller.getInfo();
-    console.log(`Joining user ${userId} back`);
-    const player = game.state.players.find(p => p.id === userId);
-    if (!player) {
-      console.log(`Could not find player ${userId} to re-join`);
-      return;
-    }
-    player.controller = controller;
-    this.sendJoined(controller, game.state.players.map(p => p.controller));
-    GamesController.initGameForPlayer(controller, game);
-  }
-
   subscribe(c: PlayerController, userId: PlayerId) {
     c.removeAllListeners('cardAction');
     c.setInfo({...c.getInfo(), userId});
@@ -221,6 +185,42 @@ export class GamesController {
     });
   }
 
+  private addToPending(controller: InGamePlayerController) {
+    const {gameId, userId, name} = controller.getInfo();
+    const joinedAs = name ? name : 'spectator';
+    const pending = this.pendingGames.get(gameId) || [];
+    const index = pending.findIndex(p => p.getInfo().userId === userId);
+    if (index === -1) {
+      pending.push(controller);
+    }
+    this.pendingGames.set(gameId, pending);
+    console.log(`User ${userId} has joined ${gameId} as ${joinedAs}`);
+    this.sendJoined(controller, pending);
+  }
+
+  private tryJoinExistingGame(game: LoveLetterGame, userId: string, controller: ReadyPlayerController) {
+    if (game.hasPlayer(userId)) {
+      this.joinActiveGame(game, controller);
+    } else {
+      console.log('game is already started without you');
+      controller.setInfo({userId}); // Clear gameId and name
+      controller.dispatch(MO_MORE_SEATS);
+    }
+  }
+
+  private joinActiveGame(game: LoveLetterGame, controller: ReadyPlayerController) {
+    const {userId} = controller.getInfo();
+    console.log(`Joining user ${userId} back`);
+    const player = game.state.players.find(p => p.id === userId);
+    if (!player) {
+      console.log(`Could not find player ${userId} to re-join`);
+      return;
+    }
+    player.controller = controller;
+    this.sendJoined(controller, game.state.players.map(p => p.controller));
+    GamesController.initGameForPlayer(controller, game);
+  }
+
   private sendJoined(controller: InGamePlayerController, controllers: InGamePlayerController[]) {
     controllers.filter(c => c.getInfo().userId !== controller.getInfo().userId).forEach(c => c.dispatch(createJoinedMessage(controller)));
     controllers.forEach(c => controller.dispatch(createJoinedMessage(c)));
@@ -254,13 +254,13 @@ export class GamesController {
     controller.dispatch(message);
   }
 
-  private createAction(game: LoveLetterGame, player: PlayerId, action: CardAction): GameAction<LoveLetterGameState> {
+  private createAction(game: LoveLetterGame, player: PlayerId, action: CardAction): LoveLetterGameAction {
     const gameAction = game.getActionForCard(action);
     return this.action(action, player, gameAction);
   }
 
   private action(cardAction: CardAction, playerId: PlayerId,
-    action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): GameAction<LoveLetterGameState> {
+    action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): LoveLetterGameAction {
     const playerIndex = cardAction.payload.playerIndex;
     const playedCard = cardAction.payload.card;
     return {
@@ -295,17 +295,6 @@ export class GamesController {
     }
     game.state.start(winnerController as ReadyPlayerController);
     game.state.players.forEach(c => GamesController.initGameForPlayer(c.controller, game));
-  }
-
-  private static initGameForPlayer(controller: ReadyPlayerController, game: LoveLetterGame) {
-    const {userId} = controller.getInfo();
-    controller.dispatch(createSetTableMessage(userId, game.state));
-    controller.dispatch(createLoadCardMessage(game.state.getPlayer(userId)));
-    const activePlayer = game.state.getActivePlayer();
-    if (activePlayer.id === userId) {
-      controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
-    }
-    controller.dispatch(createTextMessage(`It's ${activePlayer.name}'s turn`, 'info'));
   }
 }
 
