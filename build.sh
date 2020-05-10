@@ -7,4 +7,3 @@ pushd ui
 #npm ci
 npm run build
 popd
-docker build -t love-letter docker
