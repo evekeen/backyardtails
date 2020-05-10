@@ -88,20 +88,24 @@ wss.on('connection', (ws: WebSocket, request: any) => {
 
   // Wait for hello message.
   ws.on('message', (m: string) => {
-    const parsedMessage = Either.parseJSON(m, reason => {
-      ws.send(error(ErrorCode.INVALID_MESSAGE, 'Invalid JSON received: ' + reason));
-    });
+    try {
+      const parsedMessage = Either.parseJSON(m, reason => {
+        ws.send(error(ErrorCode.INVALID_MESSAGE, 'Invalid JSON received: ' + reason));
+      });
 
-    pipe(parsedMessage, Either.map(message => {
-      const typedMessage = Message.decode(message);
+      pipe(parsedMessage, Either.map(message => {
+        const typedMessage = Message.decode(message);
 
-      // websocketReporter(ws).report(typedMessage)
-      pipe(typedMessage, fold(_ => ThrowReporter.report(typedMessage), m => {
-        console.log('received: %s', JSON.stringify(m));
-        const type = m.type;
-        controller.onMessage(type, message);
+        // websocketReporter(ws).report(typedMessage)
+        pipe(typedMessage, fold(_ => ThrowReporter.report(typedMessage), m => {
+          console.log('received: %s', JSON.stringify(m));
+          const type = m.type;
+          controller.onMessage(type, message);
+        }));
       }));
-    }));
+    } catch (err) {
+      console.log(err);
+    }
   });
 
   controller.on('stateReady', state => {
