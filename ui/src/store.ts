@@ -10,7 +10,7 @@ import thunk from 'redux-thunk';
 import urlController from './middleware/urlController';
 
 const prod = process.env.NODE_ENV === 'production';
-const wsUrl = prod ? 'wss://ll.ivkin.dev:433/ws' : 'ws://localhost:8081';
+const wsUrl = prod ? 'wss://ll.ivkin.dev/ws' : 'ws://localhost:8081';
 
 const wsClient = new WsClient(wsUrl);
 
