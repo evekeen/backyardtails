@@ -43,8 +43,8 @@
   },
   "scripts": {
     "start": "node ../docker/backend/server.js",
-    "build": "webpack --mode development",
-    "build-prod": "webpack",
+    "build-dev": "webpack --mode development",
+    "build": "webpack",
     "watch": "webpack --watch"
   },
   "author": "",

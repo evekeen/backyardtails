@@ -13,7 +13,10 @@ npm ci
 npm run build
 ```
 ### Run
-Open in a browser: `./dist/index.html`
+Open in a browser: 
+```
+open ../docker/ui/index.html
+```
 
 ### Build & run
 ```
