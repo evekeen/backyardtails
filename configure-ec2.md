@@ -10,7 +10,7 @@ logout and log-in back
 Test WS connection from your computer
 ```
 npm i -g wscat
-wscat --connect wss://ll.ivkin.dev:443
+wscat --connect wss://ll.ivkin.dev/ws
 ```
 
 Docker tips
