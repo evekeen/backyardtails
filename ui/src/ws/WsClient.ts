@@ -1,5 +1,5 @@
 import {Dispatch, Store} from 'redux';
-import {ActionRouter} from './actionRouter';
+import {ActionRouter} from './ActionRouter';
 
 const CONNECT_TIMEOUT = 60000;
 

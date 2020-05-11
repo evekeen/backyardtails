@@ -30,7 +30,7 @@ jobs:
     - name: Clean install dependencies and build
       run: |
         npm ci
-        npm run build-zip
+        npm run build-prod
 
 #    - uses: einaregilsson/beanstalk-deploy@v9
 #      with:

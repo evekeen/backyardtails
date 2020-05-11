@@ -45,7 +45,6 @@
     "start": "node ../docker/backend/server.js",
     "build": "webpack --mode development",
     "build-prod": "webpack",
-    "build-zip": "webpack;./build.sh",
     "watch": "webpack --watch"
   },
   "author": "",

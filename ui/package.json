@@ -4,7 +4,7 @@
   "description": "Love letter board game",
   "private": true,
   "scripts": {
-    "build": "webpack",
+    "build-prod": "webpack",
     "watch": "webpack-dev-server --open --mode development",
     "watch-prod": "webpack-dev-server --open --mode production",
     "storybook": "start-storybook -s ./src -p 9009",
