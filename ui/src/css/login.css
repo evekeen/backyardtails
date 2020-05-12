@@ -26,6 +26,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .start-page-element {
@@ -64,7 +65,8 @@
 
 .game-link {
   margin-left: 50px;
-  width: 700px;
+  min-width: 400px;
+  max-width: 700px;
   font-weight: 300;
   font-size: 18px;
   line-height: 70px;
