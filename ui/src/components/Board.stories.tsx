@@ -7,6 +7,7 @@ import {Player} from '../model/Player';
 import {PlayerHand} from './PlayerHand';
 import {CardType} from '../model/commonTypes';
 import {StatusPanel} from './StatusPanel';
+import {StatusMessage} from '../reducers/status';
 
 const players: Player[] = [
   {
@@ -39,11 +40,16 @@ const players: Player[] = [
   }
 ];
 
+const messages: StatusMessage[] = [
+  {type: "info", text: "It's Поручик Ржевский's turn"},
+  {type: "death", text: "Наташа Ростова has stabbed her veines"}
+];
+
 storiesOf('Board', module)
   .add('Your turn', () => {
     return (
       <div className="game-container">
-        <StatusPanel log={[{type: "info", text: "It's Поручик Ржевский's turn"}]}/>
+        <StatusPanel log={messages}/>
         <Board discardPileTop={2} deckLeft={2} selectPlayer={() => undefined} currentPlayerIndex={0} currentPlayerInTurn={true}
                players={players} selectedPlayerIndex={undefined} turnIndex={0}/>
         <PlayerHand hasAvailablePlayers={true} player={players[0]} cards={[CardType.King, CardType.Baron]} active={true}
