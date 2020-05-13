@@ -21,10 +21,19 @@ import {InvalidGameStateError} from "../error/InvalidGameStateError";
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
+// This is a singleton. If someone is not sure.
 export class GamesController {
   private playerControllers = new Map<PlayerId, PlayerController>();
   private pendingGames = new Map<GameId, InGamePlayerController[]>();
   private games = new Map<GameId, LoveLetterGame>();
+  private constructor(){}
+
+  public static instance(): GamesController{
+    if (!this.instance){
+      this.instance = new GamesController();
+    }
+    return this.instance;
+  }
 
   onCreateGame(controller: PlayerController, gameId: GameId, userId: PlayerId): void {
     if (this.games.has(gameId) || this.pendingGames.has(gameId)) {
@@ -72,7 +81,7 @@ export class GamesController {
         this.games.set(gameId, game);
         console.log(`Created game ${gameId} with players ${newReady}`);
         game.init();
-        newReady.forEach(c => GamesController.initGameForPlayer(c, game));
+        newReady.forEach(c => initGameForPlayer(c, game));
       }
     }
   }
@@ -127,6 +136,7 @@ export class GamesController {
     c.setInfo({...c.getInfo(), userId});
     this.playerControllers.set(userId, c);
 
+    // should be in game controller
     c.on('cardAction', (action: CardAction) => {
       const {gameId} = c.getInfo();
       if (!gameId) {
@@ -142,7 +152,7 @@ export class GamesController {
         controller.dispatch(createGameNotFoundMessage(gameId));
         return;
       }
-      const gameAction = this.createAction(game, userId, action);
+      const gameAction = createAction(game, userId, action);
       let actionResult: ActionResult;
       try{
         actionResult = game.applyAction(gameAction);
@@ -218,7 +228,7 @@ export class GamesController {
     }
     player.controller = controller;
     this.sendJoined(controller, game.state.players.map(p => p.controller));
-    GamesController.initGameForPlayer(controller, game);
+    initGameForPlayer(controller, game);
   }
 
   private sendJoined(controller: InGamePlayerController, controllers: InGamePlayerController[]) {
@@ -254,35 +264,6 @@ export class GamesController {
     controller.dispatch(message);
   }
 
-  private createAction(game: LoveLetterGame, player: PlayerId, action: CardAction): LoveLetterGameAction {
-    const gameAction = game.getActionForCard(action);
-    return this.action(action, player, gameAction);
-  }
-
-  private action(cardAction: CardAction, playerId: PlayerId,
-    action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): LoveLetterGameAction {
-    const playerIndex = cardAction.payload.playerIndex;
-    const playedCard = cardAction.payload.card;
-    return {
-      playerId: playerId,
-      apply: (s: LoveLetterGameState): ActionResult => {
-        const me = s.getPlayer(playerId);
-        const hand = me.hand;
-        if (playedCard === hand.card) {
-          hand.card = hand.pendingCard;
-        }
-
-        const targetPlayer = playerIndex !== undefined ? s.players[playerIndex] : me;
-        if (targetPlayer.id !== me.id && targetPlayer.hand.immune) {
-          //Should be blocked on fe side.
-          throw new InvalidGameStateError('applying card to immune player');
-        }
-
-        return action(me, targetPlayer, s);
-      },
-    };
-  }
-
   private onRoundEnd(gameId: GameId, game: LoveLetterGame) {
     const winnerController = this.playerControllers.get(game.state.winnerId!!)!!;
     const winnerName = winnerController.getInfo().name!!;
@@ -294,8 +275,50 @@ export class GamesController {
       return;
     }
     game.state.start(winnerController as ReadyPlayerController);
-    game.state.players.forEach(c => GamesController.initGameForPlayer(c.controller, game));
+    game.state.players.forEach(c => initGameForPlayer(c.controller, game));
   }
+}
+
+// Those things \/ Should be in a separate class responsible for the game. Probably LoveLetterGame
+
+function createAction(game: LoveLetterGame, player: PlayerId, action: CardAction): LoveLetterGameAction {
+  const gameAction = game.getActionForCard(action);
+  return actionFunc(action, player, gameAction);
+}
+
+function actionFunc(cardAction: CardAction, playerId: PlayerId,
+  action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): LoveLetterGameAction {
+  const playerIndex = cardAction.payload.playerIndex;
+  const playedCard = cardAction.payload.card;
+  return {
+    playerId: playerId,
+    apply: (s: LoveLetterGameState): ActionResult => {
+      const me = s.getPlayer(playerId);
+      const hand = me.hand;
+      if (playedCard === hand.card) {
+        hand.card = hand.pendingCard;
+      }
+
+      const targetPlayer = playerIndex !== undefined ? s.players[playerIndex] : me;
+      if (targetPlayer.id !== me.id && targetPlayer.hand.immune) {
+        //Should be blocked on fe side.
+        throw new InvalidGameStateError('applying card to immune player');
+      }
+
+      return action(me, targetPlayer, s);
+    },
+  };
+}
+
+function initGameForPlayer(controller: ReadyPlayerController, game: LoveLetterGame) {
+  const {userId} = controller.getInfo();
+  controller.dispatch(createSetTableMessage(userId, game.state));
+  controller.dispatch(createLoadCardMessage(game.state.getPlayer(userId)));
+  const activePlayer = game.state.getActivePlayer();
+  if (activePlayer.id === userId) {
+    controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
+  }
+  controller.dispatch(createTextMessage(`It's ${activePlayer.name}'s turn`, 'info'));
 }
 
 function getReady(controllers: PlayerController[]): ReadyPlayerController[] {

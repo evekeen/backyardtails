@@ -3,7 +3,7 @@ import * as http from 'http';
 import * as WebSocket from 'ws';
 import {AddressInfo} from 'net';
 import * as session from 'express-session';
-import {CreateGameMessage, error, ErrorCode, ForceGame, InitSession, JoinMessage, Message} from './protocol';
+import {error, ErrorCode, Message} from './protocol';
 import {ThrowReporter} from 'io-ts/lib/ThrowReporter';
 import * as Either from 'fp-ts/lib/Either';
 import {fold} from 'fp-ts/lib/Either';
@@ -23,7 +23,7 @@ app.use(sessionParser);
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({noServer: true});
-const gamesController = new GamesController();
+const gamesController = GamesController.instance();
 
 function generateUserId(): string {
   return 'u-' + Math.ceil(Math.random() * 100);
@@ -45,7 +45,7 @@ function authenticate(req: any, callback: (userId: string) => any) {
 wss.on('connection', (ws: WebSocket, request: any) => {
   console.log('connection');
   // authenticate(request, sessionUserId => {
-  const controller = new PlayerControllerImpl();
+  const controller = new PlayerControllerImpl(ws);
 
   const scheduleKa = (ws: WebSocket) => setTimeout(() => {
     controller.kaTimer = scheduleKa(ws);
@@ -53,38 +53,6 @@ wss.on('connection', (ws: WebSocket, request: any) => {
   }, KA_INTERVAL);
 
   scheduleKa(ws);
-
-  controller.on('connection/initSession', msg => {
-    pipe(InitSession.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
-      request => {
-        console.log(`Init session for ${request.payload}`);
-        gamesController.subscribe(controller, request.payload);
-      }));
-  });
-
-  controller.on('connection/createGame', msg => {
-    pipe(CreateGameMessage.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
-      request => {
-        const {gameId, userId} = request.payload;
-        console.log(`Creating a game ${gameId} by user ${userId}...`);
-        gamesController.onCreateGame(controller, gameId, userId);
-      }));
-  });
-
-  controller.on('connection/join', msg => {
-    pipe(JoinMessage.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
-      request => {
-        console.log(`Joining user ${request.payload.userId} to a game...`);
-        gamesController.onJoin(controller, request.payload);
-      }));
-  });
-
-  controller.on('connection/forceGame', msg => {
-    pipe(ForceGame.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
-      request => {
-        gamesController.forceGame(controller, request.payload);
-      }));
-  });
 
   // Wait for hello message.
   ws.on('message', (m: string) => {
@@ -102,12 +70,6 @@ wss.on('connection', (ws: WebSocket, request: any) => {
         controller.onMessage(type, message);
       }));
     }));
-  });
-
-  controller.on('stateReady', state => {
-    const userId = state.payload?.userId ? ` about ${state.payload.userId}` : '';
-    console.log(`Sending ${state.type}${userId} to ${controller.userId}`);
-    ws.send(JSON.stringify(state));
   });
 
   ws.on('error', (error) => console.log('Error: ' + error));
