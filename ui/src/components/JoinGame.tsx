@@ -41,7 +41,7 @@ export const JoinGameComponent = (props: JoinGameProps) => {
           <Button variant="link" onClick={props.resetGame}>
             Back
           </Button>
-          <button disabled={disabledButton} className="start-page-element start-page-button" onClick={() => join(name)}>Join game</button>
+          <button disabled={disabledButton} className="start-page-element start-page-button join-button" onClick={() => join(name)}>Join game</button>
         </div>
       </div>
     </div>
