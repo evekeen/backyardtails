@@ -33,7 +33,7 @@ export const cardCounts = {
   [CardType.Priest]: 2,
   [CardType.Baron]: 2,
   [CardType.Handmaid]: 2,
-  [CardType.Prince]: 5,
+  [CardType.Prince]: 2,
   [CardType.King]: 1,
   [CardType.Countess]: 1,
   [CardType.Princess]: 1

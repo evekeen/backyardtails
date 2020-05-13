@@ -1,0 +1,44 @@
+.status-messages {
+  right: 0;
+  padding: 5px;
+  margin-bottom: 5px;
+  border: 1px #b8daff;
+  background: linear-gradient(171.1deg, #EEF1F5 4.98%, #E6E9EF 94.88%);
+  box-shadow: inset 2px 2px 5px rgba(166, 180, 200, 0.75), inset -2px -2px 5px rgba(255, 255, 255, 0.75);
+  border-radius: 5px;
+  line-height: 12px;
+  font-size: 12px;
+  min-width: 300px;
+  max-width: 375px;
+  text-align: right;
+}
+
+@media only screen and (min-width: 768px) {
+  .status-messages {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    margin: 10px;
+    padding: 10px;
+    box-shadow: inset 5px 5px 10px rgba(166, 180, 200, 0.75), inset -5px -5px 15px rgba(255, 255, 255, 0.75);
+    border-radius: 10px;
+    font-size: 16px;
+    line-height: 28px;
+    max-width: 600px;
+    width: unset;
+  }
+}
+
+.status-messages > p {
+  margin: 0;
+}
+
+.status-victory {
+  font-weight: bold;
+}
+
+.status-death {
+  font-style: italic;
+  color: #bc5952;
+}

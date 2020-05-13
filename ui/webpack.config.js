@@ -23,6 +23,8 @@ module.exports = {
       './src/index.tsx',
       './src/css/main.css',
       './src/css/login.css',
+      './src/css/rules.css',
+      './src/css/status-messages.css',
       './node_modules/bootstrap/dist/css/bootstrap.min.css',
       './src/img/guard.png',
       './src/img/priest.png',
