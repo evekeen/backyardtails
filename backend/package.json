@@ -42,10 +42,9 @@
     "typescript": "3.8.3"
   },
   "scripts": {
-    "start": "node ./dist/server.js",
-    "build": "webpack --mode development",
-    "build-prod": "webpack",
-    "build-zip": "webpack;./build.sh",
+    "start": "node ../docker/backend/server.js",
+    "build-dev": "webpack --mode development",
+    "build": "webpack",
     "watch": "webpack --watch"
   },
   "author": "",

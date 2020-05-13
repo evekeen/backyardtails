@@ -2,17 +2,30 @@
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  justify-content: center;
-  max-width: 1100px;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
   text-align: center;
-  margin: 150px auto;
+  margin: 50px auto;
 }
 
 .create-game-text {
-  font-size: 42px;
+  font-size: 24px;
   font-weight: 300;
-  line-height: 120%;
   color: rgba(62, 62, 62, 0.9);
+}
+
+@media only screen and (min-width: 768px) {
+  .login-wrapper.create-game {
+    max-width: 1100px;
+    margin: 150px auto;
+    align-items: flex-start;
+  }
+
+  .create-game-text {
+    font-size: 42px;
+    line-height: 120%;
+  }
 }
 
 .pending-users {
@@ -24,13 +37,19 @@
 
 .link-wrapper {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
+@media only screen and (min-width: 768px) {
+  .link-wrapper {
+    flex-direction: row;
+  }
+}
+
 .start-page-element {
   height: 70px;
-  margin-top: 50px;
   background: linear-gradient(173.93deg, #eef1f5 4.98%, #e6e9ef 94.88%);
   box-shadow: inset 5px 5px 10px rgba(166, 180, 200, 0.75), inset -5px -5px 15px rgba(255, 255, 255, 0.75);
   border-radius: 40px;
@@ -63,8 +82,9 @@
 }
 
 .game-link {
-  margin-left: 50px;
-  width: 700px;
+  margin: 50px 10px;
+  width: 350px;
+  padding: 0 20px;
   font-weight: 300;
   font-size: 18px;
   line-height: 70px;
@@ -72,6 +92,21 @@
   color: rgba(62, 62, 62, 0.9);
   cursor: pointer;
   overflow: hidden;
+}
+
+@media only screen and (min-width: 768px) {
+  .game-link {
+    margin-left: 50px;
+    min-width: 400px;
+    max-width: 700px;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 70px;
+    text-decoration: none;
+    color: rgba(62, 62, 62, 0.9);
+    cursor: pointer;
+    overflow: hidden;
+  }
 }
 
 .game-link.disabled {
@@ -85,14 +120,13 @@
   align-items: center;
 }
 
-.input-name {
-  width: 600px;
+.input-name input {
+  width: 350px;
+  padding: 0 40px;
   background: linear-gradient(171.1deg, #EEF1F5 4.98%, #E6E9EF 94.88%);
   box-shadow: inset 5px 5px 10px rgba(166, 180, 200, 0.75), inset -5px -5px 15px rgba(255, 255, 255, 0.75);
   border-radius: 40px;
-}
 
-.input-name input {
   font-weight: lighter;
   font-size: 28px;
   line-height: 70px;
@@ -103,13 +137,29 @@
   outline: none;
 }
 
+@media only screen and (min-width: 768px) {
+  .input-name input {
+    width: 600px;
+  }
+}
+
 .clipboard-message {
   width: 100px;
-  margin-top: 50px;
   color: #bc5952;
+  margin-bottom: 30px;
+}
+
+@media only screen and (min-width: 768px) {
+  .clipboard-message {
+    margin: 0;
+  }
 }
 
 .login-wrapper img {
+  margin-top: 50px;
+}
+
+.join-button {
   margin-top: 50px;
 }
 

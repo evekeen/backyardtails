@@ -8,12 +8,6 @@ It's the board game
 cd ui
 npm ci
 ```
-### Build
-```
-npm run build
-```
-### Run
-Open in a browser: `./dist/index.html`
 
 ### Build & run
 ```

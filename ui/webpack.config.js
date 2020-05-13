@@ -1,3 +1,4 @@
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
@@ -22,6 +23,8 @@ module.exports = {
       './src/index.tsx',
       './src/css/main.css',
       './src/css/login.css',
+      './src/css/rules.css',
+      './src/css/status-messages.css',
       './node_modules/bootstrap/dist/css/bootstrap.min.css',
       './src/img/guard.png',
       './src/img/priest.png',
@@ -37,6 +40,10 @@ module.exports = {
       './src/img/jigsaw.svg',
       './src/img/winner.svg',
     ]
+  },
+
+  output: {
+    path: path.resolve(__dirname, '../docker/ui'),
   },
 
   module: {

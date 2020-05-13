@@ -29,7 +29,7 @@ const CreateGameComponent = (props: CreateGameProps) => {
   }
 
   return (
-    <div className="login-wrapper">
+    <div className="login-wrapper create-game">
       <p className="create-game-text">Create a new game and invite your friends via link</p>
       <div className="link-wrapper">
         <button className="start-page-element start-page-button" onClick={() => createGame(uuid4())}>Create game</button>

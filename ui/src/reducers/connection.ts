@@ -211,7 +211,7 @@ const connectionSlice = createSlice({
 });
 
 const prod = process.env.NODE_ENV === 'production';
-const baseUrl = prod ? 'http://llfront.s3-website-us-east-1.amazonaws.com' : 'http://localhost:8080';
+const baseUrl = prod ? 'https://ll.ivkin.dev' : 'http://localhost:8080';
 
 export const gameUrl = (gameId?: string, userId?: string) => {
   if (!gameId) return baseUrl;

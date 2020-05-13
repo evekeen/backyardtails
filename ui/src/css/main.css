@@ -6,23 +6,43 @@
 .game-container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: normal;
   height: 100%;
   max-height: 1000px;
-  padding: 1vh;
+  padding: 0 3px;
   margin: 0 auto;
   font-family: 'Roboto', sans-serif;
 }
 
+@media only screen and (min-width: 768px) {
+  .game-container {
+    justify-content: space-between;
+    padding: 10px;
+  }
+}
+
 .middle-row_wrapper {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+@media only screen and (min-width: 768px) {
+  .middle-row_wrapper {
+    justify-content: space-around;
+  }
 }
 
 .top-row_wrapper, .main-wrapper {
   display: flex;
   justify-content: center;
   margin: 0 auto;
+}
+
+@media only screen and (min-width: 768px) {
+  .top-row_wrapper, .middle-row_wrapper {
+    margin-bottom: 30px;
+  }
 }
 
 .player-wrapper {
@@ -63,22 +83,31 @@
 }
 
 .player-wrapper h3 {
-  font-weight: 300;
+  font-size: 12px;
+  font-weight: 100;
   text-transform: uppercase;
   text-align: center;
 }
 
+@media only screen and (min-width: 768px) {
+  .player-wrapper h3 {
+    font-size: 24px;
+    font-weight: 300;
+  }
+}
+
 .player-wrapper h3 .your-name {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: lighter;
   vertical-align: middle;
 }
 
 .ll-card__box {
   background: #fff8f8;
-  box-shadow: 17px 17px 43px rgba(196, 191, 191, 0.9), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(196, 191, 191, 0.2), -17px 17px 34px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+  box-shadow: 2px 2px 5px rgba(196, 191, 191, 0.9), -2px -2px 5px rgba(255, 255, 255, 0.9), 2px -2px 5px rgba(196, 191, 191, 0.2), -2px 2px 5px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
   border-radius: 10px;
-  width: 166px;
+  width: 84px;
+  height: 112px;
 }
 
 .player-active .ll-card__box:not(.ll-card-selected) {
@@ -103,30 +132,35 @@
   border: 2px solid #c7c299;
   box-sizing: border-box;
   border-radius: 10px;
-  width: 148px;
-  height: 209px;
-  margin: 8px;
+  width: 76px;
+  height: 104px;
+  margin: 4px;
 }
 
 .description-box {
   position: absolute;
-  bottom: 6px;
-  left: 9px;
-  width: 146px;
+  bottom: 4px;
+  left: 4px;
+  width: 76px;
   border-radius: 10px;
   background: #fff8f8;
   opacity: 0.8;
-  padding: 0 5px 0 5px;
+  padding: 0 2px 0 2px;
 }
 
 .description-box {
-  font-size: 10px;
+  font-size: 6px;
   line-height: 100%;
   text-align: center;
 }
 
 .description-box > h4 {
-  font-size: 1rem;
+  font-size: 0.6rem;
+  margin: 2px 0;
+}
+
+.description-box > p {
+  margin-bottom: 4px;
 }
 
 .ll-card-selected {
@@ -135,54 +169,58 @@
 }
 
 .decks {
+  position: relative;
   display: flex;
   justify-content: space-between;
   margin-top: 40px;
 }
 
 .played_cards {
-  margin-right: 30px;
+  position: absolute;
+  z-index: 100;
+  margin-left: -10px;
 }
 
 .unplayed_cards {
-  margin-right: 30px;
+  margin-right: 5px;
 }
 
+@media only screen and (min-width: 768px) {
+  .played_cards {
+    position: static;
+    margin-right: 30px;
+  }
 
-.rules {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  width: 400px;
-  background-color: #fff8f8;
-  box-shadow: 17px 17px 43px rgba(196, 191, 191, 0.9), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(196, 191, 191, 0.2), -17px 17px 34px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  text-align: justify;
+  .unplayed_cards {
+    margin-right: 30px;
+  }
 }
 
-.rules h4 {
-  margin: 0;
-  padding: 10px;
-  text-align: center;
-  text-transform: uppercase;
-}
+@media only screen and (min-width: 768px) {
+  .ll-card__cover img {
+    width: 148px;
+    height: 209px;
+    margin: 8px;
+  }
 
-.rules ol {
-  padding: 20px 30px 20px 30px;
-  font-weight: 300;
-  font-size: 14px;
-  max-width: 640px;
-  line-height: 150%;
-}
+  .ll-card__box {
+    box-shadow: 17px 17px 43px rgba(196, 191, 191, 0.9), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(196, 191, 191, 0.2), -17px 17px 34px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+    width: 166px;
+    height: 226px;
+  }
 
-.rules .card-header {
-  margin: 0;
-  padding: 0;
-  cursor: pointer;
-}
+  .description-box {
+    display: block;
+    bottom: 6px;
+    left: 9px;
+    width: 146px;
+    font-size: 10px;
+    padding: 0 5px 0 5px;
+  }
 
-ol li span {
-  font-weight: 500;
+  .description-box > h4 {
+    font-size: 1rem;
+  }
 }
 
 .main-wrapper {
@@ -199,39 +237,69 @@ ol li span {
 }
 
 .main-player__cards .ll-card {
-  margin-right: 30px;
+  margin-right: 10px;
+}
+
+@media only screen and (min-width: 768px) {
+  .main-player__cards .ll-card {
+    margin-right: 30px;
+  }
 }
 
 .markers {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-left: 40px;
+  margin-left: 5px;
 }
 
 .main-player .markers {
-  margin-left: 30px;
+  margin-left: 5px;
 }
 
 .markers svg {
   color: #aab78f;
-  height: 50px;
-  width: 40px;
+  height: 25px;
+  width: 20px;
 }
 
 .score {
   margin: 0;
   padding: 0;
+  line-height: 13px;
 }
 
 .score li {
   list-style: none;
-  margin-top: 4px;
 }
 
 .score li img {
-  height: 30px;
+  height: 13px;
   padding: 0;
+}
+
+@media only screen and (min-width: 768px) {
+  .markers {
+    margin-left: 40px;
+  }
+
+  .main-player .markers {
+    margin-left: 30px;
+  }
+
+  .markers svg {
+    height: 50px;
+    width: 40px;
+  }
+
+  .score li {
+    line-height: 24px;
+    margin-top: 4px;
+  }
+
+  .score li img {
+    height: 30px;
+  }
 }
 
 .move-description {
@@ -251,42 +319,6 @@ ol li span {
   position: absolute;
   left: 20px;
   top: 20px;
-}
-
-@media screen and (max-width: 1440px) {
-  .top-row_wrapper, .middle-row_wrapper {
-    margin-bottom: 30px;
-  }
-}
-
-.status-messages {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 100;
-  margin: 10px;
-  padding: 10px;
-  border: 1px #b8daff;
-  background: #fff8f8;
-  box-shadow: 17px 17px 43px rgba(196, 191, 191, 0.9), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(196, 191, 191, 0.2), -17px 17px 34px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  line-height: 28px;
-  min-width: 300px;
-  max-width: 600px;
-  text-align: right;
-}
-
-.status-messages > p {
-  margin: 0;
-}
-
-.status-victory {
-  font-weight: bold;
-}
-
-.status-death {
-  font-style: italic;
-  color: #bc5952;
 }
 
 .ll-feedback .modal-body > div {

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
+    "outDir": "../docker/ui",
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "commonjs",

@@ -7,7 +7,7 @@ const CARDS = [CardType.Guard, CardType.Priest, CardType.Baron, CardType.Handmai
 export const Rules = () => {
   return (
     <div className="rules">
-      <Accordion defaultActiveKey="0">
+      <Accordion>
         <Card>
           <Card.Header>
             <Accordion.Toggle as={Card.Header} eventKey="0">
@@ -32,7 +32,7 @@ interface CardRulesProps {
 const CardRules = (props: CardRulesProps) => {
   const count = cardCounts[props.card];
   return (
-    <li><span>{cardNameMapping[props.card]} {count} card{count > 1 ? 's' : ''}</span>
+    <li><b>{cardNameMapping[props.card]}</b> <span>({count} card{count > 1 ? 's' : ''})</span>
       &nbsp;{cardDescriptionMapping[props.card]}
     </li>
   );

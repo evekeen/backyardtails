@@ -7,7 +7,6 @@
     "build": "webpack",
     "watch": "webpack-dev-server --open --mode development",
     "watch-prod": "webpack-dev-server --open --mode production",
-    "copy": "cp package.json dist",
     "storybook": "start-storybook -s ./src -p 9009",
     "build-storybook": "build-storybook"
   },

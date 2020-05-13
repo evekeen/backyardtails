@@ -1,3 +1,4 @@
+const path = require('path');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
@@ -13,6 +14,10 @@ module.exports = {
 
   entry: {
     'server': ['./src/server.ts',]
+  },
+
+  output: {
+    path: path.resolve(__dirname, '../docker/backend'),
   },
 
   module: {

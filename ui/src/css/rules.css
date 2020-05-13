@@ -1,0 +1,53 @@
+.rules {
+  position: absolute;
+  z-index: 200;
+  left: 10px;
+  bottom: 0;
+  width: calc(100% - 20px);
+  box-shadow: 8px 8px 17px rgba(196, 191, 191, 0.9), -8px -8px 34px rgba(255, 255, 255, 0.9), 8px -8px 17px rgba(196, 191, 191, 0.2), -8px 8px 17px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  text-align: justify;
+}
+
+.rules h4 {
+  margin: 0;
+  padding: 10px;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.rules ol {
+  padding: 20px 30px 20px 30px;
+  font-weight: 100;
+  font-size: 12px;
+  max-width: 640px;
+  line-height: 150%;
+}
+
+.rules .card-header {
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.rules ol li span {
+  font-weight: 500;
+  color: #492513;
+}
+
+@media only screen and (min-width: 768px) {
+  .rules {
+    width: 400px;
+    box-shadow: 17px 17px 43px rgba(196, 191, 191, 0.9), -17px -17px 34px rgba(255, 255, 255, 0.9), 17px -17px 34px rgba(196, 191, 191, 0.2), -17px 17px 34px rgba(196, 191, 191, 0.2), inset -1px -1px 2px rgba(196, 191, 191, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+  }
+
+  .rules ol {
+    font-weight: 300;
+    font-size: 14px;
+  }
+
+  .rules h4 {
+    font-size: 20px;
+  }
+}
