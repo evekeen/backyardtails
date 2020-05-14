@@ -1,12 +1,20 @@
 import {EventEmitter} from 'events';
 import {CreateGameMessage, ForceGame, InitSession, JoinMessage, RemoteAction} from './protocol';
 import {GameId, PlayerId} from './game/loveletter';
+import * as WebSocket from 'ws';
 import _ = require('lodash');
 import {GamesController} from "./game/GamesController";
+import {pipe} from "fp-ts/lib/pipeable";
+import {fold} from "fp-ts/lib/Either";
 
 export class PlayerControllerImpl extends EventEmitter implements PlayerController {
   public kaTimer?: any = undefined;
-  constructor(ws: WebSocket, public userId?: string, public gameId?: string, public name?: string) {
+  constructor(
+    private readonly ws: WebSocket,
+    public userId?: string,
+    public gameId?: string,
+    public name?: string
+  ) {
     super();
 
     // All controller listeners should be configured in it's constructor!
@@ -14,9 +22,9 @@ export class PlayerControllerImpl extends EventEmitter implements PlayerControll
     // Player controller should be able to communicate with game or games controller.
     this.on('connection/initSession', msg => {
       pipe(InitSession.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
-        request => {
+        (request: { payload: any; }) => {
           console.log(`Init session for ${request.payload}`);
-          GamesController.instance().subscribe(controller, request.payload);
+          GamesController.instance().subscribe(this, request.payload);
         }));
     });
 
@@ -25,7 +33,7 @@ export class PlayerControllerImpl extends EventEmitter implements PlayerControll
         request => {
           const {gameId, userId} = request.payload;
           console.log(`Creating a game ${gameId} by user ${userId}...`);
-          GamesController.instance().onCreateGame(controller, gameId, userId);
+          GamesController.instance().onCreateGame(this, gameId, userId);
         }));
     });
 
@@ -33,20 +41,20 @@ export class PlayerControllerImpl extends EventEmitter implements PlayerControll
       pipe(JoinMessage.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
         request => {
           console.log(`Joining user ${request.payload.userId} to a game...`);
-          GamesController.instance().onJoin(controller, request.payload);
+          GamesController.instance().onJoin(this, request.payload);
         }));
     });
 
     this.on('connection/forceGame', msg => {
       pipe(ForceGame.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
         request => {
-          GamesController.instance().forceGame(controller, request.payload);
+          GamesController.instance().forceGame(this, request.payload);
         }));
     });
     
     this.on('stateReady', state => {
       const userId = state.payload?.userId ? ` about ${state.payload.userId}` : '';
-      console.log(`Sending ${state.type}${userId} to ${controller.userId}`);
+      console.log(`Sending ${state.type}${userId} to ${this.userId}`);
       this.ws.send(JSON.stringify(state));
     });
 

@@ -26,13 +26,14 @@ export class GamesController {
   private playerControllers = new Map<PlayerId, PlayerController>();
   private pendingGames = new Map<GameId, InGamePlayerController[]>();
   private games = new Map<GameId, LoveLetterGame>();
+  private static instanceObj: GamesController;
   private constructor(){}
 
   public static instance(): GamesController{
-    if (!this.instance){
-      this.instance = new GamesController();
+    if (!this.instanceObj){
+      this.instanceObj = new GamesController();
     }
-    return this.instance;
+    return this.instanceObj;
   }
 
   onCreateGame(controller: PlayerController, gameId: GameId, userId: PlayerId): void {
