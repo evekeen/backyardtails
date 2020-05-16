@@ -1,4 +1,4 @@
-import {ActionResult, LoveLetterGameAction, GameId, LoveLetterGame, LoveLetterGameState, Player, PlayerId} from './loveletter';
+import {ActionResult, GameId, LoveLetterGame, LoveLetterGameAction, LoveLetterGameState, Player, PlayerId} from './loveletter';
 import {InGamePlayerController, InGamePlayerControllerInfo, PlayerController, ReadyPlayerController,} from '../PlayerController';
 import {
   CardAction,
@@ -17,7 +17,7 @@ import {
 } from '../protocol';
 import {cardNameMapping} from './commonTypes';
 import {nextKilledText, nextSuicideText} from './Texts';
-import {InvalidGameStateError} from "../error/InvalidGameStateError";
+import {InvalidGameStateError} from '../error/InvalidGameStateError';
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
@@ -169,9 +169,10 @@ export class GamesController {
 
       const opponentName = action.payload.playerIndex !== undefined ? game.state.players[action.payload.playerIndex].name : undefined;
       const playerSuffix = opponentName ? ` on ${opponentName}` : '';
+      const guardGuess = action.payload.guess ? ` - guessed ${cardNameMapping[action.payload.guess]}` : ''
       const cardName = cardNameMapping[action.payload.card];
       const name = controller.getInfo().name;
-      this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}`, 'info'));
+      this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}${guardGuess}`, 'info'));
       if (actionResult.killed) {
         this.sendToTheGame(gameId, () => createTextMessage(`${opponentName} ${nextKilledText()}`, 'death'));
       } else if (actionResult.suicide) {
