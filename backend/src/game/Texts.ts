@@ -1,7 +1,8 @@
 const KILLED = [
   'has been brutally murdered',
-  'was found stubbed in a bathroom',
+  'was found stabbed in a bathroom',
   'was found dead in a dumpster',
+  'did not survive a bar fight',
 ]
 
 const SUICIDE = [

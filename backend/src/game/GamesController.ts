@@ -174,9 +174,11 @@ export class GamesController {
       const name = controller.getInfo().name;
       this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}${guardGuess}`, 'info'));
       if (actionResult.killed) {
-        this.sendToTheGame(gameId, () => createTextMessage(`${opponentName} ${nextKilledText()}`, 'death'));
+        const text = nextKilledText();
+        this.sendToTheGame(gameId, () => createTextMessage(`${opponentName} ${text}`, 'death'));
       } else if (actionResult.suicide) {
-        this.sendToTheGame(gameId, () => createTextMessage(`${name} ${nextSuicideText()}`, 'death'));
+        const text = nextSuicideText();
+        this.sendToTheGame(gameId, () => createTextMessage(`${name} ${text}`, 'death'));
       }
 
       if (game.state.winnerId) {
