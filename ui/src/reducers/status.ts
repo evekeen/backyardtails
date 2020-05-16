@@ -8,7 +8,7 @@ export interface StatusState {
 
 export interface StatusMessage {
   text: string;
-  type: 'info' | 'victory' | 'death' | 'error' | undefined;
+  type: 'info' | 'turn' | 'victory' | 'death' | 'error' | undefined;
 }
 
 const statusSlice = createSlice({
@@ -18,7 +18,9 @@ const statusSlice = createSlice({
   } as StatusState,
   reducers: {
     addMessage(state: StatusState, action: PayloadAction<StatusMessage>) {
-      state.log = _.takeRight(state.log.concat([action.payload]), 3);
+      const log = state.log.concat([action.payload]).reverse();
+      const filtered = _.uniqBy(log, m => m.type);
+      state.log = filtered.reverse();
     },
     reportRoundVictory(state: StatusState, action: PayloadAction<string>) {
       state.roundWinnerName = action.payload;

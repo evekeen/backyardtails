@@ -191,6 +191,7 @@ export class GamesController {
         }
       });
       this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
+      this.sendToTheGame(gameId, (player, game) => createNextTurnLogMessage(game));
 
       const player = game.state.getActivePlayer();
       this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
@@ -312,6 +313,10 @@ function actionFunc(cardAction: CardAction, playerId: PlayerId,
   };
 }
 
+function createNextTurnLogMessage(game: LoveLetterGame) {
+  return createTextMessage(`It's ${game.state.getActivePlayer().name}'s turn`, 'turn');
+}
+
 function initGameForPlayer(controller: ReadyPlayerController, game: LoveLetterGame) {
   const {userId} = controller.getInfo();
   controller.dispatch(createSetTableMessage(userId, game.state));
@@ -320,7 +325,7 @@ function initGameForPlayer(controller: ReadyPlayerController, game: LoveLetterGa
   if (activePlayer.id === userId) {
     controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
   }
-  controller.dispatch(createTextMessage(`It's ${activePlayer.name}'s turn`, 'info'));
+  controller.dispatch(createNextTurnLogMessage(game));
 }
 
 function getReady(controllers: PlayerController[]): ReadyPlayerController[] {
