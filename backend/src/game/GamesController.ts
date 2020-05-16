@@ -1,4 +1,4 @@
-import {ActionResult, GameAction, GameId, LoveLetterGame, LoveLetterGameState, Player, PlayerId} from './loveletter';
+import {ActionResult, LoveLetterGameAction, GameId, LoveLetterGame, LoveLetterGameState, Player, PlayerId} from './loveletter';
 import {InGamePlayerController, InGamePlayerControllerInfo, PlayerController, ReadyPlayerController,} from '../PlayerController';
 import {
   CardAction,
@@ -17,13 +17,24 @@ import {
 } from '../protocol';
 import {cardNameMapping} from './commonTypes';
 import {nextKilledText, nextSuicideText} from './Texts';
+import {InvalidGameStateError} from "../error/InvalidGameStateError";
 
 const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 
+// This is a singleton. If someone is not sure.
 export class GamesController {
   private playerControllers = new Map<PlayerId, PlayerController>();
   private pendingGames = new Map<GameId, InGamePlayerController[]>();
   private games = new Map<GameId, LoveLetterGame>();
+  private static instanceObj: GamesController;
+  private constructor(){}
+
+  public static instance(): GamesController{
+    if (!this.instanceObj){
+      this.instanceObj = new GamesController();
+    }
+    return this.instanceObj;
+  }
 
   onCreateGame(controller: PlayerController, gameId: GameId, userId: PlayerId): void {
     if (this.games.has(gameId) || this.pendingGames.has(gameId)) {
@@ -71,7 +82,7 @@ export class GamesController {
         this.games.set(gameId, game);
         console.log(`Created game ${gameId} with players ${newReady}`);
         game.init();
-        newReady.forEach(c => GamesController.initGameForPlayer(c, game));
+        newReady.forEach(c => initGameForPlayer(c, game));
       }
     }
   }
@@ -121,6 +132,70 @@ export class GamesController {
     }
   }
 
+  subscribe(c: PlayerController, userId: PlayerId) {
+    c.removeAllListeners('cardAction');
+    c.setInfo({...c.getInfo(), userId});
+    this.playerControllers.set(userId, c);
+
+    // should be in game controller
+    c.on('cardAction', (action: CardAction) => {
+      const {gameId} = c.getInfo();
+      if (!gameId) {
+        console.error(`game-id was not set for ${userId}`);
+        c.dispatch(createGameNotFoundMessage(gameId));
+        return;
+      }
+      const controller = c as InGamePlayerController;
+      const game = this.games.get(gameId);
+      if (!game) {
+        console.log(`Game ${gameId} was not found`);
+        controller.setInfo({userId}); // Clear game id and name
+        controller.dispatch(createGameNotFoundMessage(gameId));
+        return;
+      }
+      const gameAction = createAction(game, userId, action);
+      let actionResult: ActionResult;
+      try{
+        actionResult = game.applyAction(gameAction);
+      } catch (e) {
+        console.log(e);
+        return;
+      }
+
+      controller.dispatch({
+        type: 'feedback/showFeedback',
+        payload: {...actionResult, card: action.payload.card},
+      });
+
+      const opponentName = action.payload.playerIndex !== undefined ? game.state.players[action.payload.playerIndex].name : undefined;
+      const playerSuffix = opponentName ? ` on ${opponentName}` : '';
+      const cardName = cardNameMapping[action.payload.card];
+      const name = controller.getInfo().name;
+      this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}`, 'info'));
+      if (actionResult.killed) {
+        this.sendToTheGame(gameId, () => createTextMessage(`${opponentName} ${nextKilledText()}`, 'death'));
+      } else if (actionResult.suicide) {
+        this.sendToTheGame(gameId, () => createTextMessage(`${name} ${nextSuicideText()}`, 'death'));
+      }
+
+      if (game.state.winnerId) {
+        this.onRoundEnd(gameId, game);
+        return;
+      }
+
+      game.state.players.forEach(p => {
+        if (p.updatedCard) {
+          this.send(p.id, createLoadCardMessage(p));
+          p.updatedCard = false;
+        }
+      });
+      this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
+
+      const player = game.state.getActivePlayer();
+      this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
+    });
+  }
+
   private addToPending(controller: InGamePlayerController) {
     const {gameId, userId, name} = controller.getInfo();
     const joinedAs = name ? name : 'spectator';
@@ -154,64 +229,7 @@ export class GamesController {
     }
     player.controller = controller;
     this.sendJoined(controller, game.state.players.map(p => p.controller));
-    GamesController.initGameForPlayer(controller, game);
-  }
-
-  subscribe(c: PlayerController, userId: PlayerId) {
-    c.removeAllListeners('cardAction');
-    c.setInfo({...c.getInfo(), userId});
-    this.playerControllers.set(userId, c);
-
-    c.on('cardAction', (action: CardAction) => {
-      const {gameId} = c.getInfo();
-      if (!gameId) {
-        console.error(`game-id was not set for ${userId}`);
-        c.dispatch(createGameNotFoundMessage(gameId));
-        return;
-      }
-      const controller = c as InGamePlayerController;
-      const game = this.games.get(gameId);
-      if (!game) {
-        console.log(`Game ${gameId} was not found`);
-        controller.setInfo({userId}); // Clear game id and name
-        controller.dispatch(createGameNotFoundMessage(gameId));
-        return;
-      }
-      const gameAction = this.createAction(game, userId, action);
-      game.applyAction(gameAction).then(res => {
-        controller.dispatch({
-          type: 'feedback/showFeedback',
-          payload: {...res, card: action.payload.card},
-        });
-
-        const opponentName = action.payload.playerIndex !== undefined ? game.state.players[action.payload.playerIndex].name : undefined;
-        const playerSuffix = opponentName ? ` on ${opponentName}` : '';
-        const cardName = cardNameMapping[action.payload.card];
-        const name = controller.getInfo().name;
-        this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}`, 'info'));
-        if (res.killed) {
-          this.sendToTheGame(gameId, () => createTextMessage(`${opponentName} ${nextKilledText()}`, 'death'));
-        } else if (res.suicide) {
-          this.sendToTheGame(gameId, () => createTextMessage(`${name} ${nextSuicideText()}`, 'death'));
-        }
-
-        if (game.state.winnerId) {
-          this.onRoundEnd(gameId, game);
-          return;
-        }
-
-        game.state.players.forEach(p => {
-          if (p.updatedCard) {
-            this.send(p.id, createLoadCardMessage(p));
-            p.updatedCard = false;
-          }
-        });
-        this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
-
-        const player = game.state.getActivePlayer();
-        this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
-      }).catch(err => console.log(err));
-    });
+    initGameForPlayer(controller, game);
   }
 
   private sendJoined(controller: InGamePlayerController, controllers: InGamePlayerController[]) {
@@ -247,34 +265,6 @@ export class GamesController {
     controller.dispatch(message);
   }
 
-  private createAction(game: LoveLetterGame, player: PlayerId, action: CardAction): GameAction<LoveLetterGameState> {
-    const gameAction = game.getActionForCard(action);
-    return this.action(action, player, gameAction);
-  }
-
-  private action(cardAction: CardAction, playerId: PlayerId,
-    action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): GameAction<LoveLetterGameState> {
-    const playerIndex = cardAction.payload.playerIndex;
-    const playedCard = cardAction.payload.card;
-    return {
-      playerId: playerId,
-      apply: (s: LoveLetterGameState): Promise<ActionResult> => {
-        const me = s.getPlayer(playerId);
-        const hand = me.hand;
-        if (playedCard === hand.card) {
-          hand.card = hand.pendingCard;
-        }
-
-        const targetPlayer = playerIndex !== undefined ? s.players[playerIndex] : me;
-        if (targetPlayer.id !== me.id && targetPlayer.hand.immune) {
-          return Promise.reject();
-        }
-
-        return Promise.resolve(action(me, targetPlayer, s));
-      },
-    };
-  }
-
   private onRoundEnd(gameId: GameId, game: LoveLetterGame) {
     const winnerController = this.playerControllers.get(game.state.winnerId!!)!!;
     const winnerName = winnerController.getInfo().name!!;
@@ -286,19 +276,50 @@ export class GamesController {
       return;
     }
     game.state.start(winnerController as ReadyPlayerController);
-    game.state.players.forEach(c => GamesController.initGameForPlayer(c.controller, game));
+    game.state.players.forEach(c => initGameForPlayer(c.controller, game));
   }
+}
 
-  private static initGameForPlayer(controller: ReadyPlayerController, game: LoveLetterGame) {
-    const {userId} = controller.getInfo();
-    controller.dispatch(createSetTableMessage(userId, game.state));
-    controller.dispatch(createLoadCardMessage(game.state.getPlayer(userId)));
-    const activePlayer = game.state.getActivePlayer();
-    if (activePlayer.id === userId) {
-      controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
-    }
-    controller.dispatch(createTextMessage(`It's ${activePlayer.name}'s turn`, 'info'));
+// Those things \/ Should be in a separate class responsible for the game. Probably LoveLetterGame
+
+function createAction(game: LoveLetterGame, player: PlayerId, action: CardAction): LoveLetterGameAction {
+  const gameAction = game.getActionForCard(action);
+  return actionFunc(action, player, gameAction);
+}
+
+function actionFunc(cardAction: CardAction, playerId: PlayerId,
+  action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): LoveLetterGameAction {
+  const playerIndex = cardAction.payload.playerIndex;
+  const playedCard = cardAction.payload.card;
+  return {
+    playerId: playerId,
+    apply: (s: LoveLetterGameState): ActionResult => {
+      const me = s.getPlayer(playerId);
+      const hand = me.hand;
+      if (playedCard === hand.card) {
+        hand.card = hand.pendingCard;
+      }
+
+      const targetPlayer = playerIndex !== undefined ? s.players[playerIndex] : me;
+      if (targetPlayer.id !== me.id && targetPlayer.hand.immune) {
+        //Should be blocked on fe side.
+        throw new InvalidGameStateError('applying card to immune player');
+      }
+
+      return action(me, targetPlayer, s);
+    },
+  };
+}
+
+function initGameForPlayer(controller: ReadyPlayerController, game: LoveLetterGame) {
+  const {userId} = controller.getInfo();
+  controller.dispatch(createSetTableMessage(userId, game.state));
+  controller.dispatch(createLoadCardMessage(game.state.getPlayer(userId)));
+  const activePlayer = game.state.getActivePlayer();
+  if (activePlayer.id === userId) {
+    controller.dispatch(createStartTurnMessage(activePlayer.hand.pendingCard!));
   }
+  controller.dispatch(createTextMessage(`It's ${activePlayer.name}'s turn`, 'info'));
 }
 
 function getReady(controllers: PlayerController[]): ReadyPlayerController[] {

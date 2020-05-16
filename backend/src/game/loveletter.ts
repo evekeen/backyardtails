@@ -3,6 +3,7 @@ import {CardType} from './commonTypes';
 import {CardAction} from '../protocol';
 import {PLAYERS_NUMBER} from '../../../ui/src/model/commonTypes';
 import {ReadyPlayerController} from '../PlayerController';
+import {InvalidGameStateError} from "../error/InvalidGameStateError";
 
 export type GameId = string;
 export type PlayerId = string
@@ -80,19 +81,10 @@ class LoveLetterDeck implements Deck {
   }
 }
 
-
-interface GameState {
-  activePlayerIds: PlayerId[];
-  deadPlayerIds: PlayerId[];
-  activeTurnPlayerId: PlayerId | undefined;
-  discarded: CardType[];
-  deck: Deck;
-}
-
-export interface GameAction<State> {
+export interface LoveLetterGameAction {
   playerId: PlayerId
 
-  apply(gameState: State): Promise<ActionResult>;
+  apply(gameState: LoveLetterGameState): ActionResult;
 }
 
 
@@ -102,14 +94,6 @@ export interface ActionResult {
   suicide?: boolean;
   opponentCard?: CardType;
   opponentIndex?: number;
-}
-
-export interface Game<State> {
-  state: State
-
-  init(): void;
-
-  applyAction(action: GameAction<State>): Promise<ActionResult>;
 }
 
 export class LoveLetterGameState {
@@ -233,23 +217,27 @@ export class LoveLetterGameState {
   }
 }
 
-export class LoveLetterGame implements Game<LoveLetterGameState> {
+export class LoveLetterGame {
   public state = new LoveLetterGameState(this.controllers);
-  private actions: GameAction<LoveLetterGameState>[] = [];
+  private actions: LoveLetterGameAction[] = [];
   private firstPlayerIdx = -1;
 
   constructor(private controllers: ReadyPlayerController[]) {
   }
 
-  applyAction(action: GameAction<LoveLetterGameState>): Promise<ActionResult> {
+  applyAction(action: LoveLetterGameAction): ActionResult {
     if (action.playerId !== this.state.activeTurnPlayerId) {
-      return Promise.reject();
+      throw new InvalidGameStateError()
     }
-    return action.apply(this.state).then(res => {
+    try{
+      const actionResult =  action.apply(this.state);
       this.actions.push(action);
       this.state.nextTurn();
-      return res;
-    });
+      return actionResult;
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
   }
 
   hasPlayer(id: PlayerId): boolean {
