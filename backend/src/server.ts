@@ -23,7 +23,7 @@ app.use(sessionParser);
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({noServer: true});
-const gamesController = GamesController.instance();
+const gamesController = new GamesController();
 
 function generateUserId(): string {
   return 'u-' + Math.ceil(Math.random() * 100);
@@ -45,7 +45,7 @@ function authenticate(req: any, callback: (userId: string) => any) {
 wss.on('connection', (ws: WebSocket, request: any) => {
   console.log('connection');
   // authenticate(request, sessionUserId => {
-  const controller = new PlayerControllerImpl(ws);
+  const controller = new PlayerControllerImpl(ws, gamesController);
 
   const scheduleKa = (ws: WebSocket) => setTimeout(() => {
     controller.kaTimer = scheduleKa(ws);
