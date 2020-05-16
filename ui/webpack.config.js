@@ -25,6 +25,7 @@ module.exports = {
       './src/css/login.css',
       './src/css/rules.css',
       './src/css/status-messages.css',
+      './src/css/feedback.css',
       './node_modules/bootstrap/dist/css/bootstrap.min.css',
       './src/img/guard.png',
       './src/img/priest.png',

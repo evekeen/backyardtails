@@ -1,0 +1,17 @@
+.ll-feedback .modal-body > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.ll-trade-report .modal-body {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.ll-feedback.ll-trade-report .modal-body > div {
+  justify-content: space-between;
+  width: 330px;
+}

@@ -3,17 +3,19 @@ import React = require('react');
 
 interface CardProps {
   card?: CardType;
+  blink?: boolean;
   onClick?: () => void;
   selected?: boolean;
   showDescription?: boolean;
 }
 
 export const Card = (props: CardProps) => {
-  const selected = props.selected ? 'll-card-selected' : '';
+  const selectedClass = props.selected ? 'll-card-selected' : '';
+  const blinkClass = props.blink ? 'blink' : '';
   const showDescription = props.showDescription !== false;
   return (
-    <div className="ll-card" onClick={() => props.onClick && props.onClick()}>
-      <div className={`ll-card__box ${selected}`}>
+    <div className={`ll-card`} onClick={() => props.onClick && props.onClick()}>
+      <div className={`ll-card__box ${selectedClass} ${blinkClass}`}>
         <div className={`ll-card__cover`}>
           <CardImg card={props.card} showDescription={showDescription}/>
         </div>

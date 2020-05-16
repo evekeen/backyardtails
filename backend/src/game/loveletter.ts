@@ -3,7 +3,7 @@ import {CardType} from './commonTypes';
 import {CardAction} from '../protocol';
 import {PLAYERS_NUMBER} from '../../../ui/src/model/commonTypes';
 import {ReadyPlayerController} from '../PlayerController';
-import {InvalidGameStateError} from "../error/InvalidGameStateError";
+import {InvalidGameStateError} from '../error/InvalidGameStateError';
 
 export type GameId = string;
 export type PlayerId = string
@@ -92,8 +92,14 @@ export interface LoveLetterGameAction {
 export interface ActionResult {
   killed?: boolean;
   suicide?: boolean;
+  trade?: TradeInfo;
   opponentCard?: CardType;
   opponentIndex?: number;
+}
+
+export interface TradeInfo {
+  incoming: CardType;
+  outgoing: CardType;
 }
 
 export class LoveLetterGameState {
@@ -316,7 +322,11 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
       me.updatedCard = true;
       target.hand.card = otherCard;
       target.updatedCard = true;
-      return {opponentCard};
+      const trade = {
+        incoming: otherCard,
+        outgoing: opponentCard!!
+      };
+      return {opponentCard, trade};
     case CardType.Countess:
       return {};
     case CardType.Princess:

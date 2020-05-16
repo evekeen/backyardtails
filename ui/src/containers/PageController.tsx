@@ -14,6 +14,7 @@ import {store} from '../store';
 import {GameNotFound, GamePreexisted, NoMoreSeats} from '../components/GameErrors';
 import {Rules} from '../components/Rules';
 import VictoryReport from '../components/VictoryReport';
+import TradeReport from '../components/TradeReport';
 
 const PageController = (props: PageControllerProps) => {
   const readyUsers = props.users?.filter(u => u.ready)?.length || 0;
@@ -40,6 +41,7 @@ const PageController = (props: PageControllerProps) => {
       <PlayerHandContainer/>
       <Rules/>
       <ManagedFeedback/>
+      <TradeReport/>
       <VictoryReport/>
     </>
   );

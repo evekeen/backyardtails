@@ -1,9 +1,11 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {CardType} from '../model/commonTypes';
 import {BoardState, setTable} from './board';
+import {TradeInfo} from '../model/TradeInfo';
 
 export interface FeedbackState {
   lastAction: CardActionFeedback | undefined;
+  trade: TradeInfo | undefined;
   playerNames: string[];
 }
 
@@ -33,6 +35,12 @@ const feedback = createSlice({
     },
     hideFeedback(state: FeedbackState) {
       state.lastAction = undefined;
+    },
+    reportTrade(state: FeedbackState, action: PayloadAction<TradeInfo>) {
+      state.trade = action.payload;
+    },
+    hideTradeReport(state: FeedbackState) {
+      state.trade = undefined;
     }
   },
   extraReducers: builder => {
@@ -42,6 +50,6 @@ const feedback = createSlice({
   }
 });
 
-export const {showFeedback, hideFeedback} = feedback.actions;
+export const {showFeedback, hideFeedback, hideTradeReport} = feedback.actions;
 
 export default feedback.reducer;

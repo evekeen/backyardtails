@@ -4,7 +4,7 @@ import {Reporter} from 'io-ts/lib/Reporter';
 import * as WebSocket from 'ws';
 import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
-import {GameId, LoveLetterGameState, Player, PlayerId} from './game/loveletter';
+import {GameId, LoveLetterGameState, Player, PlayerId, TradeInfo} from './game/loveletter';
 import {CardType, StatusMessageType} from './game/commonTypes';
 import {InGamePlayerController} from './PlayerController';
 import _ = require('lodash');
@@ -133,6 +133,11 @@ export interface ShowFeedback {
   };
 }
 
+export interface TradeMessage {
+  type: 'feedback/reportTrade',
+  payload: TradeInfo;
+}
+
 export interface CardAction {
   payload: {
     card: CardType;
@@ -240,7 +245,7 @@ export function createStartTurnMessage(card: CardType): StartTurnMessage {
   return {
     type: 'yourTurn/startTurn',
     payload: {
-      card: card,
+      card: CardType.King,
     },
   };
 }
@@ -256,6 +261,13 @@ export function createRoundVictoryMessage(winnerName: string): RemoteAction {
   return {
     type: 'status/reportRoundVictory',
     payload: winnerName,
+  };
+}
+
+export function createTradeMessage(trade: TradeInfo): TradeMessage {
+  return {
+    type: 'feedback/reportTrade',
+    payload: trade,
   };
 }
 

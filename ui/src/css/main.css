@@ -82,6 +82,39 @@
   transition: background-color 0.2s ease;
 }
 
+.blink {
+  animation: blink-animation 0.7s ease-in-out 4;
+  -webkit-animation: blink-animation 0.7s ease-in-out 4;
+}
+@keyframes blink-animation {
+  0% {
+    opacity: 50%;
+    background-color: transparent;
+  }
+  50% {
+    opacity: 100%;
+    background-color: #e5ad93;
+  }
+  100%{
+    opacity: 50%;
+    background-color: transparent;
+  }
+}
+@-webkit-keyframes blink-animation {
+  0% {
+    opacity: 50%;
+    background-color: transparent;
+  }
+  50% {
+    opacity: 100%;
+    background-color: #e5ad93;
+  }
+  100%{
+    opacity: 50%;
+    background-color: transparent;
+  }
+}
+
 .player-wrapper h3 {
   font-size: 12px;
   font-weight: 100;
@@ -319,13 +352,6 @@
   position: absolute;
   left: 20px;
   top: 20px;
-}
-
-.ll-feedback .modal-body > div {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
 }
 
 .ll-winner {

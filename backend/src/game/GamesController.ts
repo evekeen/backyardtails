@@ -11,6 +11,7 @@ import {
   createSetTableMessage,
   createStartTurnMessage,
   createTextMessage,
+  createTradeMessage,
   createUserDisconnectedMessage,
   MO_MORE_SEATS,
   RemoteAction,
@@ -167,7 +168,8 @@ export class GamesController {
         payload: {...actionResult, card: action.payload.card},
       });
 
-      const opponentName = action.payload.playerIndex !== undefined ? game.state.players[action.payload.playerIndex].name : undefined;
+      const targetPlayer = action.payload.playerIndex !== undefined ? game.state.players[action.payload.playerIndex] : undefined;
+      const opponentName = targetPlayer?.name;
       const playerSuffix = opponentName ? ` on ${opponentName}` : '';
       const guardGuess = action.payload.guess ? ` - guessed ${cardNameMapping[action.payload.guess]}` : ''
       const cardName = cardNameMapping[action.payload.card];
@@ -179,6 +181,8 @@ export class GamesController {
       } else if (actionResult.suicide) {
         const text = nextSuicideText();
         this.sendToTheGame(gameId, () => createTextMessage(`${name} ${text}`, 'death'));
+      } else if (actionResult.trade && targetPlayer) {
+        this.send(targetPlayer.id, createTradeMessage(actionResult.trade));
       }
 
       if (game.state.winnerId) {
