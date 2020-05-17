@@ -74,11 +74,21 @@ class LoveLetterDeck implements Deck {
   }
 
   init(): void {
-    const shuffled = _.shuffle(cards);
+    const shuffled = shuffleFisherYates(cards);
     if (shuffled.length > 0)
       shuffled.pop();
     this.deck = shuffled;
   }
+}
+
+function shuffleFisherYates<T>(source: Array<T>): Array<T> {
+  const array = [...source];
+  let i = array.length;
+  while (i--) {
+    const ri = Math.floor(Math.random() * (i + 1));
+    [array[i], array[ri]] = [array[ri], array[i]];
+  }
+  return array;
 }
 
 export interface LoveLetterGameAction {

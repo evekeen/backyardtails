@@ -244,9 +244,7 @@ export function createLoadCardMessage(player: Player): LoadCardMessage {
 export function createStartTurnMessage(card: CardType): StartTurnMessage {
   return {
     type: 'yourTurn/startTurn',
-    payload: {
-      card: CardType.King,
-    },
+    payload: {card},
   };
 }
 
