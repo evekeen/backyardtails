@@ -41,7 +41,7 @@ export class PlayerControllerHelper {
     return c;
   }
 
-  startGame(helper: PlayerControllerHelper): AllControllers {
+  startGame(helper: PlayerControllerHelper, clear: boolean = true): AllControllers {
     const send2 = jest.fn();
     const send3 = jest.fn();
     const send4 = jest.fn();
@@ -53,6 +53,12 @@ export class PlayerControllerHelper {
     helper.dispatch('connection/join', {gameId, userId: user2, name: name2}, c2);
     helper.dispatch('connection/join', {gameId, userId: user3, name: name3}, c3);
     helper.dispatch('connection/join', {gameId, userId: user4, name: name4}, c4);
+    if (clear) {
+      this.send.mockClear();
+      send2.mockClear();
+      send3.mockClear();
+      send4.mockClear();
+    }
     return {
       send: this.send, send2, send3, send4,
       c: this.controller, c2, c3, c4

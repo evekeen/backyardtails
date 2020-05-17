@@ -70,7 +70,7 @@ describe('connection', () => {
   }, 1000);
 
   it('all joined', () => {
-    const {send, send2, send3, send4} = helper.startGame(helper);
+    const {send, send2, send3, send4} = helper.startGame(helper, false);
 
     expect(getMessages(send)).toStrictEqual([
       setTableMessage(0),

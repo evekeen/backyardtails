@@ -41,27 +41,27 @@ describe('actions', () => {
       return {...table, payload: {...table.payload, deckLeft: 9, discardPileTop: CardType.Countess, turnIndex: 2, players}};
     }
 
-    expect(getMessages(send, 9)).toStrictEqual([
+    expect(getMessages(send)).toStrictEqual([
       tableAfter(setTableMessage(0)),
       feedbackMessage({card: CardType.Guard, killed: true, opponentIndex: 1}),
       message('info', 'Poruchik played Guard on Natasha - guessed Countess'),
       message('death', 'Natasha was found stabbed in a bathroom'),
       turnMessage(name3)
     ]);
-    expect(getMessages(send2, 7)).toStrictEqual([
+    expect(getMessages(send2)).toStrictEqual([
       tableAfter(setTableMessage(1)),
       message('info', 'Poruchik played Guard on Natasha - guessed Countess'),
       message('death', 'Natasha was found stabbed in a bathroom'),
       turnMessage(name3)
     ]);
-    expect(getMessages(send3, 7)).toStrictEqual([
+    expect(getMessages(send3)).toStrictEqual([
       tableAfter(setTableMessage(2)),
       message('info', 'Poruchik played Guard on Natasha - guessed Countess'),
       message('death', 'Natasha was found stabbed in a bathroom'),
       turnMessage(name3),
       startTurnMessage(CardType.Handmaid)
     ]);
-    expect(getMessages(send4, 7)).toStrictEqual([
+    expect(getMessages(send4)).toStrictEqual([
       tableAfter(setTableMessage(3)),
       message('info', 'Poruchik played Guard on Natasha - guessed Countess'),
       message('death', 'Natasha was found stabbed in a bathroom'),
@@ -79,24 +79,24 @@ describe('actions', () => {
       return {...table, payload: {...table.payload, deckLeft: 9, discardPileTop: CardType.Priest, turnIndex: 1, players}};
     }
 
-    expect(getMessages(send, 9)).toStrictEqual([
+    expect(getMessages(send)).toStrictEqual([
       tableAfter(setTableMessage(0)),
       feedbackMessage({card: CardType.Priest, opponentIndex: 1, opponentCard: CardType.Countess}),
       message('info', 'Poruchik played Priest on Natasha'),
       turnMessage(name2)
     ]);
-    expect(getMessages(send2, 7)).toStrictEqual([
+    expect(getMessages(send2)).toStrictEqual([
       tableAfter(setTableMessage(1)),
       message('info', 'Poruchik played Priest on Natasha'),
       turnMessage(name2),
       startTurnMessage(CardType.Handmaid)
     ]);
-    expect(getMessages(send3, 7)).toStrictEqual([
+    expect(getMessages(send3)).toStrictEqual([
       tableAfter(setTableMessage(2)),
       message('info', 'Poruchik played Priest on Natasha'),
       turnMessage(name2),
     ]);
-    expect(getMessages(send4, 7)).toStrictEqual([
+    expect(getMessages(send4)).toStrictEqual([
       tableAfter(setTableMessage(3)),
       message('info', 'Poruchik played Priest on Natasha'),
       turnMessage(name2)
@@ -114,26 +114,30 @@ describe('actions', () => {
       return {...table, payload: {...table.payload, deckLeft: 9, discardPileTop: CardType.Guard, turnIndex: 1, players}};
     }
 
-    expect(getMessages(send, 9)).toStrictEqual([
+    expect(getMessages(send)).toStrictEqual([
       tableAfter(setTableMessage(0)),
       feedbackMessage({card: CardType.Baron, killed: false, opponentIndex: 1, opponentCard: CardType.Countess}),
       message('info', 'Poruchik played Baron on Natasha'),
+      message('death', 'Poruchik was found stabbed in a bathroom'),
       turnMessage(name2)
     ]);
-    expect(getMessages(send2, 7)).toStrictEqual([
+    expect(getMessages(send2)).toStrictEqual([
       tableAfter(setTableMessage(1)),
       message('info', 'Poruchik played Baron on Natasha'),
+      message('death', 'Poruchik was found stabbed in a bathroom'),
       turnMessage(name2),
       startTurnMessage(CardType.Handmaid)
     ]);
-    expect(getMessages(send3, 7)).toStrictEqual([
+    expect(getMessages(send3)).toStrictEqual([
       tableAfter(setTableMessage(2)),
       message('info', 'Poruchik played Baron on Natasha'),
+      message('death', 'Poruchik was found stabbed in a bathroom'),
       turnMessage(name2),
     ]);
-    expect(getMessages(send4, 7)).toStrictEqual([
+    expect(getMessages(send4)).toStrictEqual([
       tableAfter(setTableMessage(3)),
       message('info', 'Poruchik played Baron on Natasha'),
+      message('death', 'Poruchik was found stabbed in a bathroom'),
       turnMessage(name2)
     ]);
 

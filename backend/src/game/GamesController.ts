@@ -165,9 +165,10 @@ export class GamesController {
       const cardName = cardNameMapping[action.payload.card];
       const name = controller.getInfo().name;
       this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}${guardGuess}`, 'info'));
-      if (actionResult.killed) {
+      if (actionResult.killed !== undefined) {
         const text = nextKilledText();
-        this.sendToTheGame(gameId, () => createTextMessage(`${opponentName} ${text}`, 'death'));
+        const victim = actionResult.killed ? opponentName : name;
+        this.sendToTheGame(gameId, () => createTextMessage(`${victim} ${text}`, 'death'));
       } else if (actionResult.suicide) {
         const text = nextSuicideText();
         this.sendToTheGame(gameId, () => createTextMessage(`${name} ${text}`, 'death'));
