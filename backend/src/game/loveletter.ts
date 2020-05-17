@@ -323,7 +323,7 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
         target.updatedCard = true;
       }
       const suicide = death && me === target;
-      const killed = death && !suicide;
+      const killed = death && !suicide ? true : undefined;
       return {killed, suicide, opponentCard};
     }
     case CardType.King:

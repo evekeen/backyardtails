@@ -92,6 +92,10 @@ export function feedbackMessage(feedback: any): any {
   return {type: 'feedback/showFeedback', payload: feedback};
 }
 
+export function tradeMessage(trade: any): any {
+  return {type: 'feedback/reportTrade', payload: trade};
+}
+
 export function joinMessage(userId: string, name: string): any {
   return {type: 'connection/userJoined', payload: {gameId, userId, name, ready: true}};
 }

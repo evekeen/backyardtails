@@ -155,7 +155,7 @@ export class GamesController {
 
       controller.dispatch({
         type: 'feedback/showFeedback',
-        payload: {...actionResult, card: action.payload.card},
+        payload: {...actionResult, card: action.payload.card, trade: undefined},
       });
 
       const targetPlayer = action.payload.playerIndex !== undefined ? game.state.players[action.payload.playerIndex] : undefined;
