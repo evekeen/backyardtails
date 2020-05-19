@@ -71,7 +71,7 @@ export class GamesController {
         this.pendingGames.delete(gameId);
         const game = new LoveLetterGame(newReady);
         this.games.set(gameId, game);
-        console.log(`Created game ${gameId} with players ${newReady}`);
+        console.log(`Created game ${gameId} with players ${newReady.map(c => c.getInfo().userId)}`);
         game.init();
         newReady.forEach(c => initGameForPlayer(c, game));
       }
