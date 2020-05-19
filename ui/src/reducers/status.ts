@@ -1,4 +1,4 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createAction, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import _ = require('lodash');
 
 export interface StatusState {
@@ -10,6 +10,10 @@ export interface StatusMessage {
   text: string;
   type: 'info' | 'turn' | 'victory' | 'death' | 'error' | undefined;
 }
+
+export const victoryAcknowledgement = createAction('status/victoryAcknowledgement', () => {
+  return {meta: 'remote', payload: undefined};
+});
 
 const statusSlice = createSlice({
   name: 'status',
@@ -24,13 +28,15 @@ const statusSlice = createSlice({
     },
     reportRoundVictory(state: StatusState, action: PayloadAction<string>) {
       state.roundWinnerName = action.payload;
-    },
-    discardVictoryReport(state: StatusState) {
+    }
+  },
+  extraReducers: builder => {
+    builder.addCase(victoryAcknowledgement, (state: StatusState) => {
       state.roundWinnerName = undefined;
-    },
+    });
   }
 });
 
-export const {addMessage, discardVictoryReport} = statusSlice.actions;
+export const {addMessage} = statusSlice.actions;
 
 export default statusSlice.reducer;

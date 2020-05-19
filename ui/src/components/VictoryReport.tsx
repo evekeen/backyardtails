@@ -1,20 +1,20 @@
 import React = require('react');
 import {AppState} from './App';
 import {connect} from 'react-redux';
-import {discardVictoryReport} from '../reducers/status';
+import {victoryAcknowledgement} from '../reducers/status';
 import {CardActionFeedback} from '../reducers/feedback';
 import {Button, Modal} from 'react-bootstrap';
 
 interface VictoryReportProps {
   roundWinnerName: string;
   feedback: CardActionFeedback | undefined;
-  discardVictoryReport: () => void;
+  victoryAcknowledgement: () => void;
 }
 
 const VictoryReport = (props: VictoryReportProps) => {
   const show = props.roundWinnerName && !props.feedback;
   return (
-    <Modal size="lg" show={show} onHide={() => props.discardVictoryReport()}>
+    <Modal size="lg" show={show} onHide={() => props.victoryAcknowledgement()}>
       <Modal.Header closeButton>
         <Modal.Title>Winner of the round</Modal.Title>
       </Modal.Header>
@@ -25,7 +25,7 @@ const VictoryReport = (props: VictoryReportProps) => {
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="primary" onClick={() => props.discardVictoryReport()}>Continue</Button>
+        <Button variant="primary" onClick={() => props.victoryAcknowledgement()}>Continue</Button>
       </Modal.Footer>
     </Modal>
   );
@@ -38,4 +38,4 @@ const mapStateToProps = (state: AppState) => {
   };
 }
 
-export default connect(mapStateToProps, {discardVictoryReport})(VictoryReport);
+export default connect(mapStateToProps, {victoryAcknowledgement})(VictoryReport);
