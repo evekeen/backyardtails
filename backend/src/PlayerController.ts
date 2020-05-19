@@ -1,5 +1,5 @@
 import {EventEmitter} from 'events';
-import {CreateGameMessage, ForceGame, InitSession, JoinMessage, RemoteAction} from './protocol';
+import {CreateGameMessage, ForceGame, InitSession, JoinMessage, RemoteAction, VictoryAcknowledgement} from './protocol';
 import {GameId, PlayerId} from './game/loveletter';
 import {GamesController} from './game/GamesController';
 import {pipe} from 'fp-ts/lib/pipeable';
@@ -51,9 +51,12 @@ export class PlayerControllerImpl extends EventEmitter implements PlayerControll
 
     this.on('connection/forceGame', msg => {
       pipe(ForceGame.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
-        request => {
-          gamesController.forceGame(this, request.payload);
-        }));
+        request => gamesController.forceGame(this, request.payload)));
+    });
+
+    this.on('status/victoryAcknowledgement', msg => {
+      pipe(VictoryAcknowledgement.decode(msg), fold(() => console.log('Failed to parse: ' + JSON.stringify(msg)),
+        () => gamesController.acknowledgeVictory(this)));
     });
     
     this.on('stateReady', state => {

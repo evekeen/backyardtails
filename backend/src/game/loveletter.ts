@@ -120,6 +120,7 @@ export class LoveLetterGameState {
   public deadPlayerIds: PlayerId[] = [];
   public activeTurnPlayerId: PlayerId | undefined;
   public winnerId: PlayerId | undefined;
+  private acknowledgedVictory = new Set<PlayerId>();
 
   constructor(controllers: ReadyPlayerController[]) {
     controllers.forEach(c => this.newPlayer(c));
@@ -230,6 +231,15 @@ export class LoveLetterGameState {
 
   getActivePlayer(): Player {
     return this.getPlayer(this.activeTurnPlayerId!);
+  }
+
+  acknowledgeVictory(playerId: PlayerId): boolean {
+    this.acknowledgedVictory.add(playerId);
+    const done = this.acknowledgedVictory.size === this.players.length;
+    if (done) {
+      this.acknowledgedVictory = new Set<PlayerId>();
+    }
+    return done;
   }
 }
 

@@ -15,6 +15,7 @@ export const MessageType = t.union([
   t.literal('connection/join'),
   t.literal('connection/forceGame'),
   t.literal('cardAction'),
+  t.literal('status/victoryAcknowledgement'),
   t.literal('state'),
 ]);
 
@@ -42,6 +43,10 @@ export const CreateGameMessage = t.interface({
 export const InitSession = t.interface({
   type: t.literal('connection/initSession'),
   payload: t.string,
+});
+
+export const VictoryAcknowledgement = t.interface({
+  type: t.literal('status/victoryAcknowledgement')
 });
 
 export const ForceGame = t.interface({

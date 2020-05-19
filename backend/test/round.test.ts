@@ -3,8 +3,10 @@ import {
   ControllersHelper,
   feedbackMessage,
   getMessages,
+  loadCardMessage,
   message,
   name2,
+  roundVictoryMessage,
   setTableMessage,
   startTurnMessage,
   turnMessage
@@ -47,26 +49,59 @@ describe('actions', () => {
     helper.playCards(CardType.Handmaid, 1);
 
     expect(getMessages(send)).toStrictEqual([
-      feedbackMessage({card: CardType.Princess, opponentIndex: 0, suicide: true}),
-      message('info', 'Poruchik played Princess'),
-      message('death', 'Poruchik has opened own veins'),
-      turnMessage(name2),
+      message('info', 'Andrey played Handmaid'),
+      message('victory', 'Natasha won the round!'),
+      roundVictoryMessage(name2),
     ]);
     expect(getMessages(send2)).toStrictEqual([
-      message('info', 'Poruchik played Princess'),
-      message('death', 'Poruchik has opened own veins'),
-      turnMessage(name2),
-      startTurnMessage(CardType.Handmaid)
+      message('info', 'Andrey played Handmaid'),
+      message('victory', 'Natasha won the round!'),
+      roundVictoryMessage(name2),
     ]);
     expect(getMessages(send3)).toStrictEqual([
-      message('info', 'Poruchik played Princess'),
-      message('death', 'Poruchik has opened own veins'),
-      turnMessage(name2),
+      feedbackMessage({card: CardType.Handmaid, opponentIndex: 2}),
+      message('info', 'Andrey played Handmaid'),
+      message('victory', 'Natasha won the round!'),
+      roundVictoryMessage(name2),
     ]);
     expect(getMessages(send4)).toStrictEqual([
-      message('info', 'Poruchik played Princess'),
-      message('death', 'Poruchik has opened own veins'),
-      turnMessage(name2)
+      message('info', 'Andrey played Handmaid'),
+      message('victory', 'Natasha won the round!'),
+      roundVictoryMessage(name2),
+    ]);
+
+    helper.clearSockets();
+    helper.dispatch('status/victoryAcknowledgement', undefined, 0);
+    helper.dispatch('status/victoryAcknowledgement', undefined, 1);
+    helper.dispatch('status/victoryAcknowledgement', undefined, 2);
+    helper.dispatch('status/victoryAcknowledgement', undefined, 3);
+
+    function tableAfter(table: any): any {
+      const players = [...table.payload.players];
+      players[1].score = 1;
+      return {...table, payload: {...table.payload, deckLeft: 10, discardPileTop: CardType.Handmaid, turnIndex: 1, players}};
+    }
+
+    expect(getMessages(send)).toStrictEqual([
+      tableAfter(setTableMessage(0)),
+      turnMessage(name2),
+      loadCardMessage(CardType.Guard)
+    ]);
+    expect(getMessages(send2)).toStrictEqual([
+      tableAfter(setTableMessage(1)),
+      turnMessage(name2),
+      loadCardMessage(CardType.Countess),
+      startTurnMessage(CardType.Prince)
+    ]);
+    expect(getMessages(send3)).toStrictEqual([
+      tableAfter(setTableMessage(2)),
+      turnMessage(name2),
+      loadCardMessage(CardType.King)
+    ]);
+    expect(getMessages(send4)).toStrictEqual([
+      tableAfter(setTableMessage(3)),
+      turnMessage(name2),
+      loadCardMessage(CardType.Guard)
     ]);
   }, 1000);
 });

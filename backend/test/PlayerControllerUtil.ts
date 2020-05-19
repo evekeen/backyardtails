@@ -104,6 +104,10 @@ export function startTurnMessage(card: CardType): any {
   return {type: 'yourTurn/startTurn', payload: {card}};
 }
 
+export function roundVictoryMessage(name: string): any {
+  return {type: 'status/reportRoundVictory', payload: name};
+}
+
 export function getMessages(send: Mock): Array<any> {
   const args = send.mock.calls.map(call => JSON.parse(call[0]));
   return _.sortBy(args, ['type', 'payload.userId']);

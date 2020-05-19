@@ -130,20 +130,11 @@ export class GamesController {
 
     // should be in game controller
     c.on('cardAction', (action: CardAction) => {
-      const {gameId} = c.getInfo();
-      if (!gameId) {
-        console.error(`game-id was not set for ${userId}`);
-        c.dispatch(createGameNotFoundMessage(gameId));
+      const game = this.getGame(c);
+      if (!game) {
         return;
       }
       const controller = c as InGamePlayerController;
-      const game = this.games.get(gameId);
-      if (!game) {
-        console.log(`Game ${gameId} was not found`);
-        controller.setInfo({userId}); // Clear game id and name
-        controller.dispatch(createGameNotFoundMessage(gameId));
-        return;
-      }
       const gameAction = createAction(game, userId, action);
       let actionResult: ActionResult;
       try{
@@ -164,20 +155,20 @@ export class GamesController {
       const guardGuess = action.payload.guess ? ` - guessed ${cardNameMapping[action.payload.guess]}` : ''
       const cardName = cardNameMapping[action.payload.card];
       const name = controller.getInfo().name;
-      this.sendToTheGame(gameId, () => createTextMessage(`${name} played ${cardName}${playerSuffix}${guardGuess}`, 'info'));
+      this.sendToTheGame(game, () => createTextMessage(`${name} played ${cardName}${playerSuffix}${guardGuess}`, 'info'));
       if (actionResult.killed !== undefined) {
         const text = nextKilledText();
         const victim = actionResult.killed ? opponentName : name;
-        this.sendToTheGame(gameId, () => createTextMessage(`${victim} ${text}`, 'death'));
+        this.sendToTheGame(game, () => createTextMessage(`${victim} ${text}`, 'death'));
       } else if (actionResult.suicide) {
         const text = nextSuicideText();
-        this.sendToTheGame(gameId, () => createTextMessage(`${name} ${text}`, 'death'));
+        this.sendToTheGame(game, () => createTextMessage(`${name} ${text}`, 'death'));
       } else if (actionResult.trade && targetPlayer) {
         this.send(targetPlayer.id, createTradeMessage(actionResult.trade));
       }
 
       if (game.state.winnerId) {
-        this.onRoundEnd(gameId, game);
+        this.onRoundEnd(game);
         return;
       }
 
@@ -187,12 +178,40 @@ export class GamesController {
           p.updatedCard = false;
         }
       });
-      this.sendToTheGame(gameId, (player, game) => createSetTableMessage(player.id, game.state));
-      this.sendToTheGame(gameId, (player, game) => createNextTurnLogMessage(game));
+      this.sendToTheGame(game, (player, game) => createSetTableMessage(player.id, game.state));
+      this.sendToTheGame(game, (player, game) => createNextTurnLogMessage(game));
 
       const player = game.state.getActivePlayer();
       this.send(player.id, createStartTurnMessage(player.hand.pendingCard!));
     });
+  }
+
+  acknowledgeVictory(c: PlayerController): void {
+    const game = this.getGame(c);
+    if (!game) {
+      return;
+    }
+    const controller = c as InGamePlayerController;
+    if (game.state?.acknowledgeVictory(controller.getInfo().userId)) {
+      this.nextRound(game);
+    }
+  }
+
+  private getGame(controller: PlayerController): LoveLetterGame | undefined {
+    const {gameId, userId} = controller.getInfo();
+    if (!gameId) {
+      console.log(`Game was not found to acknowledge a victory`);
+      controller.dispatch(createGameNotFoundMessage(gameId));
+      return undefined;
+    }
+    const game = this.games.get(gameId);
+    if (!game) {
+      console.log(`Game ${gameId} was not found`);
+      controller.setInfo({userId}); // Clear game id and name
+      controller.dispatch(createGameNotFoundMessage(gameId));
+      return undefined;
+    }
+    return game;
   }
 
   private addToPending(controller: InGamePlayerController) {
@@ -236,10 +255,15 @@ export class GamesController {
     controllers.forEach(c => controller.dispatch(createJoinedMessage(c)));
   }
 
-  private sendToTheGame(gameId: GameId, messageCreator: (player: Player, game: LoveLetterGame) => RemoteAction): void {
-    const game = this.games.get(gameId);
-    if (!game) {
-      return;
+  private sendToTheGame(idOrGame: GameId | LoveLetterGame, messageCreator: (player: Player, game: LoveLetterGame) => RemoteAction): void {
+    let game: LoveLetterGame;
+    if (typeof idOrGame === 'string') {
+      if (!this.games.get(idOrGame)) {
+        return;
+      }
+      game = this.games.get(idOrGame)!!;
+    } else {
+      game = idOrGame;
     }
     game.state.players.forEach((player: Player) => {
       const controller = this.playerControllers.get(player.id);
@@ -264,14 +288,19 @@ export class GamesController {
     controller.dispatch(message);
   }
 
-  private onRoundEnd(gameId: GameId, game: LoveLetterGame) {
+  private onRoundEnd(game: LoveLetterGame) {
     const winnerController = this.playerControllers.get(game.state.winnerId!!)!!;
     const winnerName = winnerController.getInfo().name!!;
-    this.sendToTheGame(gameId, () => createRoundVictoryMessage(winnerName));
-    this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} won the round! Starting next one`, 'victory'));
+    this.sendToTheGame(game, () => createRoundVictoryMessage(winnerName));
+    this.sendToTheGame(game, () => createTextMessage(`${winnerName} won the round!`, 'victory'));
+  }
+
+  private nextRound(game: LoveLetterGame): void {
+    const winnerController = this.playerControllers.get(game.state.winnerId!!)!!;
+    const winnerName = winnerController.getInfo().name!!;
     if (!winnerController.isReady()) {
       console.log('Winner is not ready. Cannot start next round');
-      this.sendToTheGame(gameId, () => createTextMessage(`${winnerName} is not ready. Cannot start next round`, 'error'));
+      this.sendToTheGame(game, () => createTextMessage(`${winnerName} is not ready. Cannot start next round`, 'error'));
       return;
     }
     game.state.start(winnerController as ReadyPlayerController);
