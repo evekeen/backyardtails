@@ -245,14 +245,14 @@ export class LoveLetterGame {
     if (action.playerId !== this.state.activeTurnPlayerId) {
       throw new InvalidGameStateError()
     }
-    try{
-      const actionResult =  action.apply(this.state);
+    try {
+      const actionResult = action.apply(this.state);
       this.actions.push(action);
       this.state.nextTurn();
       return actionResult;
     } catch (e) {
-        console.log(e);
-        throw e;
+      console.log(e);
+      throw e;
     }
   }
 
