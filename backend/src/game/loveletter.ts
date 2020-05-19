@@ -281,8 +281,6 @@ export class LoveLetterGame {
 function getActionResult(action: CardAction, me: Player, target: Player, state: LoveLetterGameState): ActionResult {
   const otherCard = me.hand.card === action.payload.card ? me.hand.pendingCard!! : me.hand.card!!;
   const opponentCard = target.hand.card;
-  console.log('me', me.name, otherCard);
-  console.log('target', target.name, opponentCard);
   state.discardPile.push(action.payload.card);
   me.hand.card = otherCard;
   me.hand.pendingCard = undefined;

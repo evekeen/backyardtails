@@ -1,5 +1,6 @@
 import {CardType} from '../src/game/commonTypes';
 import {
+  ControllersHelper,
   gameId,
   getMessages,
   joinMessage,
@@ -8,7 +9,6 @@ import {
   name2,
   name3,
   name4,
-  PlayerControllerHelper,
   setTableMessage,
   startTurnMessage,
   turnMessage,
@@ -20,7 +20,7 @@ import {
 import Mock = jest.Mock;
 
 describe('connection', () => {
-  let helper: PlayerControllerHelper;
+  let helper: ControllersHelper;
   let send: Mock;
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ describe('connection', () => {
   })
 
   beforeEach(() => {
-    helper = new PlayerControllerHelper();
+    helper = new ControllersHelper();
     send = helper.send;
     expect(send).toBeCalledTimes(0);
   });
@@ -70,7 +70,7 @@ describe('connection', () => {
   }, 1000);
 
   it('all joined', () => {
-    const {send, send2, send3, send4} = helper.startGame(helper, false);
+    const [send, send2, send3, send4] = helper.startGame(false);
 
     expect(getMessages(send)).toStrictEqual([
       setTableMessage(0),

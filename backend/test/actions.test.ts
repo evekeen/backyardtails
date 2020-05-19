@@ -1,12 +1,12 @@
 import {CardType} from '../src/game/commonTypes';
 import {
+  ControllersHelper,
   feedbackMessage,
   getMessages,
   loadCardMessage,
   message,
   name2,
   name3,
-  PlayerControllerHelper,
   setTableMessage,
   startTurnMessage,
   tradeMessage,
@@ -15,7 +15,7 @@ import {
 import Mock = jest.Mock;
 
 describe('actions', () => {
-  let helper: PlayerControllerHelper;
+  let helper: ControllersHelper;
   let send: Mock;
 
   beforeEach(() => {
@@ -28,13 +28,13 @@ describe('actions', () => {
   })
 
   beforeEach(() => {
-    helper = new PlayerControllerHelper();
+    helper = new ControllersHelper();
     send = helper.send;
     expect(send).toBeCalledTimes(0);
   });
 
   it('guard', () => {
-    const {send, send2, send3, send4} = helper.startGame(helper);
+    const [send, send2, send3, send4] = helper.startGame();
     helper.dispatch('cardAction', {card: CardType.Guard, playerIndex: 1, guess: CardType.Countess});
 
     function tableAfter(table: any): any {
@@ -72,7 +72,7 @@ describe('actions', () => {
   }, 1000);
 
   it('priest', () => {
-    const {send, send2, send3, send4} = helper.startGame(helper);
+    const [send, send2, send3, send4] = helper.startGame();
     helper.dispatch('cardAction', {card: CardType.Priest, playerIndex: 1});
 
     function tableAfter(table: any): any {
@@ -105,7 +105,7 @@ describe('actions', () => {
   }, 1000);
 
   it('baron', () => {
-    const {send, send2, send3, send4} = helper.startGame(helper);
+    const [send, send2, send3, send4] = helper.startGame();
     helper.dispatch('cardAction', {card: CardType.Baron, playerIndex: 1});
 
     function tableAfter(table: any): any {
@@ -143,7 +143,7 @@ describe('actions', () => {
   }, 1000);
 
   it('handmaid', () => {
-    const {send, send2, send3, send4} = helper.startGame(helper);
+    const [send, send2, send3, send4] = helper.startGame();
     helper.dispatch('cardAction', {card: CardType.Handmaid});
 
     function tableAfter(table: any): any {
@@ -177,7 +177,7 @@ describe('actions', () => {
   }, 1000);
 
   it('prince', () => {
-    const {send, send2, send3, send4} = helper.startGame(helper);
+    const [send, send2, send3, send4] = helper.startGame();
     helper.dispatch('cardAction', {card: CardType.Prince, playerIndex: 1});
 
     function tableAfter(table: any): any {
@@ -211,7 +211,7 @@ describe('actions', () => {
   }, 1000);
 
   it('king', () => {
-    const {send, send2, send3, send4} = helper.startGame(helper);
+    const [send, send2, send3, send4] = helper.startGame();
     helper.dispatch('cardAction', {card: CardType.King, playerIndex: 1});
 
     function tableAfter(table: any): any {
@@ -247,7 +247,7 @@ describe('actions', () => {
   }, 1000);
 
   it('countess', () => {
-    const {send, send2, send3, send4} = helper.startGame(helper);
+    const [send, send2, send3, send4] = helper.startGame();
     helper.dispatch('cardAction', {card: CardType.Countess});
 
     function tableAfter(table: any): any {
@@ -280,7 +280,7 @@ describe('actions', () => {
   }, 1000);
 
   it('princess', () => {
-    const {send, send2, send3, send4} = helper.startGame(helper);
+    const [send, send2, send3, send4] = helper.startGame();
     helper.dispatch('cardAction', {card: CardType.Princess});
 
     function tableAfter(table: any): any {

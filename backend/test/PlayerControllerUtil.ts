@@ -16,65 +16,61 @@ export const name2 = 'Natasha';
 export const name3 = 'Andrey';
 export const name4 = 'Pierre';
 
-export class PlayerControllerHelper {
+export class ControllersHelper {
   public readonly send: Mock;
-  public readonly controller: PlayerControllerImpl;
   public readonly gamesController: GamesController;
+  private readonly controllers: PlayerControllerImpl[] = [];
+  private sockets: Mock[];
+  private lastIndex = 0;
 
   constructor() {
     this.send = jest.fn();
+    this.sockets = [this.send];
     this.gamesController = new GamesController();
-    this.controller = this.initController(userId, this.send);
+    this.addController(userId, this.send);
   }
 
   createGame(): void {
     this.dispatch('connection/createGame', {gameId, userId});
   }
 
-  dispatch(type: string, payload: any, c: PlayerControllerImpl = this.controller): void {
-    c.onMessage(type, {type, payload});
+  dispatch(type: string, payload: any, controllerIndex: number = 0): void {
+    this.controllers[controllerIndex].onMessage(type, {type, payload});
+    this.lastIndex = controllerIndex;
   }
 
-  initController(userId: string, sender: Mock = this.send): PlayerControllerImpl {
-    const c = new PlayerControllerImpl({send: sender}, this.gamesController);
-    this.dispatch('connection/initSession', userId, c);
+  playCards(card: CardType, iterations: number, startIndex: number = (this.lastIndex + 1) % 4): void {
+    if (iterations === 0) return;
+    this.dispatch('cardAction', {card}, startIndex);
+    this.playCards(card, iterations - 1, (startIndex + 1) % 4);
+  }
+
+  addController(userId: string, send: Mock = this.send): PlayerControllerImpl {
+    const c = new PlayerControllerImpl({send}, this.gamesController);
+    this.controllers.push(c);
+    this.dispatch('connection/initSession', userId, this.controllers.length - 1);
     return c;
   }
 
-  startGame(helper: PlayerControllerHelper, clear: boolean = true): AllControllers {
-    const send2 = jest.fn();
-    const send3 = jest.fn();
-    const send4 = jest.fn();
-    const c2 = helper.initController(user2, send2);
-    const c3 = helper.initController(user3, send3);
-    const c4 = helper.initController(user4, send4);
-    helper.createGame();
-    helper.dispatch('connection/join', {gameId, userId, name});
-    helper.dispatch('connection/join', {gameId, userId: user2, name: name2}, c2);
-    helper.dispatch('connection/join', {gameId, userId: user3, name: name3}, c3);
-    helper.dispatch('connection/join', {gameId, userId: user4, name: name4}, c4);
+  startGame(clear: boolean = true): Mock[] {
+    this.sockets = [this.send, jest.fn(), jest.fn(), jest.fn()];
+    this.addController(user2, this.sockets[1]);
+    this.addController(user3, this.sockets[2]);
+    this.addController(user4, this.sockets[3]);
+    this.createGame();
+    this.dispatch('connection/join', {gameId, userId, name}, 0);
+    this.dispatch('connection/join', {gameId, userId: user2, name: name2}, 1);
+    this.dispatch('connection/join', {gameId, userId: user3, name: name3}, 2);
+    this.dispatch('connection/join', {gameId, userId: user4, name: name4}, 3);
     if (clear) {
-      this.send.mockClear();
-      send2.mockClear();
-      send3.mockClear();
-      send4.mockClear();
+      this.clearSockets();
     }
-    return {
-      send: this.send, send2, send3, send4,
-      c: this.controller, c2, c3, c4
-    };
+    return [...this.sockets];
   }
-}
 
-interface AllControllers {
-  send: Mock;
-  send2: Mock;
-  send3: Mock;
-  send4: Mock;
-  c: PlayerControllerImpl;
-  c2: PlayerControllerImpl;
-  c3: PlayerControllerImpl;
-  c4: PlayerControllerImpl;
+  clearSockets(): void {
+    this.sockets.forEach(s => s.mockClear());
+  }
 }
 
 export function turnMessage(name: string): any {
@@ -108,8 +104,8 @@ export function startTurnMessage(card: CardType): any {
   return {type: 'yourTurn/startTurn', payload: {card}};
 }
 
-export function getMessages(send: Mock, drop: number = 0): Array<any> {
-  const args = _.drop(send.mock.calls.map(call => JSON.parse(call[0])), drop);
+export function getMessages(send: Mock): Array<any> {
+  const args = send.mock.calls.map(call => JSON.parse(call[0]));
   return _.sortBy(args, ['type', 'payload.userId']);
 }
 
