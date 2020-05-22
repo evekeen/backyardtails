@@ -16,7 +16,7 @@ import {
   MO_MORE_SEATS,
   RemoteAction,
 } from '../protocol';
-import {cardNameMapping} from './commonTypes';
+import {cardNameMapping, CardType} from './commonTypes';
 import {nextKilledText, nextSuicideText} from './Texts';
 import {InvalidGameStateError} from '../error/InvalidGameStateError';
 
@@ -152,7 +152,7 @@ export class GamesController {
       const targetPlayer = action.payload.playerIndex !== undefined ? game.state.players[action.payload.playerIndex] : undefined;
       const opponentName = targetPlayer?.name;
       const playerSuffix = opponentName ? ` on ${opponentName}` : '';
-      const guardGuess = action.payload.guess ? ` - guessed ${cardNameMapping[action.payload.guess]}` : ''
+      const guardGuess = action.payload.card === CardType.Guard && action.payload.guess ? ` - guessed ${cardNameMapping[action.payload.guess]}` : ''
       const cardName = cardNameMapping[action.payload.card];
       const name = controller.getInfo().name;
       this.sendToTheGame(game, () => createTextMessage(`${name} played ${cardName}${playerSuffix}${guardGuess}`, 'info'));
