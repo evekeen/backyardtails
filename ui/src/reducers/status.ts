@@ -22,9 +22,8 @@ const statusSlice = createSlice({
   } as StatusState,
   reducers: {
     addMessage(state: StatusState, action: PayloadAction<StatusMessage>) {
-      const log = state.log.concat([action.payload]).reverse();
-      const filtered = _.uniqBy(log, m => m.type);
-      state.log = filtered.reverse();
+      const log = state.log.concat([action.payload]);
+      state.log = filterMessages(log);
     },
     reportRoundVictory(state: StatusState, action: PayloadAction<string>) {
       state.roundWinnerName = action.payload;
@@ -36,6 +35,16 @@ const statusSlice = createSlice({
     });
   }
 });
+
+export function filterMessages(log: StatusMessage[]): StatusMessage[] {
+  const unique = _.uniqBy(log.reverse(), m => m.type);
+  const victoryIndex = unique.findIndex(m => m.type === 'victory');
+  const infoIndex = unique.findIndex(m => m.type === 'info');
+  if (infoIndex !== -1 && infoIndex < victoryIndex) {
+    return unique.slice(0, victoryIndex).reverse();
+  }
+  return unique.reverse();
+}
 
 export const {addMessage} = statusSlice.actions;
 
