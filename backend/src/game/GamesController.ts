@@ -291,7 +291,9 @@ export class GamesController {
   private onRoundEnd(game: LoveLetterGame) {
     const winnerController = this.playerControllers.get(game.state.winnerId!!)!!;
     const winnerName = winnerController.getInfo().name!!;
-    this.sendToTheGame(game, () => createRoundVictoryMessage(winnerName));
+    const cards = game.state.players.filter(p => p.alive).map(p => ({name: p.name, card: p.hand.card}));
+    const endOfRound = {winnerName, cards};
+    this.sendToTheGame(game, () => createRoundVictoryMessage(endOfRound));
     this.sendToTheGame(game, () => createTextMessage(`${winnerName} won the round!`, 'victory'));
   }
 

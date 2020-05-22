@@ -1,9 +1,20 @@
 import {createAction, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {CardType} from '../model/commonTypes';
 import _ = require('lodash');
 
 export interface StatusState {
   log: StatusMessage[];
-  roundWinnerName: string | undefined;
+  endOfRound: EndOfRound;
+}
+
+export interface EndOfRound {
+  winnerName: string;
+  cards: PlayerCard[];
+}
+
+export interface PlayerCard {
+  card: CardType | undefined;
+  name: string;
 }
 
 export interface StatusMessage {
@@ -25,13 +36,13 @@ const statusSlice = createSlice({
       const log = state.log.concat([action.payload]);
       state.log = filterMessages(log);
     },
-    reportRoundVictory(state: StatusState, action: PayloadAction<string>) {
-      state.roundWinnerName = action.payload;
+    reportRoundVictory(state: StatusState, action: PayloadAction<EndOfRound>) {
+      state.endOfRound = action.payload;
     }
   },
   extraReducers: builder => {
     builder.addCase(victoryAcknowledgement, (state: StatusState) => {
-      state.roundWinnerName = undefined;
+      state.endOfRound = undefined;
     });
   }
 });

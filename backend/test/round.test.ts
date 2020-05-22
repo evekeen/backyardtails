@@ -34,9 +34,9 @@ describe('actions', () => {
 
   it('end of round', () => {
     const [send, send2, send3, send4] = helper.startGame();
-    helper.playCards(CardType.Handmaid, 9, 0);
+    helper.playCards({card: CardType.Handmaid}, 9, 0);
     helper.clearSockets();
-    helper.playCards(CardType.Handmaid, 1);
+    helper.playCards({card: CardType.Handmaid}, 1);
 
     function tableOnLastCard(table: any): any {
       const players = table.payload.players.map((p: any) => ({...p, shield: true}));
@@ -46,28 +46,38 @@ describe('actions', () => {
 
     expect(getMessages(send)).toContainEqual(tableOnLastCard(setTableMessage(0)));
     helper.clearSockets();
-    helper.playCards(CardType.Handmaid, 1);
+    helper.playCards({card: CardType.Handmaid}, 1);
+
+    const endOfRound = {
+      cards: [
+        {card: CardType.Guard, name: 'Poruchik'},
+        {card: CardType.Countess, name: 'Natasha'},
+        {card: CardType.King, name: 'Andrey'},
+        {card: CardType.Guard, name: 'Pierre'},
+      ],
+      winnerName: 'Natasha'
+    };
 
     expect(getMessages(send)).toStrictEqual([
       message('info', 'Andrey played Handmaid'),
       message('victory', 'Natasha won the round!'),
-      roundVictoryMessage(name2),
+      roundVictoryMessage(endOfRound),
     ]);
     expect(getMessages(send2)).toStrictEqual([
       message('info', 'Andrey played Handmaid'),
       message('victory', 'Natasha won the round!'),
-      roundVictoryMessage(name2),
+      roundVictoryMessage(endOfRound),
     ]);
     expect(getMessages(send3)).toStrictEqual([
       feedbackMessage({card: CardType.Handmaid, opponentIndex: 2}),
       message('info', 'Andrey played Handmaid'),
       message('victory', 'Natasha won the round!'),
-      roundVictoryMessage(name2),
+      roundVictoryMessage(endOfRound),
     ]);
     expect(getMessages(send4)).toStrictEqual([
       message('info', 'Andrey played Handmaid'),
       message('victory', 'Natasha won the round!'),
-      roundVictoryMessage(name2),
+      roundVictoryMessage(endOfRound),
     ]);
 
     helper.clearSockets();
@@ -104,4 +114,46 @@ describe('actions', () => {
       loadCardMessage(CardType.Guard)
     ]);
   }, 1000);
+
+  it('end of round with death', () => {
+    const [send, send2, send3, send4] = helper.startGame();
+    helper.playCards({card: CardType.Priest, playerIndex: 2}, 10, 0);
+    helper.clearSockets();
+    helper.playCards({card: CardType.Guard, playerIndex: 1, guess: CardType.Countess}, 1);
+
+    const endOfRound = {
+      cards: [
+        {card: CardType.Guard, name: 'Poruchik'},
+        {card: CardType.King, name: 'Andrey'},
+        {card: CardType.Guard, name: 'Pierre'},
+      ],
+      winnerName: 'Andrey'
+    };
+
+    expect(getMessages(send)).toStrictEqual([
+      message('info', 'Andrey played Guard on Natasha - guessed Countess'),
+      message('death', 'Natasha was found stabbed in a bathroom'),
+      message('victory', 'Andrey won the round!'),
+      roundVictoryMessage(endOfRound),
+    ]);
+    expect(getMessages(send2)).toStrictEqual([
+      message('info', 'Andrey played Guard on Natasha - guessed Countess'),
+      message('death', 'Natasha was found stabbed in a bathroom'),
+      message('victory', 'Andrey won the round!'),
+      roundVictoryMessage(endOfRound),
+    ]);
+    expect(getMessages(send3)).toStrictEqual([
+      feedbackMessage({card: CardType.Guard, killed: true, opponentIndex: 1}),
+      message('info', 'Andrey played Guard on Natasha - guessed Countess'),
+      message('death', 'Natasha was found stabbed in a bathroom'),
+      message('victory', 'Andrey won the round!'),
+      roundVictoryMessage(endOfRound),
+    ]);
+    expect(getMessages(send4)).toStrictEqual([
+      message('info', 'Andrey played Guard on Natasha - guessed Countess'),
+      message('death', 'Natasha was found stabbed in a bathroom'),
+      message('victory', 'Andrey won the round!'),
+      roundVictoryMessage(endOfRound),
+    ]);
+  });
 });

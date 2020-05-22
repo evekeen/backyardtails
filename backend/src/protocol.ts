@@ -5,7 +5,7 @@ import * as WebSocket from 'ws';
 import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
 import {GameId, LoveLetterGameState, Player, PlayerId, TradeInfo} from './game/loveletter';
-import {CardType, StatusMessageType} from './game/commonTypes';
+import {CardType, EndOfRound, StatusMessageType} from './game/commonTypes';
 import {InGamePlayerController} from './PlayerController';
 import _ = require('lodash');
 
@@ -260,10 +260,10 @@ export function createTextMessage(text: string, type?: StatusMessageType): Remot
   };
 }
 
-export function createRoundVictoryMessage(winnerName: string): RemoteAction {
+export function createRoundVictoryMessage(endOfRound: EndOfRound): RemoteAction {
   return {
     type: 'status/reportRoundVictory',
-    payload: winnerName,
+    payload: endOfRound,
   };
 }
 

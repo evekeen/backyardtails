@@ -1,6 +1,6 @@
 import {PlayerControllerImpl} from '../src/PlayerController';
 import {GamesController} from '../src/game/GamesController';
-import {CardType} from '../src/game/commonTypes';
+import {CardType, EndOfRound} from '../src/game/commonTypes';
 import _ = require('lodash');
 import Mock = jest.Mock;
 
@@ -39,10 +39,10 @@ export class ControllersHelper {
     this.lastIndex = controllerIndex;
   }
 
-  playCards(card: CardType, iterations: number, startIndex: number = (this.lastIndex + 1) % 4): void {
+  playCards(action: any, iterations: number, startIndex: number = (this.lastIndex + 1) % 4): void {
     if (iterations === 0) return;
-    this.dispatch('cardAction', {card}, startIndex);
-    this.playCards(card, iterations - 1, (startIndex + 1) % 4);
+    this.dispatch('cardAction', action, startIndex);
+    this.playCards(action, iterations - 1, (startIndex + 1) % 4);
   }
 
   addController(userId: string, send: Mock = this.send): PlayerControllerImpl {
@@ -104,8 +104,8 @@ export function startTurnMessage(card: CardType): any {
   return {type: 'yourTurn/startTurn', payload: {card}};
 }
 
-export function roundVictoryMessage(name: string): any {
-  return {type: 'status/reportRoundVictory', payload: name};
+export function roundVictoryMessage(endOfRound: EndOfRound): any {
+  return {type: 'status/reportRoundVictory', payload: endOfRound};
 }
 
 export function getMessages(send: Mock): Array<any> {

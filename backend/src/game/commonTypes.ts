@@ -23,3 +23,13 @@ export const cardNameMapping = {
 };
 
 export type StatusMessageType = 'info' | 'turn' | 'victory' | 'death' | 'error' | undefined;
+
+export interface EndOfRound {
+  winnerName: string;
+  cards: PlayerCard[];
+}
+
+export interface PlayerCard {
+  card: CardType | undefined;
+  name: string;
+}
