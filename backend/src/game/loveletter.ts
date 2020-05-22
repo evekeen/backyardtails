@@ -296,7 +296,7 @@ function getActionResult(action: CardAction, me: Player, target: Player, state: 
       if (killed) {
         state.killPlayer(target.id);
       }
-      return {killed};
+      return {killed: killed ? true : undefined};
     }
     case CardType.Priest:
       return {opponentCard};
