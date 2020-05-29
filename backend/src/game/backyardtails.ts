@@ -59,7 +59,7 @@ export interface Deck {
   init(): void;
 }
 
-class LoveLetterDeck implements Deck {
+class BackyardTailsDeck implements Deck {
   private deck: CardType[] = [];
 
   size(): number {
@@ -91,10 +91,10 @@ function shuffleFisherYates<T>(source: Array<T>): Array<T> {
   return array;
 }
 
-export interface LoveLetterGameAction {
+export interface BackyardTailsGameAction {
   playerId: PlayerId
 
-  apply(gameState: LoveLetterGameState): ActionResult;
+  apply(gameState: BackyardTailsGameState): ActionResult;
 }
 
 
@@ -112,9 +112,9 @@ export interface TradeInfo {
   outgoing: CardType;
 }
 
-export class LoveLetterGameState {
+export class BackyardTailsGameState {
   public players: Player[] = [];
-  public deck: Deck = new LoveLetterDeck();
+  public deck: Deck = new BackyardTailsDeck();
   public discardPile: CardType[] = [];
   public activePlayerIds: PlayerId[] = [];
   public deadPlayerIds: PlayerId[] = [];
@@ -243,15 +243,15 @@ export class LoveLetterGameState {
   }
 }
 
-export class LoveLetterGame {
-  public state = new LoveLetterGameState(this.controllers);
-  private actions: LoveLetterGameAction[] = [];
+export class BackyardTailsGame {
+  public state = new BackyardTailsGameState(this.controllers);
+  private actions: BackyardTailsGameAction[] = [];
   private firstPlayerIdx = -1;
 
   constructor(private controllers: ReadyPlayerController[]) {
   }
 
-  applyAction(action: LoveLetterGameAction): ActionResult {
+  applyAction(action: BackyardTailsGameAction): ActionResult {
     if (action.playerId !== this.state.activeTurnPlayerId) {
       throw new InvalidGameStateError()
     }
@@ -271,7 +271,7 @@ export class LoveLetterGame {
     this.state.start(firstPlayer);
   }
 
-  getActionForCard(action: CardAction): (me: Player, target: Player, s: LoveLetterGameState) => ActionResult {
+  getActionForCard(action: CardAction): (me: Player, target: Player, s: BackyardTailsGameState) => ActionResult {
     return (me, target, state) => this.createResult(getActionResult(action, me, target, state), target);
   }
 
@@ -283,7 +283,7 @@ export class LoveLetterGame {
   }
 }
 
-function getActionResult(action: CardAction, me: Player, target: Player, state: LoveLetterGameState): ActionResult {
+function getActionResult(action: CardAction, me: Player, target: Player, state: BackyardTailsGameState): ActionResult {
   const otherCard = me.hand.card === action.payload.card ? me.hand.pendingCard!! : me.hand.card!!;
   const opponentCard = target.hand.card;
   state.discardPile.push(action.payload.card);

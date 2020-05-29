@@ -1,4 +1,4 @@
-import {ActionResult, GameId, LoveLetterGame, LoveLetterGameAction, LoveLetterGameState, Player, PlayerId} from './loveletter';
+import {ActionResult, BackyardTailsGame, BackyardTailsGameAction, BackyardTailsGameState, GameId, Player, PlayerId} from './backyardtails';
 import {InGamePlayerController, InGamePlayerControllerInfo, PlayerController, ReadyPlayerController,} from '../PlayerController';
 import {
   CardAction,
@@ -25,7 +25,7 @@ const PLAYERS_COUNT = 4; // TODO allow to alter this on game creation
 export class GamesController {
   private playerControllers = new Map<PlayerId, PlayerController>();
   private pendingGames = new Map<GameId, InGamePlayerController[]>();
-  private games = new Map<GameId, LoveLetterGame>();
+  private games = new Map<GameId, BackyardTailsGame>();
 
   onCreateGame(controller: PlayerController, gameId: GameId, userId: PlayerId): void {
     if (this.games.has(gameId) || this.pendingGames.has(gameId)) {
@@ -69,7 +69,7 @@ export class GamesController {
       const newReady = getReady(pending);
       if (newReady.length === PLAYERS_COUNT) {
         this.pendingGames.delete(gameId);
-        const game = new LoveLetterGame(newReady);
+        const game = new BackyardTailsGame(newReady);
         this.games.set(gameId, game);
         console.log(`Created game ${gameId} with players ${newReady.map(c => c.getInfo().userId)}`);
         game.init();
@@ -197,7 +197,7 @@ export class GamesController {
     }
   }
 
-  private getGame(controller: PlayerController): LoveLetterGame | undefined {
+  private getGame(controller: PlayerController): BackyardTailsGame | undefined {
     const {gameId, userId} = controller.getInfo();
     if (!gameId) {
       console.log(`Game was not found to acknowledge a victory`);
@@ -227,7 +227,7 @@ export class GamesController {
     this.sendJoined(controller, pending);
   }
 
-  private tryJoinExistingGame(game: LoveLetterGame, userId: string, controller: ReadyPlayerController) {
+  private tryJoinExistingGame(game: BackyardTailsGame, userId: string, controller: ReadyPlayerController) {
     if (game.hasPlayer(userId)) {
       this.joinActiveGame(game, controller);
     } else {
@@ -237,7 +237,7 @@ export class GamesController {
     }
   }
 
-  private joinActiveGame(game: LoveLetterGame, controller: ReadyPlayerController) {
+  private joinActiveGame(game: BackyardTailsGame, controller: ReadyPlayerController) {
     const {userId} = controller.getInfo();
     console.log(`Joining user ${userId} back`);
     const player = game.state.players.find(p => p.id === userId);
@@ -255,8 +255,8 @@ export class GamesController {
     controllers.forEach(c => controller.dispatch(createJoinedMessage(c)));
   }
 
-  private sendToTheGame(idOrGame: GameId | LoveLetterGame, messageCreator: (player: Player, game: LoveLetterGame) => RemoteAction): void {
-    let game: LoveLetterGame;
+  private sendToTheGame(idOrGame: GameId | BackyardTailsGame, messageCreator: (player: Player, game: BackyardTailsGame) => RemoteAction): void {
+    let game: BackyardTailsGame;
     if (typeof idOrGame === 'string') {
       if (!this.games.get(idOrGame)) {
         return;
@@ -288,7 +288,7 @@ export class GamesController {
     controller.dispatch(message);
   }
 
-  private onRoundEnd(game: LoveLetterGame) {
+  private onRoundEnd(game: BackyardTailsGame) {
     const winnerController = this.playerControllers.get(game.state.winnerId!!)!!;
     const winnerName = winnerController.getInfo().name!!;
     const cards = game.state.players.filter(p => p.alive).map(p => ({name: p.name, card: p.hand.card}));
@@ -297,7 +297,7 @@ export class GamesController {
     this.sendToTheGame(game, () => createTextMessage(`${winnerName} won the round!`, 'victory'));
   }
 
-  private nextRound(game: LoveLetterGame): void {
+  private nextRound(game: BackyardTailsGame): void {
     const winnerController = this.playerControllers.get(game.state.winnerId!!)!!;
     const winnerName = winnerController.getInfo().name!!;
     if (!winnerController.isReady()) {
@@ -310,20 +310,20 @@ export class GamesController {
   }
 }
 
-// Those things \/ Should be in a separate class responsible for the game. Probably LoveLetterGame
+// Those things \/ Should be in a separate class responsible for the game. Probably BackyardTailsGame
 
-function createAction(game: LoveLetterGame, player: PlayerId, action: CardAction): LoveLetterGameAction {
+function createAction(game: BackyardTailsGame, player: PlayerId, action: CardAction): BackyardTailsGameAction {
   const gameAction = game.getActionForCard(action);
   return actionFunc(action, player, gameAction);
 }
 
 function actionFunc(cardAction: CardAction, playerId: PlayerId,
-  action: (me: Player, target: Player, s: LoveLetterGameState) => ActionResult): LoveLetterGameAction {
+  action: (me: Player, target: Player, s: BackyardTailsGameState) => ActionResult): BackyardTailsGameAction {
   const playerIndex = cardAction.payload.playerIndex;
   const playedCard = cardAction.payload.card;
   return {
     playerId: playerId,
-    apply: (s: LoveLetterGameState): ActionResult => {
+    apply: (s: BackyardTailsGameState): ActionResult => {
       const me = s.getPlayer(playerId);
       const hand = me.hand;
       if (playedCard === hand.card) {
@@ -341,11 +341,11 @@ function actionFunc(cardAction: CardAction, playerId: PlayerId,
   };
 }
 
-function createNextTurnLogMessage(game: LoveLetterGame) {
+function createNextTurnLogMessage(game: BackyardTailsGame) {
   return createTextMessage(`It's ${game.state.getActivePlayer().name}'s turn`, 'turn');
 }
 
-function initGameForPlayer(controller: ReadyPlayerController, game: LoveLetterGame) {
+function initGameForPlayer(controller: ReadyPlayerController, game: BackyardTailsGame) {
   const {userId} = controller.getInfo();
   controller.dispatch(createSetTableMessage(userId, game.state));
   controller.dispatch(createLoadCardMessage(game.state.getPlayer(userId)));

@@ -13,7 +13,7 @@ interface WithResetGame {
 
 const GameErrorComponent = (props: GameErrorProps) => {
   useEffect(() => {
-    window.history.pushState(undefined, `Love Letter`, gameUrl());
+    window.history.pushState(undefined, `Backyard Tails`, gameUrl());
     setTimeout(props.resetGame, 1000);
   }, []);
 

@@ -1,6 +1,6 @@
 import {EventEmitter} from 'events';
 import {CreateGameMessage, ForceGame, InitSession, JoinMessage, RemoteAction, VictoryAcknowledgement} from './protocol';
-import {GameId, PlayerId} from './game/loveletter';
+import {GameId, PlayerId} from './game/backyardtails';
 import {GamesController} from './game/GamesController';
 import {pipe} from 'fp-ts/lib/pipeable';
 import {fold} from 'fp-ts/lib/Either';

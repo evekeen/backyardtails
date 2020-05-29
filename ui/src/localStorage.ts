@@ -5,7 +5,7 @@ const storage = prod ? localStorage : sessionStorage;
 
 export function loadState(): SavedState | undefined {
   try {
-    const serializedState = storage.getItem('love-letter');
+    const serializedState = storage.getItem('backyard-tails');
     if (!serializedState) return undefined;
     return JSON.parse(serializedState);
   } catch (err) {
@@ -22,7 +22,7 @@ export const saveState = (state: AppState) => {
       }
     };
     const serializedState = JSON.stringify(toSave);
-    storage.setItem('love-letter', serializedState);
+    storage.setItem('backyard-tails', serializedState);
   } catch (err) {
     console.log(err);
   }

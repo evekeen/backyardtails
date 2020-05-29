@@ -11,5 +11,5 @@ export default (store: Store<any, any>) => (next: any) => (action: any) => {
 }
 
 export function updateUrl(gameId: string | undefined, userId: string) {
-  window.history.pushState(undefined, `Love Letter ${gameId}`, gameUrl(gameId, userId));
+  window.history.pushState(undefined, `Backyard Tails ${gameId}`, gameUrl(gameId, userId));
 }

@@ -1,7 +1,7 @@
 {
-  "name": "loveletter",
+  "name": "backyardtails",
   "version": "1.0.0",
-  "description": "Love letter board game",
+  "description": "Backyard Tails board game",
   "private": true,
   "scripts": {
     "build": "webpack",

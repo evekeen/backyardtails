@@ -102,7 +102,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      title: 'Love Letter',
+      title: 'Backyard Tails',
       hash: true,
       // Load a custom template (lodash by default)
       template: './src/index.html'

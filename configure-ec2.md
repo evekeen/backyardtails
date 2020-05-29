@@ -23,10 +23,10 @@ docker rm -f $(docker ps -a -q)
 
 From the EC2
 ```bash
-docker pull ivkin/love-letter
-docker stop ivkin/love-letter
-docker rm -f ivkin/love-letter
+docker pull ivkin/backyard-tails
+docker stop ivkin/backyard-tails
+docker rm -f ivkin/backyard-tails
 docker run -dit -p 8081:8081 \
  --mount type=volume,dst=/usr/loveletter/ui,volume-driver=local,volume-opt=type=none,volume-opt=o=bind,volume-opt=device=/home/ubuntu/llfront \
- ivkin/love-letter:latest
+ ivkin/backyard-tails:latest
 ```

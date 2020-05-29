@@ -4,7 +4,7 @@ import {Reporter} from 'io-ts/lib/Reporter';
 import * as WebSocket from 'ws';
 import {PathReporter} from 'io-ts/lib/PathReporter';
 import * as Either from 'fp-ts/lib/Either';
-import {GameId, LoveLetterGameState, Player, PlayerId, TradeInfo} from './game/loveletter';
+import {BackyardTailsGameState, GameId, Player, PlayerId, TradeInfo} from './game/backyardtails';
 import {CardType, EndOfRound, StatusMessageType} from './game/commonTypes';
 import {InGamePlayerController} from './PlayerController';
 import _ = require('lodash');
@@ -216,7 +216,7 @@ export function createGamePreexistedMessage(gameId: GameId): GamePreexistedMessa
   };
 }
 
-export function createSetTableMessage(playerId: PlayerId, state: LoveLetterGameState): SetTableMessage {
+export function createSetTableMessage(playerId: PlayerId, state: BackyardTailsGameState): SetTableMessage {
   return {
     type: 'board/setTable',
     payload: {

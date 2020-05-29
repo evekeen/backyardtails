@@ -1,4 +1,4 @@
-# Love Letter
+# Backyard Tails
 It's the board game
 
 ## Frontend
